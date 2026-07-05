@@ -1989,7 +1989,8 @@ body.pa-owner .owner-only.btn-pub{display:flex!important}
 <script src="../js/ai/assistant.js?v=20260705v21"></script>
 <script src="../js/ai/agents/rafaela.js"></script>
 <script src="../js/ai/divulgacao-assistant.js"></script>
-<script src="../js/core/social.js?v=20260705v24"></script>
+<script src="../js/ui/dialog.js?v=20260705v25"></script>
+<script src="../js/core/social.js?v=20260705v25"></script>
 <script>
 /* ════ AUTH GUARD ════ */
 let isOwnerUser = false;
@@ -2234,7 +2235,7 @@ async function updateScannerStatus() {
 }
 
 async function resetSearch() {
-  if (!confirm('Resetar busca? Isso limpa o cache de fontes já verificadas e todas as notícias pendentes da IA.')) return;
+  if (!await PADialog.confirm({ title: 'Resetar busca', message: 'Isso limpa o cache de fontes já verificadas e todas as notícias pendentes da IA.', confirmText: 'Resetar', variant: 'warning' })) return;
   try {
     const res = await PAAPI.resetScanner();
     knownPendingIds.clear();
@@ -2959,7 +2960,7 @@ function saveProfile() {
 }
 
 async function zeroProfilePanel() {
-  if (!confirm('Zerar perfil e estatísticas?\n\nIsso apaga dados salvos localmente (perfil, rascunhos, publicações do navegador, mídia e cache). O painel volta a 0.')) return;
+  if (!await PADialog.confirm({ title: 'Zerar perfil', message: 'Isso apaga dados salvos localmente (perfil, rascunhos, publicações do navegador, mídia e cache). O painel volta a 0.', confirmText: 'Zerar tudo', variant: 'danger' })) return;
   const key = profileKey();
   try {
     const prof = JSON.parse(localStorage.getItem(LS_PROFILE) || '{}');
@@ -3367,7 +3368,7 @@ async function toggleAdActive(id, active) {
 }
 
 async function deleteAdItem(id) {
-  if (!confirm('Excluir esta campanha?')) return;
+  if (!await PADialog.confirm({ title: 'Excluir campanha', message: 'Deseja remover esta campanha publicitária?', confirmText: 'Excluir', variant: 'danger' })) return;
   try {
     await PAAPI.deleteAd(id);
     showToast('Campanha removida.', 'info');
@@ -3458,7 +3459,7 @@ async function toggleRestaurantActive(id, active) {
 }
 
 async function deleteRestaurantItem(id) {
-  if (!confirm('Excluir este estabelecimento?')) return;
+  if (!await PADialog.confirm({ title: 'Excluir estabelecimento', message: 'Deseja remover este restaurante/lanchonete do guia local?', confirmText: 'Excluir', variant: 'danger' })) return;
   try {
     await PAAPI.deleteRestaurant(id);
     showToast('Removido.', 'info');
@@ -3545,7 +3546,7 @@ async function toggleServiceActive(id, active) {
 }
 
 async function deleteServiceItem(id) {
-  if (!confirm('Excluir este serviço?')) return;
+  if (!await PADialog.confirm({ title: 'Excluir serviço', message: 'Deseja remover este serviço do guia local?', confirmText: 'Excluir', variant: 'danger' })) return;
   try {
     await PAAPI.deleteService(id);
     showToast('Removido.', 'info');
@@ -3758,7 +3759,7 @@ async function renderVerifiedRequests() {
 }
 
 async function approveVerifiedReq(id) {
-  if (!confirm('Conceder selo verificado a este usuário por 1 ano?')) return;
+  if (!await PADialog.confirm({ title: 'Aprovar selo', message: 'Conceder selo verificado a este usuário por 1 ano?', confirmText: 'Aprovar', variant: 'success' })) return;
   try {
     await PASocial.approveVerified(id);
     showToast('Selo verificado concedido!', 'success');
@@ -3767,7 +3768,7 @@ async function approveVerifiedReq(id) {
 }
 
 async function rejectVerifiedReq(id) {
-  if (!confirm('Recusar esta solicitação?')) return;
+  if (!await PADialog.confirm({ title: 'Recusar solicitação', message: 'Deseja recusar esta solicitação de selo verificado?', confirmText: 'Recusar', variant: 'warning' })) return;
   try {
     await PASocial.rejectVerified(id);
     showToast('Solicitação recusada.', 'info');

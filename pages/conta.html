@@ -8,10 +8,10 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<link rel="stylesheet" href="../assets/css/pa-auth.css"/>
 <style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{--g:#1d7a1d;--g3:#2ecc2e;--y:#c9a227;--k:#080808;--k3:#1a1a1a}
-body{background:var(--k);color:#f2f2f2;font-family:'Inter',sans-serif;min-height:100dvh;line-height:1.6}
+body{color:#f2f2f2;line-height:1.6}
 a{text-decoration:none;color:inherit}
 .top{background:var(--k3);border-bottom:1px solid rgba(29,122,29,.25);padding:14px 0;position:sticky;top:0;z-index:50}
 .top-inner{max-width:720px;margin:0 auto;padding:0 20px;display:flex;align-items:center;gap:12px}
@@ -47,20 +47,24 @@ a{text-decoration:none;color:inherit}
 </style>
 </head>
 <body>
-<div class="top">
-  <div class="top-inner">
+<div class="pa-auth-bg"></div>
+<div class="pa-auth-bg-img"></div>
+<div class="pa-auth-scan"></div>
+<div class="pa-auth-top" style="position:relative;z-index:50">
+  <div class="pa-auth-top-inner">
     <a href="../index.html"><img src="../assets/images/pains-acontece-logo.png" alt=""/></a>
     <a href="../index.html" class="back"><i class="fas fa-arrow-left"></i> Portal</a>
   </div>
 </div>
-<main class="wrap" id="main">
+<main class="wrap pa-auth-wide" id="main" style="position:relative;z-index:10;padding-top:32px">
   <p style="text-align:center;color:rgba(255,255,255,.4)">Carregando…</p>
 </main>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="../js/core/config.js"></script>
 <script src="../js/core/supabase-client.js"></script>
-<script src="../js/core/social.js?v=20260705v24"></script>
-<script src="../js/ui/social-widget.js?v=20260705v24"></script>
+<script src="../js/ui/dialog.js?v=20260705v25"></script>
+<script src="../js/core/social.js?v=20260705v25"></script>
+<script src="../js/ui/social-widget.js?v=20260705v25"></script>
 <script>
 (async function(){
   const main = document.getElementById('main');
@@ -139,6 +143,7 @@ a{text-decoration:none;color:inherit}
         });
         msg.textContent = 'Perfil salvo com sucesso!';
         msg.classList.add('ok');
+        PADialog.toast('Perfil atualizado!', 'success');
         renderForm();
       } catch (err) {
         msg.textContent = err.message;

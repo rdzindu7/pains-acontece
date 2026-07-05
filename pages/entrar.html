@@ -8,51 +8,50 @@
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;600;700&display=swap" rel="stylesheet"/>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
-<style>
-*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
-body{min-height:100dvh;background:#080808;color:#f2f2f2;font-family:'Inter',sans-serif;display:flex;align-items:center;justify-content:center;padding:24px}
-.card{max-width:420px;width:100%;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:12px;padding:40px 32px;text-align:center}
-.logo img{height:56px;margin-bottom:24px}
-h1{font-family:'Bebas Neue',sans-serif;letter-spacing:2px;font-size:1.6rem;color:#c9a227;margin-bottom:8px}
-p{color:rgba(255,255,255,.5);font-size:.85rem;line-height:1.6;margin-bottom:28px}
-.btn-google{display:flex;align-items:center;justify-content:center;gap:12px;width:100%;padding:14px 20px;border-radius:8px;border:none;background:#fff;color:#333;font-weight:700;font-size:.9rem;cursor:pointer;transition:transform .2s,box-shadow .2s}
-.btn-google:hover{transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.4)}
-.btn-google:disabled{opacity:.6;cursor:wait}
-.features{text-align:left;margin:28px 0;padding:16px;background:rgba(29,122,29,.08);border-radius:8px;border:1px solid rgba(29,122,29,.2)}
-.features li{font-size:.78rem;color:rgba(255,255,255,.65);margin-bottom:8px;list-style:none;display:flex;gap:8px;align-items:flex-start}
-.features li i{color:#2ecc2e;margin-top:2px}
-.links{margin-top:20px;font-size:.75rem}
-.links a{color:#2ecc2e;margin:0 8px}
-.err{color:#e74c3c;font-size:.78rem;margin-top:12px}
-.back{display:inline-flex;align-items:center;gap:6px;margin-top:24px;color:rgba(255,255,255,.4);font-size:.78rem;text-decoration:none}
-.back:hover{color:#2ecc2e}
-</style>
+<link rel="stylesheet" href="../assets/css/pa-auth.css"/>
 </head>
 <body>
-<div class="card">
-  <a href="../index.html" class="logo"><img src="../assets/images/pains-acontece-logo.png" alt="Pains Acontece"/></a>
-  <h1>Entrar no Portal</h1>
-  <p>Use sua conta Google para curtir, comentar, reagir às notícias e personalizar seu perfil.</p>
-  <button type="button" class="btn-google" id="btnGoogle">
-    <i class="fab fa-google"></i> Continuar com Google
-  </button>
-  <p class="err" id="errMsg"></p>
-  <ul class="features">
-    <li><i class="fas fa-check"></i> Edite seu perfil como quiser</li>
-    <li><i class="fas fa-check"></i> Comente e reaja às publicações</li>
-    <li><i class="fas fa-check"></i> Solicite o selo verificado</li>
-  </ul>
-  <div class="links">
-    <a href="verificado.html">Selo Verificado</a>
-    <a href="login.html">Área Admin</a>
+<div class="pa-auth-bg"></div>
+<div class="pa-auth-bg-img"></div>
+<div class="pa-auth-scan"></div>
+<div class="pa-auth-particles" id="particles"></div>
+<div class="pa-auth-page">
+  <div class="pa-auth-card">
+    <a href="../index.html" class="pa-auth-logo"><img src="../assets/images/pains-acontece-logo.png" alt="Pains Acontece"/></a>
+    <h1 class="pa-auth-title">Entrar no Portal</h1>
+    <p class="pa-auth-sub">Use sua conta Google para curtir, comentar, reagir às notícias e personalizar seu perfil.</p>
+    <button type="button" class="pa-google-btn" id="btnGoogle">
+      <span class="pa-google-g" aria-hidden="true"></span> Continuar com Google
+    </button>
+    <p class="pa-auth-err" id="errMsg"></p>
+    <ul class="pa-auth-features">
+      <li><i class="fas fa-check"></i> Edite seu perfil como quiser</li>
+      <li><i class="fas fa-check"></i> Comente e reaja às publicações</li>
+      <li><i class="fas fa-check"></i> Solicite o selo verificado</li>
+    </ul>
+    <div class="pa-auth-links">
+      <a href="verificado.html">Selo Verificado</a>
+      <a href="login.html">Área Admin</a>
+    </div>
+    <a href="../index.html" class="pa-auth-back"><i class="fas fa-arrow-left"></i> Voltar ao portal</a>
   </div>
-  <a href="../index.html" class="back"><i class="fas fa-arrow-left"></i> Voltar ao portal</a>
 </div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="../js/core/config.js"></script>
 <script src="../js/core/supabase-client.js"></script>
-<script src="../js/core/social.js?v=20260705v24"></script>
+<script src="../js/ui/dialog.js?v=20260705v25"></script>
+<script src="../js/core/social.js?v=20260705v25"></script>
 <script>
+(function(){
+  const p = document.getElementById('particles');
+  for (let i = 0; i < 18; i++) {
+    const el = document.createElement('div');
+    el.className = 'pa-auth-particle';
+    const s = 2 + Math.random() * 4;
+    el.style.cssText = `width:${s}px;height:${s}px;left:${Math.random()*100}%;animation-duration:${8+Math.random()*14}s;animation-delay:${Math.random()*8}s`;
+    p.appendChild(el);
+  }
+})();
 (async function(){
   const params = new URLSearchParams(location.search);
   const redirect = params.get('redirect') || '../index.html';
@@ -67,12 +66,14 @@ p{color:rgba(255,255,255,.5);font-size:.85rem;line-height:1.6;margin-bottom:28px
 
   btn.addEventListener('click', async () => {
     btn.disabled = true;
+    errEl.classList.remove('show');
     errEl.textContent = '';
     try {
       const res = await PASocial.signInWithGoogle();
       if (res.demo) location.href = redirect;
     } catch (e) {
       errEl.textContent = e.message || 'Não foi possível entrar. Tente novamente.';
+      errEl.classList.add('show');
       btn.disabled = false;
     }
   });
