@@ -58,7 +58,9 @@ const PAAPI = (function () {
       verified: row.verified,
       confidence: row.confidence,
       deepVerified: row.deep_verified ?? row.deepVerified,
-      source_url: row.source_url
+      source_url: row.source_url,
+      quickLead: row.quick_lead ?? row.quickLead,
+      pubISO: row.pub_iso ?? row.pubISO
     };
   }
 
@@ -78,6 +80,8 @@ const PAAPI = (function () {
     if (data.confidence !== undefined) row.confidence = data.confidence;
     if (data.deepVerified !== undefined) row.deep_verified = data.deepVerified;
     if (data.source_url !== undefined) row.source_url = data.source_url;
+    if (data.quickLead !== undefined) row.quick_lead = data.quickLead;
+    if (data.pubISO !== undefined) row.pub_iso = data.pubISO;
     return row;
   }
 

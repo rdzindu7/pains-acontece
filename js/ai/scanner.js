@@ -70,8 +70,24 @@ const PAScanner = (function () {
     return Math.min(98, score);
   }
 
+  const TZ = 'America/Sao_Paulo';
+
+  function brNow() {
+    return new Date(new Date().toLocaleString('en-US', { timeZone: TZ }));
+  }
+
+  function startOfTodayBR() {
+    const d = brNow();
+    return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  }
+
+  function isFreshNews(pubDate) {
+    if (!pubDate || isNaN(pubDate.getTime())) return false;
+    return pubDate >= startOfTodayBR();
+  }
+
   function formatDate(d) {
-    const diff = Date.now() - d;
+    const diff = Date.now() - d.getTime();
     const mins = Math.floor(diff / 60000);
     if (mins < 60) return `Há ${mins || 1} min`;
     const hrs = Math.floor(mins / 60);
@@ -79,9 +95,13 @@ const PAScanner = (function () {
     return `Há ${Math.floor(hrs / 24)} dia(s)`;
   }
 
+  function formatDateBR(d) {
+    return d.toLocaleDateString('pt-BR', { timeZone: TZ });
+  }
+
   const imageCache = new Map();
   let ogFetchCount = 0;
-  const OG_FETCH_MAX = 20;
+  const OG_FETCH_MAX = 35;
 
   function pickImage(cat) {
     const imgs = {
@@ -268,7 +288,7 @@ const PAScanner = (function () {
   }
 
   function extractPageMeta(html) {
-    if (!html) return { title: '', excerpt: '', valid: false };
+    if (!html) return { title: '', excerpt: '', paragraphs: [], images: [] };
     const getMeta = (prop) => {
       const m = html.match(new RegExp(`property=["']${prop}["'][^>]*content=["']([^"']+)["']`, 'i'))
         || html.match(new RegExp(`content=["']([^"']+)["'][^>]*property=["']${prop}["']`, 'i'));
@@ -276,18 +296,47 @@ const PAScanner = (function () {
     };
     const title = getMeta('og:title') || getMeta('twitter:title');
     let excerpt = getMeta('og:description') || getMeta('description');
-    if (!excerpt) {
-      const p = html.match(/<p[^>]*>([^<]{60,500})<\/p>/i);
-      if (p) excerpt = stripHtml(p[1]);
+    const paragraphs = [];
+    const paraRe = /<p[^>]*>([\s\S]*?)<\/p>/gi;
+    let pm;
+    while ((pm = paraRe.exec(html)) !== null) {
+      const t = stripHtml(pm[1]);
+      if (t.length > 50 && !/cookie|newsletter|assin|publicidade|anúncio|banner/i.test(t)) {
+        paragraphs.push(t);
+      }
     }
-    return { title, excerpt };
+    if (!excerpt && paragraphs.length) excerpt = paragraphs[0];
+    const images = [];
+    const imgRe = /<img[^>]+src=["']([^"']+)["']/gi;
+    let im;
+    while ((im = imgRe.exec(html)) !== null) {
+      const u = normalizeImageUrl(im[1]);
+      if (u && !images.includes(u)) images.push(u);
+    }
+    return { title, excerpt, paragraphs: paragraphs.slice(0, 10), images: images.slice(0, 5) };
   }
 
-  function buildDeepContent(item, excerpt, sources, confidence, audit) {
+  function makeQuickLead(title, excerpt, paragraphs) {
+    const base = excerpt || paragraphs.slice(0, 2).join(' ') || title;
+    const text = base.replace(/\s+/g, ' ').trim();
+    if (text.length <= 320) return text;
+    const cut = text.slice(0, 317);
+    const last = cut.lastIndexOf(' ');
+    return (last > 200 ? cut.slice(0, last) : cut) + '…';
+  }
+
+  function buildDeepContent(item, meta, sources, confidence, audit, mainImg) {
     const articleUrl = extractArticleUrl(item.summary, item.link);
-    const body = excerpt || stripHtml(item.summary) || item.title;
-    let html = `<p>${body.length > 500 ? body.slice(0, 497) + '…' : body}</p>`;
-    html += `<p><strong>${item.title}</strong> — matéria verificada pela IA editorial do Pains Acontece após busca minuciosa em múltiplas fontes.</p>`;
+    const paras = meta.paragraphs?.length ? meta.paragraphs : [meta.excerpt || stripHtml(item.summary) || item.title];
+    let html = paras.map(p => `<p>${p}</p>`).join('');
+    if (meta.images?.length > 1) {
+      html += '<div class="article-gallery" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin:24px 0">';
+      meta.images.filter(u => u !== mainImg).slice(0, 3).forEach(u => {
+        html += `<figure style="margin:0;border-radius:4px;overflow:hidden;border:1px solid rgba(255,255,255,.08)"><img src="${u}" alt="" loading="lazy" style="width:100%;aspect-ratio:16/10;object-fit:cover"/></figure>`;
+      });
+      html += '</div>';
+    }
+    html += `<p><strong>${item.title}</strong> — matéria verificada pela IA editorial do Pains Acontece após busca minuciosa em múltiplas fontes públicas.</p>`;
     if (sources.length) {
       html += `<p><strong>Fontes consultadas (${sources.length}):</strong></p><ul>`;
       sources.slice(0, 6).forEach(s => {
@@ -317,19 +366,18 @@ const PAScanner = (function () {
       .slice(0, 8);
 
     let pageValidated = false;
-    let excerpt = '';
+    let pageMeta = { excerpt: '', paragraphs: [], images: [] };
     if (articleUrl && !/news\.google\.com\/rss/i.test(articleUrl) && ogFetchCount < OG_FETCH_MAX) {
       ogFetchCount++;
       const html = await fetchHtml(articleUrl);
       if (html) {
-        const meta = extractPageMeta(html);
-        excerpt = meta.excerpt;
-        const blob = norm(meta.title + ' ' + meta.excerpt + ' ' + html.slice(0, 8000));
+        pageMeta = extractPageMeta(html);
+        const blob = norm(pageMeta.title + ' ' + pageMeta.excerpt + ' ' + pageMeta.paragraphs.join(' ') + html.slice(0, 6000));
         const titleChunk = norm(item.title).slice(0, 50);
         pageValidated = matchScore(blob, keys) >= 0.22
           || (titleChunk.length > 10 && blob.includes(titleChunk))
           || keys.filter(k => blob.includes(k)).length >= Math.min(3, keys.length);
-        const pageImg = extractImagesFromHtml(html);
+        const pageImg = pageMeta.images[0] || extractImagesFromHtml(html);
         if (pageImg) item.image = pageImg;
       }
     }
@@ -361,16 +409,18 @@ const PAScanner = (function () {
     };
 
     const img = await resolveItemImage(item, cat);
-    const lead = excerpt
-      ? (excerpt.length > 220 ? excerpt.slice(0, 217) + '…' : excerpt)
+    const lead = pageMeta.excerpt
+      ? (pageMeta.excerpt.length > 280 ? pageMeta.excerpt.slice(0, 277) + '…' : pageMeta.excerpt)
       : makeLead(item.title, item.summary);
+    const quickLead = makeQuickLead(item.title, pageMeta.excerpt, pageMeta.paragraphs);
 
     return {
       approved,
       verified: approved && confidence >= 65,
       confidence,
       lead,
-      content: buildDeepContent(item, excerpt, sources, confidence, audit),
+      quickLead,
+      content: buildDeepContent(item, pageMeta, sources, confidence, audit, img),
       img,
       sources,
       source_url: articleUrl || item.link,
@@ -455,6 +505,7 @@ const PAScanner = (function () {
     const batch = [];
     for (const item of sorted) {
       if (seen.has(item.link)) continue;
+      if (!isFreshNews(item.pubDate)) continue;
       const cat = detectCategory(item.title, item.summary, item.region, item.world);
       batch.push({ item, cat });
       seen.add(item.link);
@@ -474,9 +525,11 @@ const PAScanner = (function () {
       items.push({
         title: item.title,
         lead: deep.lead,
+        quickLead: deep.quickLead,
         content: deep.content,
         cat, img: deep.img, author: 'IA Pains Acontece',
-        date: item.pubDate.toLocaleDateString('pt-BR'),
+        date: formatDateBR(item.pubDate),
+        pubISO: item.pubDate.toISOString(),
         timeAgo: formatDate(item.pubDate),
         source: item.source, source_url: deep.source_url, region: item.region,
         verified: deep.verified, confidence: deep.confidence,
@@ -637,6 +690,7 @@ const PAScanner = (function () {
   return {
     scanNews, scanNewsFull, verifyText, deepVerifyPublication, getFeedItems, searchHeadlines, searchPublished,
     detectCategory, pickImage, resolveItemImage, formatDate, keywords, RSS_FEEDS,
+    isFreshNews, startOfTodayBR, makeQuickLead,
     getDeepProgress: () => deepVerifyProgress,
     invalidateCache: () => { feedCache = null; feedCacheAt = 0; imageCache.clear(); ogFetchCount = 0; deepVerifyProgress = null; }
   };

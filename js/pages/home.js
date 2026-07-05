@@ -48,11 +48,33 @@
     }
   }
 
+  function isTodayArticle(a) {
+    if (typeof PAScanner !== 'undefined' && PAScanner.isFreshNews) {
+      if (a.pubISO) return PAScanner.isFreshNews(new Date(a.pubISO));
+      if (a.date) {
+        const p = a.date.split('/');
+        if (p.length === 3) return PAScanner.isFreshNews(new Date(+p[2], +p[1] - 1, +p[0]));
+      }
+      return (a.timeAgo || '').includes('min') || (a.timeAgo || '').includes('hora');
+    }
+    return true;
+  }
+
+  function filterToday(arts) {
+    const today = arts.filter(isTodayArticle);
+    return today.length ? today : arts;
+  }
+
+  function quickBtn(id) {
+    return `<span class="quick-btn" onclick="event.preventDefault();event.stopPropagation();location.href='pages/noticia.html?id=${id}&mode=quick'"><i class="fas fa-bolt"></i> Rápida</span>`;
+  }
+
   function card(a, size) {
     const href = 'pages/noticia.html?id=' + a.id;
     if (size === 'xl') {
       return `<a href="${href}" class="ncard-xl reveal">
         <img src="${esc(a.img)}" alt="" loading="lazy"/>
+        ${quickBtn(a.id)}
         <div class="xl-grad"></div>
         <div class="xl-body">
           <div class="xl-cat">${esc(a.cat)}${a.verified ? ' <i class="fas fa-check-circle" style="font-size:.55rem;color:#2ecc2e" title="Verificado"></i>' : ''}</div>
@@ -62,7 +84,7 @@
       </a>`;
     }
     return `<a href="${href}" class="ncard reveal">
-      <div class="thumb"><img src="${esc(a.img)}" alt="" loading="lazy"/><div class="thumb-overlay"></div><span class="cat-pill">${esc(a.cat)}</span></div>
+      <div class="thumb"><img src="${esc(a.img)}" alt="" loading="lazy"/><div class="thumb-overlay"></div>${quickBtn(a.id)}<span class="cat-pill">${esc(a.cat)}</span></div>
       <div class="card-body">
         <h3 class="card-title">${esc(a.title)}</h3>
         <div class="card-foot"><span><i class="fas fa-clock"></i> ${esc(a.timeAgo || a.date)}</span><span class="views"><i class="fas fa-eye"></i> ${Number(a.views||0).toLocaleString('pt-BR')}</span></div>
@@ -372,6 +394,8 @@
     } else {
       allPub = raw.filter(a => a.verified !== false && (a.confidence || 0) >= 55);
     }
+
+    allPub = filterToday(allPub);
 
     renderHome();
     setupNav();

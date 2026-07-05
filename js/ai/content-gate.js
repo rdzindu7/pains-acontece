@@ -39,13 +39,15 @@ const PAContentGate = (function () {
       ...art,
       approved: true,
       lead: deep.lead || art.lead,
+      quickLead: deep.quickLead || art.quickLead,
       content: deep.content || art.content,
       img: deep.img || art.img,
       verified: deep.verified,
       confidence: deep.confidence,
       deepVerified: true,
       audit: deep.audit,
-      source_url: deep.source_url || art.source_url
+      source_url: deep.source_url || art.source_url,
+      pubISO: art.pubISO || new Date().toISOString()
     };
   }
 

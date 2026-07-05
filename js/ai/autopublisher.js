@@ -44,6 +44,8 @@ const PAAutoPublisher = (function () {
         await PAAPI.addArticle({
           title: item.title,
           lead: item.lead,
+          quickLead: item.quickLead,
+          pubISO: item.pubISO,
           content: item.content,
           cat: item.cat,
           status: 'pub',

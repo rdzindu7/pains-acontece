@@ -562,6 +562,51 @@ body.cat-filter-mode .category-view { display: block; }
 .pa-loading-status.active { opacity: 1; }
 @keyframes loadingBar { from { background-position: 200% 0; } to { background-position: -200% 0; } }
 
+/* ── SCROLL NAV (barra vertical estilo imagem) ── */
+.pa-scroll-nav {
+  position: fixed; right: calc(16px + env(safe-area-inset-right)); top: 50%;
+  transform: translateY(-50%); z-index: 7500;
+  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  opacity: 0; pointer-events: none; transition: opacity .4s var(--ease);
+}
+.pa-scroll-nav.visible { opacity: 1; pointer-events: all; }
+.pa-scroll-btn {
+  width: 28px; height: 24px; border: none; cursor: pointer;
+  background: linear-gradient(180deg, #2a2a2a, #111);
+  color: rgba(255,255,255,.7); font-size: .55rem;
+  border-radius: 3px; box-shadow: 0 2px 8px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.12);
+  transition: color .2s, transform .2s, box-shadow .2s;
+  display: flex; align-items: center; justify-content: center;
+}
+.pa-scroll-btn:hover { color: var(--y); transform: scale(1.08); box-shadow: 0 4px 16px rgba(29,122,29,.35); }
+.pa-scroll-track {
+  width: 10px; height: clamp(120px, 28vh, 220px);
+  background: linear-gradient(180deg, #1a1a1a, #0a0a0a);
+  border-radius: 5px; position: relative;
+  border: 1px solid rgba(255,255,255,.1);
+  box-shadow: inset 0 0 8px rgba(0,0,0,.6), 0 0 12px rgba(0,0,0,.4);
+}
+.pa-scroll-thumb {
+  position: absolute; left: 1px; right: 1px; top: 0;
+  min-height: 36px; border-radius: 4px;
+  background: linear-gradient(90deg, #a8a8a8, #e8e8e8 40%, #c0c0c0 60%, #909090);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.9), inset 0 -1px 0 rgba(0,0,0,.2), 0 2px 6px rgba(0,0,0,.4);
+  transition: transform .12s var(--ease), height .2s;
+}
+
+/* ── NOTÍCIA RÁPIDA nos cards ── */
+.ncard .quick-btn, .ncard-xl .quick-btn {
+  position: absolute; z-index: 5; bottom: 12px; right: 12px;
+  padding: 5px 10px; border-radius: 20px; font-size: .58rem; font-weight: 800;
+  letter-spacing: .8px; text-transform: uppercase;
+  background: rgba(8,8,8,.85); border: 1px solid rgba(201,162,39,.5);
+  color: var(--y); opacity: 0; transform: translateY(6px);
+  transition: opacity .3s, transform .3s var(--ease);
+  pointer-events: auto;
+}
+.ncard:hover .quick-btn, .ncard-xl:hover .quick-btn { opacity: 1; transform: none; }
+.ncard .thumb, .ncard-xl { position: relative; }
+
 /* ═══════════════════════════════════════════
    BREAKING STRIP
 ═══════════════════════════════════════════ */
@@ -1564,6 +1609,8 @@ document.querySelectorAll('.ncard, .ncard-xl, .srv-card').forEach(card => {
 <script src="js/ai/content-gate.js"></script>
 <script src="js/ai/autopublisher.js"></script>
 <script src="js/pages/weather.js"></script>
+<script src="js/ai/bom-dia.js"></script>
+<script src="js/ui/scroll-nav.js"></script>
 <script src="js/ai/public-assistant.js"></script>
 <script src="js/pages/home.js"></script>
 </body>

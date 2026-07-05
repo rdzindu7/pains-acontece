@@ -178,7 +178,7 @@ const PAPublicIA = (function () {
       if (e.key === 'Enter') { e.preventDefault(); send(); }
     });
 
-    addMsg('bot', 'Sou a <strong>IA editorial</strong> do Pains Acontece. Monitoro Pains MG, a região, Brasil e o mundo em tempo real.<br><br>• <strong>Buscar Agora</strong> — varredura ilimitada e publicação automática de fatos verificados<br>• Pergunte sobre notícias recentes da cidade');
+    addMsg('bot', 'Sou a <strong>IA editorial</strong> do Pains Acontece. Publico apenas notícias de <strong>hoje</strong>, com verificação minuciosa e imagens reais.<br><br>• <strong>Buscar Agora</strong> — busca detalhada + publicação<br>• <strong>Notícia Rápida</strong> — resumo explicativo em cada matéria<br>• <strong>Bom dia</strong> às 6h com destaques');
   }
 
   function init() {
