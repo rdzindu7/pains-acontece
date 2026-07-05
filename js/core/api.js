@@ -1,4 +1,6 @@
 const PAAPI = (function () {
+  const SCAN_INTERVAL_MINUTES = 5;
+
   const ADMIN_USERS = [
     { email: 'admin@painsacontece.com.br', pass: 'Pains@2026', role: 'owner', name: 'Proprietário' },
     { email: 'redacao@painsacontece.com.br', pass: 'Pains@Red2026', role: 'editor', name: 'Redação' },
@@ -41,10 +43,20 @@ const PAAPI = (function () {
     localStorage.setItem(LS_ADMIN, JSON.stringify(state));
   }
 
+  function normalizeScanner(scanner) {
+    const s = scanner && typeof scanner === 'object' ? { ...scanner } : {};
+    s.interval_minutes = SCAN_INTERVAL_MINUTES;
+    if (!Array.isArray(s.seen_urls)) s.seen_urls = [];
+    if (!s.last_scan) s.last_scan = null;
+    return s;
+  }
+
   function getState() {
     const s = loadAdminState();
     if (!s.pending) s.pending = [];
-    if (!s.scanner) s.scanner = { last_scan: null, interval_minutes: 5, seen_urls: [] };
+    const prevInterval = s.scanner?.interval_minutes;
+    s.scanner = normalizeScanner(s.scanner);
+    if (prevInterval !== SCAN_INTERVAL_MINUTES) saveAdminState(s);
     return s;
   }
 
@@ -299,7 +311,7 @@ const PAAPI = (function () {
 
     scannerStatus() {
       const s = getState().scanner;
-      return Promise.resolve({ pending: getState().pending.length, interval_minutes: s.interval_minutes, last_scan: s.last_scan });
+      return Promise.resolve({ pending: getState().pending.length, interval_minutes: SCAN_INTERVAL_MINUTES, last_scan: s.last_scan });
     },
 
     async runScanner() {
@@ -320,6 +332,7 @@ const PAAPI = (function () {
       }
       state.scanner.seen_urls = seenUrls.slice(-500);
       state.scanner.last_scan = new Date().toISOString();
+      state.scanner.interval_minutes = SCAN_INTERVAL_MINUTES;
       saveAdminState(state);
       return { found, total_pending: state.pending.length };
     },
@@ -347,7 +360,7 @@ const PAAPI = (function () {
 
     resetScanner() {
       const state = getState();
-      state.scanner = { last_scan: null, interval_minutes: 5, seen_urls: [] };
+      state.scanner = normalizeScanner({ last_scan: null, seen_urls: [] });
       state.pending = [];
       saveAdminState(state);
       return Promise.resolve({ ok: true, message: 'Busca resetada. Todas as fontes serão verificadas novamente.' });
@@ -527,8 +540,11 @@ const PAAPI = (function () {
         sb().from('pending_articles').select('*', { count: 'exact', head: true }),
         sb().from('scanner_state').select('*').eq('id', 1).maybeSingle()
       ]);
-      const s = scannerRes.data || { interval_minutes: 5, last_scan: null };
-      return { pending: count || 0, interval_minutes: s.interval_minutes, last_scan: s.last_scan };
+      const s = scannerRes.data || { last_scan: null };
+      if (s.interval_minutes !== SCAN_INTERVAL_MINUTES) {
+        await sb().from('scanner_state').upsert({ id: 1, interval_minutes: SCAN_INTERVAL_MINUTES, seen_urls: s.seen_urls || [], last_scan: s.last_scan });
+      }
+      return { pending: count || 0, interval_minutes: SCAN_INTERVAL_MINUTES, last_scan: s.last_scan };
     },
 
     async runScanner() {
@@ -565,7 +581,7 @@ const PAAPI = (function () {
         id: 1,
         seen_urls: newSeen.slice(-500),
         last_scan: new Date().toISOString(),
-        interval_minutes: scannerRow?.interval_minutes || 5
+        interval_minutes: SCAN_INTERVAL_MINUTES
       });
 
       const { count } = await sb().from('pending_articles').select('*', { count: 'exact', head: true });

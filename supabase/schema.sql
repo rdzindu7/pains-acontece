@@ -43,7 +43,7 @@ CREATE TABLE IF NOT EXISTS pending_articles (
 CREATE TABLE IF NOT EXISTS scanner_state (
   id                INTEGER PRIMARY KEY DEFAULT 1 CHECK (id = 1),
   last_scan         TIMESTAMPTZ,
-  interval_minutes  INTEGER DEFAULT 20,
+  interval_minutes  INTEGER DEFAULT 5,
   seen_urls         JSONB DEFAULT '[]'::jsonb
 );
 
@@ -172,5 +172,5 @@ GRANT EXECUTE ON FUNCTION increment_article_views(BIGINT) TO anon, authenticated
 -- ═══════════════════════════════════════════════════════════════
 
 INSERT INTO scanner_state (id, interval_minutes, seen_urls)
-VALUES (1, 20, '[]'::jsonb)
+VALUES (1, 5, '[]'::jsonb)
 ON CONFLICT (id) DO NOTHING;
