@@ -70,11 +70,11 @@ img{display:block;max-width:100%}
 .not-found h1{font-family:var(--ff-display);font-size:2rem;margin-bottom:12px}
 .not-found a{color:var(--g3);margin-top:20px;display:inline-block}
 footer{text-align:center;padding:28px clamp(12px,3vw,28px);font-size:.72rem;color:#444;border-top:1px solid rgba(255,255,255,.04)}
-.pa-scroll-nav{position:fixed;right:calc(16px + env(safe-area-inset-right));top:50%;transform:translateY(-50%);z-index:7500;display:flex;flex-direction:column;align-items:center;gap:6px;opacity:0;pointer-events:none;transition:opacity .4s}
+.pa-scroll-nav{position:fixed;right:calc(12px + env(safe-area-inset-right));top:50%;transform:translateY(-50%);z-index:7500;display:flex;flex-direction:column;align-items:center;gap:4px;padding:4px 3px;background:linear-gradient(180deg,#1e1e1e,#0a0a0a);border:1px solid rgba(255,255,255,.12);border-radius:6px;box-shadow:0 4px 24px rgba(0,0,0,.65);opacity:0;pointer-events:none;transition:opacity .4s}
 .pa-scroll-nav.visible{opacity:1;pointer-events:all}
-.pa-scroll-btn{width:28px;height:24px;border:none;cursor:pointer;background:linear-gradient(180deg,#2a2a2a,#111);color:rgba(255,255,255,.7);font-size:.55rem;border-radius:3px;box-shadow:0 2px 8px rgba(0,0,0,.5),inset 0 1px 0 rgba(255,255,255,.12);display:flex;align-items:center;justify-content:center}
-.pa-scroll-track{width:10px;height:clamp(120px,28vh,220px);background:linear-gradient(180deg,#1a1a1a,#0a0a0a);border-radius:5px;position:relative;border:1px solid rgba(255,255,255,.1);box-shadow:inset 0 0 8px rgba(0,0,0,.6)}
-.pa-scroll-thumb{position:absolute;left:1px;right:1px;top:0;min-height:36px;border-radius:4px;background:linear-gradient(90deg,#a8a8a8,#e8e8e8 40%,#c0c0c0);box-shadow:inset 0 1px 0 rgba(255,255,255,.9),0 2px 6px rgba(0,0,0,.4);transition:transform .12s}
+.pa-scroll-btn{width:26px;height:22px;border:none;cursor:pointer;background:linear-gradient(180deg,#333,#1a1a1a);color:rgba(255,255,255,.75);font-size:.5rem;border-radius:3px;display:flex;align-items:center;justify-content:center}
+.pa-scroll-track{width:8px;height:clamp(100px,24vh,180px);background:#111;border-radius:4px;position:relative;border:1px solid rgba(255,255,255,.08);overflow:hidden}
+.pa-scroll-thumb{position:absolute;left:0;right:0;top:0;min-height:32px;border-radius:3px;background:linear-gradient(90deg,#8a8a8a,#d4d4d4 45%,#a0a0a0);box-shadow:inset 0 1px 0 rgba(255,255,255,.85),0 1px 4px rgba(0,0,0,.5);transition:transform .12s}
 @media(max-width:768px){.pa-scroll-nav{display:none}}
 @media(max-width:600px){.article{padding:32px 0 60px}.meta{gap:12px}.rel-grid{grid-template-columns:1fr}}
 </style>

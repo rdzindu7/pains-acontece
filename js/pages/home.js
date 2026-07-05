@@ -1,7 +1,7 @@
 (function () {
   const NAV_MAP = {
     home:        { type: 'all' },
-    ultimas:     { type: 'news', title: 'Últimas Notícias', cats: null },
+    ultimas:     { type: 'scroll', target: '#ultimas' },
     pains:       { type: 'news', title: 'Pains', cats: ['Pains'] },
     regiao:      { type: 'news', title: 'Região', cats: ['Região'] },
     brasil:      { type: 'news', title: 'Brasil / Mundo', cats: ['Brasil / Mundo'] },
@@ -339,7 +339,7 @@
   }
 
   function setupNav() {
-    document.querySelectorAll('.nav-item a[data-nav]').forEach(link => {
+    document.querySelectorAll('a[data-nav]').forEach(link => {
       link.addEventListener('click', e => {
         e.preventDefault();
         const navKey = link.dataset.nav;
@@ -365,39 +365,41 @@
     else applyNav(currentNav);
   };
 
-  async function init() {
-    setLoading(true);
+  window.applyNav = applyNav;
+
+  function applyArticles(raw, gated) {
+    allPub = filterToday(gated?.length ? gated : raw.filter(a => a.verified !== false && (a.confidence || 0) >= 55));
+    if (currentNav === 'home') renderHome();
+    else applyNav(currentNav);
+  }
+
+  async function runBackgroundSearch() {
+    setLoading(true, 'IA buscando novas notícias…');
     try {
       if (typeof PAAutoPublisher !== 'undefined') {
+        const onProgress = e => {
+          const d = e.detail;
+          if (d) setLoading(true, `Verificando ${d.current}/${d.total}…`);
+        };
+        window.addEventListener('pa-deep-verify', onProgress);
         const result = await PAAutoPublisher.run();
+        window.removeEventListener('pa-deep-verify', onProgress);
         if (result.published > 0) {
+          await PAStore.init();
+          applyArticles(PAStore.getArticles('pub'));
           showToast(`${result.published} notícia(s) verificada(s) publicada(s) pela IA`, 'success');
         }
       }
     } catch {}
+    setLoading(false, '');
+  }
 
+  async function init() {
     await PAStore.init();
     const raw = PAStore.getArticles('pub');
 
-    if (typeof PAContentGate !== 'undefined' && raw.length) {
-      setLoading(true, 'IA: busca minuciosa das matérias…');
-      window.addEventListener('pa-deep-verify', e => {
-        const d = e.detail;
-        if (d) setLoading(true, `Verificando ${d.current}/${d.total}: ${(d.title || '').slice(0, 50)}…`);
-      });
-      allPub = await PAContentGate.gate(raw, (c, t, title) => {
-        setLoading(true, `Auditoria ${c}/${t}: ${(title || '').slice(0, 45)}…`);
-      });
-      if (allPub.length < raw.length) {
-        showToast(`${allPub.length} de ${raw.length} matérias passaram na verificação minuciosa`, 'success');
-      }
-    } else {
-      allPub = raw.filter(a => a.verified !== false && (a.confidence || 0) >= 55);
-    }
+    applyArticles(raw, raw.filter(a => a.verified !== false && (a.confidence || 0) >= 55));
 
-    allPub = filterToday(allPub);
-
-    renderHome();
     setupNav();
     setupPhoneSearch();
     observeReveals();
@@ -435,7 +437,13 @@
       });
     }
 
-    setLoading(false, '');
+    if (typeof PAContentGate !== 'undefined' && raw.length) {
+      PAContentGate.gate(raw, null, { fast: true }).then(gated => {
+        if (gated.length) applyArticles(raw, gated);
+      }).catch(() => {});
+    }
+
+    runBackgroundSearch();
   }
 
   window.enviarPauta = async function (e) {

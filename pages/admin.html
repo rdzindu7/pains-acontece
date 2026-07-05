@@ -22,6 +22,7 @@
   --ff:'Bebas Neue',sans-serif;--fb:'Inter',sans-serif;
   --sidebar:260px;--ease:cubic-bezier(.16,1,.3,1);
 }
+html{color-scheme:dark}
 html,body{height:100%;overflow:hidden}
 body{background:var(--k2);font-family:var(--fb);color:var(--w);display:flex}
 
@@ -317,6 +318,47 @@ body{background:var(--k2);font-family:var(--fb);color:var(--w);display:flex}
 }
 .inp-field select option{background:#1a1a1a;color:#fff}
 .inp-field textarea{resize:vertical;min-height:320px;line-height:1.7}
+
+/* Custom select — tema escuro do painel */
+.pa-select{position:relative;width:100%}
+.pa-select-native{
+  position:absolute!important;width:1px!important;height:1px!important;
+  padding:0!important;margin:-1px!important;overflow:hidden!important;
+  clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important;
+}
+.pa-select-btn{
+  width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px;
+  padding:10px 14px;background:rgba(255,255,255,.05);
+  border:1px solid var(--border);border-radius:4px;
+  color:#fff;font-size:.85rem;font-family:var(--fb);
+  cursor:pointer;transition:border-color .25s,background .25s,box-shadow .25s;
+  text-align:left;
+}
+.pa-select-btn:hover{background:rgba(255,255,255,.08);border-color:rgba(29,122,29,.35)}
+.pa-select.open .pa-select-btn{
+  border-color:var(--g);background:rgba(29,122,29,.1);
+  box-shadow:0 0 0 3px rgba(29,122,29,.15);
+}
+.pa-select-btn i{font-size:.65rem;color:var(--muted);transition:transform .25s}
+.pa-select.open .pa-select-btn i{transform:rotate(180deg);color:var(--g3)}
+.pa-select-menu{
+  position:absolute;left:0;right:0;top:calc(100% + 4px);z-index:200;
+  background:var(--k3);border:1px solid rgba(29,122,29,.35);
+  border-radius:4px;box-shadow:0 12px 40px rgba(0,0,0,.65);
+  max-height:240px;overflow-y:auto;
+  opacity:0;visibility:hidden;transform:translateY(-6px);
+  transition:opacity .2s,transform .2s,visibility .2s;
+  list-style:none;padding:6px 0;margin:0;
+  scrollbar-width:thin;scrollbar-color:var(--g) var(--k4);
+}
+.pa-select.open .pa-select-menu{opacity:1;visibility:visible;transform:none}
+.pa-select-item{
+  padding:10px 14px;font-size:.82rem;color:rgba(255,255,255,.75);
+  cursor:pointer;transition:background .15s,color .15s;
+}
+.pa-select-item:hover{background:rgba(29,122,29,.15);color:#fff}
+.pa-select-item.active{background:rgba(29,122,29,.22);color:var(--g3);font-weight:600}
+.pa-select-item.active::before{content:'✓ ';color:var(--g3);font-size:.72rem}
 
 .side-box{background:var(--k3);border:1px solid var(--border);border-radius:6px;overflow:hidden}
 .side-box-head{
@@ -773,7 +815,7 @@ body{background:var(--k2);font-family:var(--fb);color:var(--w);display:flex}
           <div class="side-box">
             <div class="side-box-head"><i class="fas fa-tag"></i>Categoria</div>
             <div class="side-box-body">
-              <select id="artCat" class="inp-field" style="padding:10px 14px;width:100%;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:4px;color:#fff;font-family:var(--fb);outline:none">
+              <select id="artCat" class="pa-select-native">
                 <option>Últimas Notícias</option>
                 <option>Pains</option>
                 <option>Região</option>
@@ -1010,7 +1052,7 @@ body{background:var(--k2);font-family:var(--fb);color:var(--w);display:flex}
           <div class="profile-sec-head"><i class="fas fa-sliders-h"></i><h3>Configurações Gerais</h3></div>
           <div class="profile-sec-body">
             <div class="inp-field" style="padding:0"><label>Artigos por Página</label><input type="number" value="10" min="5" max="50"/></div>
-            <div class="inp-field" style="padding:0"><label>Modo de Moderação</label><select style="width:100%;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:4px;padding:10px 14px;color:#fff;font-family:var(--fb);outline:none"><option>Revisar antes de publicar</option><option>Publicar automaticamente</option></select></div>
+            <div class="inp-field" style="padding:0"><label>Modo de Moderação</label><select id="modMode" class="pa-select-native"><option>Revisar antes de publicar</option><option>Publicar automaticamente</option></select></div>
             <button class="btn-pub green" onclick="showToast('Configurações salvas!','success')"><i class="fas fa-save"></i> Salvar</button>
           </div>
         </div>
@@ -1078,6 +1120,10 @@ body{background:var(--k2);font-family:var(--fb);color:var(--w);display:flex}
 <script src="../js/core/config.js"></script>
 <script src="../js/core/supabase-client.js"></script>
 <script src="../js/ai/scanner.js"></script>
+<script src="../js/ai/agents/sofia.js"></script>
+<script src="../js/ai/agents/lucas.js"></script>
+<script src="../js/ai/agents/camila.js"></script>
+<script src="../js/ai/orchestrator.js"></script>
 <script src="../js/ai/engine.js"></script>
 <script src="../js/core/api.js"></script>
 <script src="../js/core/store.js"></script>
@@ -1365,9 +1411,9 @@ function editArticle(id) {
   document.getElementById('artLead').value = a.lead || '';
   document.getElementById('artContent').innerHTML = a.content || `<p>Conteúdo da notícia: <strong>${a.title}</strong></p><p>Edite o texto aqui…</p>`;
   const catSel = document.getElementById('artCat');
-  if (catSel) catSel.value = a.cat;
+  if (catSel) { catSel.value = a.cat; PASelect.sync('artCat'); }
   const statusSel = document.getElementById('artStatus');
-  if (statusSel) statusSel.value = a.status;
+  if (statusSel) { statusSel.value = a.status; PASelect.sync('artStatus'); }
   showToast(`Editando: ${a.title.substring(0,40)}…`, 'info');
 }
 
@@ -1451,6 +1497,10 @@ function clearEditor() {
   document.getElementById('tagWrap').innerHTML = '';
   document.getElementById('thumbPreview').style.display = 'none';
   document.getElementById('thumbPreview').innerHTML = '';
+  const cat = document.getElementById('artCat');
+  const st = document.getElementById('artStatus');
+  if (cat) { cat.selectedIndex = 0; PASelect.sync('artCat'); }
+  if (st) { st.value = 'pub'; PASelect.sync('artStatus'); }
 }
 
 /* ════ THUMB PREVIEW ════ */
@@ -1627,6 +1677,87 @@ artContent.addEventListener('input', function() {
   const placeholder = this.getAttribute('data-placeholder');
   this.style.color = this.textContent ? 'rgba(255,255,255,.85)' : 'rgba(255,255,255,.2)';
 });
+
+/* CUSTOM SELECTS */
+const PASelect = (function () {
+  const map = new Map();
+
+  function buildMenu(sel, wrap, btn, label) {
+    const menu = document.createElement('ul');
+    menu.className = 'pa-select-menu';
+    menu.setAttribute('role', 'listbox');
+    [...sel.options].forEach(opt => {
+      const li = document.createElement('li');
+      li.className = 'pa-select-item' + (opt.selected ? ' active' : '');
+      li.textContent = opt.textContent;
+      li.dataset.value = opt.value || opt.textContent;
+      li.setAttribute('role', 'option');
+      li.addEventListener('click', () => {
+        sel.value = opt.value || opt.textContent;
+        label.textContent = opt.textContent;
+        menu.querySelectorAll('.pa-select-item').forEach(i => i.classList.remove('active'));
+        li.classList.add('active');
+        wrap.classList.remove('open');
+        sel.dispatchEvent(new Event('change', { bubbles: true }));
+      });
+      menu.appendChild(li);
+    });
+    wrap.appendChild(menu);
+    return menu;
+  }
+
+  function enhance(id) {
+    const sel = document.getElementById(id);
+    if (!sel || sel.dataset.enhanced) return;
+    sel.dataset.enhanced = '1';
+    sel.classList.add('pa-select-native');
+
+    const wrap = document.createElement('div');
+    wrap.className = 'pa-select';
+    sel.parentNode.insertBefore(wrap, sel);
+    wrap.appendChild(sel);
+
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'pa-select-btn';
+    btn.innerHTML = `<span class="pa-select-label"></span><i class="fas fa-chevron-down"></i>`;
+    wrap.insertBefore(btn, sel);
+
+    const label = btn.querySelector('.pa-select-label');
+    const menu = buildMenu(sel, wrap, btn, label);
+    label.textContent = sel.options[sel.selectedIndex]?.textContent || '';
+
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      document.querySelectorAll('.pa-select.open').forEach(w => { if (w !== wrap) w.classList.remove('open'); });
+      wrap.classList.toggle('open');
+    });
+
+    map.set(id, { sel, wrap, label, menu });
+  }
+
+  function sync(id) {
+    const entry = map.get(id);
+    if (!entry) return;
+    const { sel, label, menu } = entry;
+    const opt = sel.options[sel.selectedIndex];
+    if (opt) label.textContent = opt.textContent;
+    menu.querySelectorAll('.pa-select-item').forEach((li, i) => {
+      li.classList.toggle('active', i === sel.selectedIndex);
+    });
+  }
+
+  function init() {
+    ['artStatus', 'artCat', 'modMode'].forEach(enhance);
+    document.addEventListener('click', () => {
+      document.querySelectorAll('.pa-select.open').forEach(w => w.classList.remove('open'));
+    });
+  }
+
+  return { init, sync, enhance };
+})();
+
+PASelect.init();
 
 /* STATUS SELECT AGENDAR */
 const artStatusEl = document.getElementById('artStatus');

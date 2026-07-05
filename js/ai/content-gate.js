@@ -1,6 +1,6 @@
 const PAContentGate = (function () {
   const LS_AUDITED = 'pa_deep_audited_v1';
-  const MAX_AUDIT_PER_SESSION = 12;
+  const MAX_AUDIT_PER_SESSION = 2;
 
   function alreadyAudited(id) {
     try {
@@ -51,17 +51,27 @@ const PAContentGate = (function () {
     };
   }
 
-  async function gate(articles, onProgress) {
-    const allFeeds = await PAScanner.getFeedItems?.(false) || [];
+  async function gate(articles, onProgress, options) {
+    const fast = options?.fast !== false;
     const passed = [];
-    let audited = 0;
 
     const withFlag = articles.filter(a => a.deepVerified && a.confidence >= 58);
     const needsAudit = articles.filter(a => !a.deepVerified || a.confidence < 58);
 
     withFlag.forEach(a => passed.push({ ...a, approved: true }));
 
-    for (const art of needsAudit) {
+    const trustLegacy = needsAudit.filter(a => a.verified && (a.confidence || 0) >= 55);
+    trustLegacy.forEach(a => passed.push({ ...a, approved: true }));
+
+    const toAudit = needsAudit.filter(a => !(a.verified && (a.confidence || 0) >= 55));
+    if (fast || !toAudit.length) {
+      return passed.sort((a, b) => (b.id || 0) - (a.id || 0));
+    }
+
+    const allFeeds = await PAScanner.getFeedItems?.(false) || [];
+    let audited = 0;
+
+    for (const art of toAudit) {
       if (audited >= MAX_AUDIT_PER_SESSION) {
         if (art.verified && art.confidence >= 60) passed.push({ ...art, approved: true });
         continue;
@@ -70,7 +80,7 @@ const PAContentGate = (function () {
         passed.push({ ...art, approved: true });
         continue;
       }
-      onProgress?.(audited + 1, needsAudit.length, art.title);
+      onProgress?.(audited + 1, toAudit.length, art.title);
       const result = await auditArticle(art, allFeeds);
       audited++;
       markAudited(art.id);

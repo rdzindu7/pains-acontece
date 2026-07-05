@@ -100,8 +100,12 @@ const PAScanner = (function () {
   }
 
   const imageCache = new Map();
+  const htmlCache = new Map();
   let ogFetchCount = 0;
-  const OG_FETCH_MAX = 35;
+  const OG_FETCH_MAX = 10;
+  const FETCH_TIMEOUT = 7000;
+  const DEEP_VERIFY_MAX = 12;
+  const DEEP_VERIFY_CONCURRENCY = 4;
 
   function pickImage(cat) {
     const imgs = {
@@ -199,20 +203,23 @@ const PAScanner = (function () {
   }
 
   async function fetchHtml(url) {
+    if (!url) return null;
+    if (htmlCache.has(url)) return htmlCache.get(url);
     const attempts = [
       'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(url),
-      'https://corsproxy.io/?' + encodeURIComponent(url),
-      'https://api.allorigins.win/raw?url=' + encodeURIComponent(url)
+      'https://corsproxy.io/?' + encodeURIComponent(url)
     ];
     for (const u of attempts) {
       try {
-        const res = await fetch(u, { signal: AbortSignal.timeout(14000) });
+        const res = await fetch(u, { signal: AbortSignal.timeout(FETCH_TIMEOUT) });
         const text = await res.text();
         if (text && text.length > 200 && !/^<!DOCTYPE html>\s*<html[^>]*>\s*<head>\s*<title>50[03]/i.test(text)) {
+          htmlCache.set(url, text);
           return text;
         }
       } catch {}
     }
+    htmlCache.set(url, null);
     return null;
   }
 
@@ -233,13 +240,15 @@ const PAScanner = (function () {
     return img;
   }
 
-  async function resolveItemImage(item, cat) {
+  async function resolveItemImage(item, cat, skipFetch) {
     if (item.image) {
       const direct = normalizeImageUrl(item.image);
       if (direct) return direct;
     }
     const fromSummary = extractImagesFromHtml(item.summary);
     if (fromSummary) return fromSummary;
+
+    if (skipFetch) return pickImage(cat);
 
     const articleUrl = extractArticleUrl(item.summary, item.link);
     if (ogFetchCount < OG_FETCH_MAX && articleUrl && !/news\.google\.com\/rss/i.test(articleUrl)) {
@@ -353,6 +362,7 @@ const PAScanner = (function () {
     const keys = keywords(item.title + ' ' + stripHtml(item.summary));
     const articleUrl = extractArticleUrl(item.summary, item.link);
     const trusted = isTrusted(articleUrl) || isTrusted(item.link);
+    const hasRssImage = !!(item.image || extractImagesFromHtml(item.summary));
 
     const corroborations = allFeeds
       .filter(f => f.link !== item.link)
@@ -365,11 +375,15 @@ const PAScanner = (function () {
       .sort((a, b) => b.score + b.overlap - (a.score + a.overlap))
       .slice(0, 8);
 
+    const skipPageFetch = hasRssImage && (trusted || corroborations.length >= 1);
+
     let pageValidated = false;
     let pageMeta = { excerpt: '', paragraphs: [], images: [] };
-    if (articleUrl && !/news\.google\.com\/rss/i.test(articleUrl) && ogFetchCount < OG_FETCH_MAX) {
+    let pageFetched = false;
+    if (!skipPageFetch && articleUrl && !/news\.google\.com\/rss/i.test(articleUrl) && ogFetchCount < OG_FETCH_MAX) {
       ogFetchCount++;
       const html = await fetchHtml(articleUrl);
+      pageFetched = !!html;
       if (html) {
         pageMeta = extractPageMeta(html);
         const blob = norm(pageMeta.title + ' ' + pageMeta.excerpt + ' ' + pageMeta.paragraphs.join(' ') + html.slice(0, 6000));
@@ -380,6 +394,8 @@ const PAScanner = (function () {
         const pageImg = pageMeta.images[0] || extractImagesFromHtml(html);
         if (pageImg) item.image = pageImg;
       }
+    } else if (skipPageFetch && trusted) {
+      pageValidated = true;
     }
 
     let confidence = 40;
@@ -408,7 +424,7 @@ const PAScanner = (function () {
       checkedAt: new Date().toISOString()
     };
 
-    const img = await resolveItemImage(item, cat);
+    const img = await resolveItemImage(item, cat, pageFetched || skipPageFetch);
     const lead = pageMeta.excerpt
       ? (pageMeta.excerpt.length > 280 ? pageMeta.excerpt.slice(0, 277) + '…' : pageMeta.excerpt)
       : makeLead(item.title, item.summary);
@@ -438,7 +454,7 @@ const PAScanner = (function () {
     ];
     for (const u of attempts) {
       try {
-        const res = await fetch(u, { signal: AbortSignal.timeout(18000) });
+        const res = await fetch(u, { signal: AbortSignal.timeout(10000) });
         const text = await res.text();
         if (text && text.includes('<item') && !/<html/i.test(text)) return text;
       } catch {}
@@ -487,8 +503,20 @@ const PAScanner = (function () {
     } catch { return []; }
   }
 
-  const DEEP_VERIFY_MAX = 40;
   let deepVerifyProgress = null;
+
+  async function mapPool(list, concurrency, fn) {
+    const results = new Array(list.length);
+    let idx = 0;
+    async function worker() {
+      while (idx < list.length) {
+        const i = idx++;
+        results[i] = await fn(list[i], i);
+      }
+    }
+    await Promise.all(Array.from({ length: Math.min(concurrency, list.length) }, worker));
+    return results;
+  }
 
   function setDeepProgress(current, total, title) {
     deepVerifyProgress = { current, total, title };
@@ -514,15 +542,15 @@ const PAScanner = (function () {
     }
 
     ogFetchCount = 0;
-    const items = [];
     const total = batch.length;
+    let done = 0;
 
-    for (let i = 0; i < batch.length; i++) {
-      const { item, cat } = batch[i];
-      setDeepProgress(i + 1, total, item.title);
+    const verified = await mapPool(batch, DEEP_VERIFY_CONCURRENCY, async ({ item, cat }) => {
       const deep = await deepVerifyPublication(item, all, cat);
-      if (!deep.approved) continue;
-      items.push({
+      done++;
+      setDeepProgress(done, total, item.title);
+      if (!deep.approved) return null;
+      return {
         title: item.title,
         lead: deep.lead,
         quickLead: deep.quickLead,
@@ -535,9 +563,10 @@ const PAScanner = (function () {
         verified: deep.verified, confidence: deep.confidence,
         deepVerified: true, audit: deep.audit, sources: deep.sources,
         status: 'pending'
-      });
-    }
+      };
+    });
 
+    const items = verified.filter(Boolean);
     setDeepProgress(total, total, 'Concluído');
     items.sort((a, b) => b.confidence - a.confidence);
     return items;
@@ -572,11 +601,15 @@ const PAScanner = (function () {
 
   async function getFeedItems(force) {
     if (!force && feedCache && Date.now() - feedCacheAt < CACHE_TTL) return feedCache;
-    const results = await Promise.all(RSS_FEEDS.map(async cfg => {
+    const priorityFeeds = RSS_FEEDS.filter(f => (f.priority || 0) >= 2);
+    const restFeeds = RSS_FEEDS.filter(f => (f.priority || 0) < 2);
+    const mapFeed = async cfg => {
       const items = await fetchFeed(cfg);
       return items.map(i => ({ ...i, feedPriority: cfg.priority || 0, world: !!cfg.world }));
-    }));
-    feedCache = results.flat();
+    };
+    const priorityResults = await Promise.all(priorityFeeds.map(mapFeed));
+    const restResults = await Promise.all(restFeeds.map(mapFeed));
+    feedCache = [...priorityResults, ...restResults].flat();
     feedCacheAt = Date.now();
     return feedCache;
   }
@@ -692,6 +725,6 @@ const PAScanner = (function () {
     detectCategory, pickImage, resolveItemImage, formatDate, keywords, RSS_FEEDS,
     isFreshNews, startOfTodayBR, makeQuickLead,
     getDeepProgress: () => deepVerifyProgress,
-    invalidateCache: () => { feedCache = null; feedCacheAt = 0; imageCache.clear(); ogFetchCount = 0; deepVerifyProgress = null; }
+    invalidateCache: () => { feedCache = null; feedCacheAt = 0; imageCache.clear(); htmlCache.clear(); ogFetchCount = 0; deepVerifyProgress = null; }
   };
 })();

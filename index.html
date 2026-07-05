@@ -199,46 +199,54 @@ body::before {
 }
 .h-admin-btn:hover { background: rgba(29,122,29,.2); color: var(--g3); border-color: rgba(29,122,29,.4); }
 
-/* NAV */
+/* NAV — barra verde horizontal igual ao site original */
 .main-nav {
-  background: linear-gradient(90deg, var(--g2) 0%, rgba(13,77,13,.7) 100%);
-  border-bottom: 1px solid rgba(29,122,29,.2);
-  position: relative;
-  display: flex; flex-wrap: wrap; align-items: center;
-  justify-content: center;
+  background: var(--g2);
+  border-bottom: 2px solid rgba(0,0,0,.25);
+  position: sticky; top: 68px; z-index: 900;
+  display: flex; align-items: stretch;
+  justify-content: flex-start;
+  box-shadow: 0 2px 12px rgba(0,0,0,.35);
 }
 .nav-inner {
   max-width: var(--container-max); margin: 0 auto;
-  display: flex; align-items: center; justify-content: center;
-  flex: 1 1 auto; gap: 2px;
-  padding: 0 var(--pad-x);
+  display: flex; align-items: stretch; justify-content: flex-start;
+  flex: 1 1 auto; gap: 0;
+  padding: 0;
   overflow-x: auto; scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
 }
 .nav-inner::-webkit-scrollbar { display: none; }
 .nav-item {
   position: relative;
-  display: flex; align-items: center;
+  display: flex; align-items: stretch;
+  flex-shrink: 0;
 }
 .nav-item a {
   display: flex; align-items: center; justify-content: center;
-  padding: 11px 12px; min-height: 40px;
-  font-size: .67rem; font-weight: 700;
-  letter-spacing: 1.1px; text-transform: uppercase;
-  color: rgba(255,255,255,.65);
+  padding: 0 14px; min-height: 42px;
+  font-size: .68rem; font-weight: 800;
+  letter-spacing: 1.2px; text-transform: uppercase;
+  color: #fff;
   white-space: nowrap;
-  transition: color .25s var(--ease), background .25s;
+  transition: color .2s var(--ease), background .2s;
 }
-.nav-item a:hover { background: rgba(0,0,0,.12); }
-.nav-item a::after {
-  content: '';
-  position: absolute; bottom: 0; left: 13px; right: 13px;
-  height: 2px; background: var(--y);
-  transform: scaleX(0); transform-origin: left;
-  transition: transform .3s var(--ease);
+.nav-item a:hover { background: rgba(0,0,0,.18); color: var(--y2); }
+.nav-item a::after { display: none; }
+.nav-item a:hover, .nav-item a.active { color: var(--y2); }
+.nav-item.nav-pauta a {
+  background: var(--y);
+  color: var(--k);
+  font-weight: 900;
+  padding: 0 18px;
+  margin-left: 4px;
+  clip-path: polygon(8px 0, 100% 0, 100% 100%, 0 100%);
 }
-.nav-item a:hover, .nav-item a.active { color: var(--y); }
-.nav-item a:hover::after, .nav-item a.active::after { transform: scaleX(1); }
+.nav-item.nav-pauta a:hover,
+.nav-item.nav-pauta a.active {
+  background: var(--y2);
+  color: var(--k);
+}
 
 /* Modo filtro por categoria */
 body.cat-filter-mode .home-only { display: none !important; }
@@ -251,13 +259,7 @@ body.cat-filter-mode .category-view { display: block; }
   font-size: .75rem; color: var(--dim); margin-top: 4px;
 }
 .category-view .cat-featured { margin-bottom: 28px; }
-.hamburger {
-  display: none; background: none; border: none;
-  color: #fff; font-size: 1.3rem; cursor: pointer;
-  padding: 12px var(--pad-x); margin-left: auto;
-  min-width: 44px; min-height: 44px;
-  align-items: center; justify-content: center;
-}
+.hamburger { display: none !important; }
 /* ═══════════════════════════════════════════
    HERO CINEMATOGRÁFICO
 ═══════════════════════════════════════════ */
@@ -562,37 +564,43 @@ body.cat-filter-mode .category-view { display: block; }
 .pa-loading-status.active { opacity: 1; }
 @keyframes loadingBar { from { background-position: 200% 0; } to { background-position: -200% 0; } }
 
-/* ── SCROLL NAV (barra vertical estilo imagem) ── */
+/* ── SCROLL NAV (barra vertical direita) ── */
 .pa-scroll-nav {
-  position: fixed; right: calc(16px + env(safe-area-inset-right)); top: 50%;
+  position: fixed; right: calc(12px + env(safe-area-inset-right)); top: 50%;
   transform: translateY(-50%); z-index: 7500;
-  display: flex; flex-direction: column; align-items: center; gap: 6px;
+  display: flex; flex-direction: column; align-items: center; gap: 4px;
+  padding: 4px 3px;
+  background: linear-gradient(180deg, #1e1e1e, #0a0a0a);
+  border: 1px solid rgba(255,255,255,.12);
+  border-radius: 6px;
+  box-shadow: 0 4px 24px rgba(0,0,0,.65);
   opacity: 0; pointer-events: none; transition: opacity .4s var(--ease);
 }
 .pa-scroll-nav.visible { opacity: 1; pointer-events: all; }
 .pa-scroll-btn {
-  width: 28px; height: 24px; border: none; cursor: pointer;
-  background: linear-gradient(180deg, #2a2a2a, #111);
-  color: rgba(255,255,255,.7); font-size: .55rem;
-  border-radius: 3px; box-shadow: 0 2px 8px rgba(0,0,0,.5), inset 0 1px 0 rgba(255,255,255,.12);
-  transition: color .2s, transform .2s, box-shadow .2s;
+  width: 26px; height: 22px; border: none; cursor: pointer;
+  background: linear-gradient(180deg, #333, #1a1a1a);
+  color: rgba(255,255,255,.75); font-size: .5rem;
+  border-radius: 3px;
+  transition: color .2s, background .2s;
   display: flex; align-items: center; justify-content: center;
 }
-.pa-scroll-btn:hover { color: var(--y); transform: scale(1.08); box-shadow: 0 4px 16px rgba(29,122,29,.35); }
+.pa-scroll-btn:hover { color: var(--y); background: linear-gradient(180deg, #444, #222); }
 .pa-scroll-track {
-  width: 10px; height: clamp(120px, 28vh, 220px);
-  background: linear-gradient(180deg, #1a1a1a, #0a0a0a);
-  border-radius: 5px; position: relative;
-  border: 1px solid rgba(255,255,255,.1);
-  box-shadow: inset 0 0 8px rgba(0,0,0,.6), 0 0 12px rgba(0,0,0,.4);
+  width: 8px; height: clamp(100px, 24vh, 180px);
+  background: #111;
+  border-radius: 4px; position: relative;
+  border: 1px solid rgba(255,255,255,.08);
+  overflow: hidden;
 }
 .pa-scroll-thumb {
-  position: absolute; left: 1px; right: 1px; top: 0;
-  min-height: 36px; border-radius: 4px;
-  background: linear-gradient(90deg, #a8a8a8, #e8e8e8 40%, #c0c0c0 60%, #909090);
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.9), inset 0 -1px 0 rgba(0,0,0,.2), 0 2px 6px rgba(0,0,0,.4);
+  position: absolute; left: 0; right: 0; top: 0;
+  min-height: 32px; border-radius: 3px;
+  background: linear-gradient(90deg, #8a8a8a, #d4d4d4 45%, #a0a0a0);
+  box-shadow: inset 0 1px 0 rgba(255,255,255,.85), 0 1px 4px rgba(0,0,0,.5);
   transition: transform .12s var(--ease), height .2s;
 }
+@media (max-width: 768px) { .pa-scroll-nav { display: none; } }
 
 /* ── NOTÍCIA RÁPIDA nos cards ── */
 .ncard .quick-btn, .ncard-xl .quick-btn {
@@ -1078,18 +1086,15 @@ body.cat-filter-mode .category-view { display: block; }
 }
 
 @media (max-width: 900px) {
-  .hamburger { display: flex; }
+  .main-nav { top: 0; position: relative; }
   .nav-inner {
-    display: none; flex: 1 1 100%; flex-direction: column; align-items: stretch;
-    position: absolute; top: 100%; left: 0; right: 0; z-index: 999;
-    background: var(--g2); max-height: 70vh; overflow-y: auto;
-    padding: 8px var(--pad-x) 16px;
-    box-shadow: 0 12px 40px rgba(0,0,0,.5);
-    border-top: 1px solid rgba(255,255,255,.08);
+    display: flex; flex-direction: row; align-items: stretch;
+    position: static; max-height: none;
+    padding: 0 var(--pad-x);
+    box-shadow: none; border-top: none;
   }
-  .nav-inner.open { display: flex; }
-  .nav-item a { padding: 12px 8px; min-height: 44px; display: flex; align-items: center; }
-  .nav-item a::after { display: none; }
+  .nav-item a { padding: 0 11px; min-height: 40px; font-size: .62rem; }
+  .nav-item.nav-pauta a { padding: 0 14px; }
   .search-wrap { order: 3; flex: 1 1 100%; max-width: 100%; }
   .sec-head { flex-wrap: wrap; gap: 10px; }
   .sec-head .view-all { margin-left: auto; }
@@ -1203,7 +1208,7 @@ body.cat-filter-mode .category-view { display: block; }
     <div class="nav-item"><a href="#restaurantes" data-nav="restaurantes">Restaurantes</a></div>
     <div class="nav-item"><a href="#telefones" data-nav="telefones">Telefones</a></div>
     <div class="nav-item"><a href="#clima" data-nav="clima">Clima</a></div>
-    <div class="nav-item"><a href="#contato" data-nav="contato">Pauta</a></div>
+    <div class="nav-item nav-pauta"><a href="#contato" data-nav="contato">Pauta</a></div>
   </div>
 </nav>
 
@@ -1251,7 +1256,7 @@ body.cat-filter-mode .category-view { display: block; }
     <div class="line-v"></div>
     <h2>Últimas Notícias</h2>
     <div class="rule"></div>
-    <a href="#" class="view-all">Ver todas <i class="fas fa-arrow-right"></i></a>
+    <a href="#ultimas" class="view-all" data-nav="ultimas" onclick="event.preventDefault();applyNav('ultimas')">Ver todas <i class="fas fa-arrow-right"></i></a>
   </div>
   <div class="grid-3 gap" id="ultimasGrid"></div>
 </section>
@@ -1512,13 +1517,13 @@ body.cat-filter-mode .category-view { display: block; }
     <div class="foot-col">
       <h4>Editorias</h4>
       <ul>
-        <li><a href="#">Últimas Notícias</a></li>
-        <li><a href="#">Pains</a></li>
-        <li><a href="#">Região</a></li>
-        <li><a href="#">Brasil / Mundo</a></li>
-        <li><a href="#">Polícia</a></li>
-        <li><a href="#">Política</a></li>
-        <li><a href="#">Saúde</a></li>
+        <li><a href="#ultimas" data-nav="ultimas">Últimas Notícias</a></li>
+        <li><a href="#pains" data-nav="pains">Pains</a></li>
+        <li><a href="#regiao" data-nav="regiao">Região</a></li>
+        <li><a href="#brasil" data-nav="brasil">Brasil / Mundo</a></li>
+        <li><a href="#policia" data-nav="policia">Polícia</a></li>
+        <li><a href="#politica" data-nav="politica">Política</a></li>
+        <li><a href="#saude" data-nav="saude">Saúde</a></li>
         <li><a href="#">Educação</a></li>
       </ul>
     </div>
@@ -1603,6 +1608,10 @@ document.querySelectorAll('.ncard, .ncard-xl, .srv-card').forEach(card => {
 <script src="js/core/config.js"></script>
 <script src="js/core/supabase-client.js"></script>
 <script src="js/ai/scanner.js"></script>
+<script src="js/ai/agents/sofia.js"></script>
+<script src="js/ai/agents/lucas.js"></script>
+<script src="js/ai/agents/camila.js"></script>
+<script src="js/ai/orchestrator.js"></script>
 <script src="js/ai/engine.js"></script>
 <script src="js/core/api.js"></script>
 <script src="js/core/store.js"></script>

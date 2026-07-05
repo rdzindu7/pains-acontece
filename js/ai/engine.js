@@ -122,56 +122,17 @@ const PAEngine = (function () {
   }
 
   async function chat(message, context = {}) {
+    if (typeof PAOrchestrator !== 'undefined') {
+      return PAOrchestrator.process(message, context);
+    }
     const msg = (message || '').trim();
-    const msgLow = msg.toLowerCase();
-    if (!msg) return { reply: 'Digite sua mensagem, faça uma pergunta ou cole o texto da notícia.', action: null };
-
-    if (/^(oi|olá|ola|hey|bom dia|boa tarde|boa noite)/.test(msgLow)) {
-      return {
-        reply: 'Olá! Sou a **IA editorial** do Pains Acontece.\n\n• Pergunte: _"O que aconteceu em Pains?"_\n• Digite **buscar** para varredura completa\n• Cole um texto para eu organizar e verificar\n\nMonitoro Pains MG, região, Brasil e mundo em tempo real.',
-        action: 'greeting'
-      };
-    }
-
-    if (/ajuda|help|comandos/.test(msgLow)) {
-      return {
-        reply: '**Comandos:**\n• Perguntas → busco no portal e nas fontes RSS\n• **buscar** → varredura ilimitada + publicação automática\n• Cole texto longo → organizo matéria e verifico fontes\n• **verificar** + texto → só checagem de fatos',
-        action: 'help'
-      };
-    }
-
-    if (/^(buscar|varrer|scanner|atualizar)$/.test(msgLow) || /^buscar\s+(noticia|notícia|agora)/.test(msgLow)) {
-      return {
-        reply: 'Iniciando varredura… Clique em **Buscar Agora** no painel IA (ícone cérebro) para publicar fatos verificados automaticamente.',
-        action: 'scan'
-      };
-    }
-
-    if (/^verificar\b/i.test(msgLow)) {
-      const text = msg.replace(/^verificar[:\s]*/i, '').trim() || context.lastDraft || '';
-      const verification = await PAScanner.verifyText(text);
-      const src = verification.sources.length
-        ? verification.sources.map(s => `• ${s.title} (${s.source})`).join('\n')
-        : 'Nenhuma fonte correspondente nas matérias ou RSS.';
-      return {
-        reply: `${verification.message}\n\n**Fontes:**\n${src}`,
-        action: 'verify',
-        verification
-      };
-    }
-
-    if (isQuestion(msgLow) || (!isNewsDraft(msg) && msg.length < 100)) {
+    if (!msg) return { reply: 'Digite sua mensagem.', action: null };
+    if (isQuestion(msg.toLowerCase()) || (!isNewsDraft(msg) && msg.length < 100)) {
       return answerQuestion(msg);
     }
-
-    const raw = context.lastDraft || msg;
-    const article = await organizeNews(raw, context.hints || {});
-    const src = article.verification.sources.slice(0, 3).map(s => `• ${s.title}`).join('\n');
-
+    const article = await organizeNews(context.lastDraft || msg, context.hints || {});
     return {
-      reply: article.verified
-        ? `✓ **Verificado** (${article.confidence}%)!\n\n**Título:** ${article.title}\n\n**Lead:** ${article.lead}\n\n**Categoria:** ${article.cat}${src ? '\n\n**Fontes:**\n' + src : ''}`
-        : `Matéria organizada (${article.confidence}% confiança).\n\n**Título:** ${article.title}\n\n**Lead:** ${article.lead}\n\n**Categoria:** ${article.cat}${src ? '\n\n**Fontes encontradas:**\n' + src : '\n\n_Use "Buscar Agora" para enriquecer fontes._'}`,
+      reply: `**Título:** ${article.title}\n\n**Lead:** ${article.lead}`,
       action: 'organize',
       article,
       verification: article.verification

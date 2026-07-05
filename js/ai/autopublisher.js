@@ -20,7 +20,10 @@ const PAAutoPublisher = (function () {
       if (Date.now() - last < INTERVAL) return { skipped: true, published: 0 };
     }
 
-    const { items } = await PAScanner.scanNewsFull();
+    const seen = existing.map(a => a.source_url || a.title).filter(Boolean);
+    const { items } = force
+      ? await PAScanner.scanNewsFull(seen)
+      : await PAScanner.scanNews(seen);
     const minConf = isEmpty ? MIN_CONF_EMPTY : MIN_CONF;
     const maxPub = isEmpty ? MAX_PUBLISH_EMPTY : MAX_PUBLISH;
 

@@ -66,7 +66,7 @@ const PAIA = (function () {
     panel.innerHTML = `
       <div class="paia-head">
         <div class="av"><i class="fas fa-robot"></i></div>
-        <div><h4>IA Editorial</h4><div class="status">● Online — Pains e Região</div></div>
+        <div><h4>Equipe IA Editorial</h4><div class="status">● Sofia · Lucas · Camila</div></div>
         <button onclick="PAIA.toggle()" title="Fechar"><i class="fas fa-times"></i></button>
       </div>
       <div class="paia-msgs" id="paiaMsgs"></div>
@@ -89,7 +89,7 @@ const PAIA = (function () {
       if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
     });
 
-    addMsg('bot', 'Olá! Sou a IA do Pains Acontece. Cole aqui a informação da notícia e eu verifico nas fontes regionais, organizo o texto e preparo o preview antes de publicar.');
+    addMsg('bot', '**Sofia Mendes** recebe sua demanda → **Lucas Ferreira** busca e verifica fontes → **Camila Rocha** organiza e prepara para publicar. Cole a notícia ou descreva a pauta.');
   }
 
   function addMsg(role, text, extra) {
@@ -123,8 +123,14 @@ const PAIA = (function () {
     const typing = document.createElement('div');
     typing.className = 'paia-msg bot typing';
     typing.id = 'paiaTyping';
-    typing.textContent = 'Verificando fontes e organizando…';
+    typing.textContent = 'Sofia encaminhando → Lucas buscando fontes…';
     document.getElementById('paiaMsgs').appendChild(typing);
+
+    if (typeof PAOrchestrator !== 'undefined') {
+      PAOrchestrator.setAgentCallback(({ agent, status }) => {
+        if (status) typing.textContent = `${agent?.name || 'IA'}: ${status}`;
+      });
+    }
 
     try {
       const res = await PAAPI.aiChat(msg, { lastDraft: msg, hints: getEditorHints() });
@@ -135,7 +141,8 @@ const PAIA = (function () {
         const lbl = res.verification.verified ? '✓ VERIFICADO' : '⚠ REVISAR';
         extra = `<div class="verif ${cls}">${lbl} — ${res.verification.confidence}%</div>`;
       }
-      addMsg('bot', res.reply, extra);
+      const prefix = res.agent ? `**${res.agent.name}:** ` : '';
+      addMsg('bot', prefix + res.reply, extra);
       if (res.article && res.action === 'organize') {
         lastArticle = res.article;
         applyToEditor(true);
