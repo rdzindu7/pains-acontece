@@ -1698,7 +1698,7 @@ body.pa-owner .owner-only.btn-pub{display:flex!important}
     <div id="previewModalBody" style="padding:20px 24px"></div>
     <div style="padding:16px 24px;border-top:1px solid var(--border);display:flex;gap:10px;justify-content:flex-end;position:sticky;bottom:0;background:var(--k3)">
       <button class="btn-pub outline" style="padding:10px 20px" onclick="closeModal('previewModal')"><i class="fas fa-edit"></i> Voltar e Editar</button>
-      <button class="btn-pub green" style="padding:10px 20px" onclick="confirmPublish()"><i class="fas fa-paper-plane"></i> Confirmar Publicação</button>
+      <button class="btn-pub green" id="btnConfirmPreview" style="padding:10px 20px" onclick="confirmPublishFromPreview()"><i class="fas fa-paper-plane"></i> Confirmar Publicação</button>
     </div>
   </div>
 </div>
@@ -1795,8 +1795,8 @@ body.pa-owner .owner-only.btn-pub{display:flex!important}
 <script src="../js/ai/agents/camila.js"></script>
 <script src="../js/ai/orchestrator.js"></script>
 <script src="../js/ai/engine.js"></script>
-<script src="../js/core/purge.js?v=20260705v15"></script>
-<script src="../js/core/api.js?v=20260705v15"></script>
+<script src="../js/core/purge.js?v=20260705v19"></script>
+<script src="../js/core/api.js?v=20260705v19"></script>
 <script src="../js/ui/corner-notify.js"></script>
 <script src="../js/core/store.js"></script>
 <script src="../js/ai/assistant.js"></script>
@@ -1928,6 +1928,7 @@ function showToast(msg, type = 'success', dur = 3500) {
 
 /* ════ IA SCANNER ════ */
 let modalPendingId = null;
+let pendingPreviewId = null;
 let knownPendingIds = new Set();
 let iaPollTimer = null;
 let iaScanning = false;
@@ -1977,7 +1978,7 @@ async function renderPending() {
           <div class="ia-pending-lead">${escHtml((p.lead || '').substring(0, 200))}${(p.lead || '').length > 200 ? '…' : ''}</div>
         </div>
         <div class="ia-pending-actions">
-          <button class="btn-pub green" style="padding:8px 14px;font-size:.65rem" onclick="approvePending('${p.id}')"><i class="fas fa-check"></i> Publicar</button>
+          <button class="btn-pub green" style="padding:8px 14px;font-size:.65rem" onclick="previewPending('${p.id}')"><i class="fas fa-eye"></i> Ver Preview</button>
           <button class="btn-pub red-btn" style="padding:8px 14px;font-size:.65rem" onclick="rejectPending('${p.id}')"><i class="fas fa-times"></i> Rejeitar</button>
         </div>
       </div>`).join('');
@@ -2052,13 +2053,22 @@ async function runScanNow() {
 async function approvePending(id) {
   try {
     await PAAPI.approvePending(id);
+    pendingPreviewId = null;
     showToast('Notícia publicada no portal!', 'success');
     await PAStore.init();
     await renderPending();
     await updateScannerStatus();
     renderDashboard();
     renderPubs();
-  } catch { showToast('Erro ao publicar.', 'error'); }
+  } catch (err) {
+    if (err?.message === 'duplicate') {
+      showToast('Esta notícia já foi publicada — duplicata removida.', 'info');
+      await renderPending();
+      await updateScannerStatus();
+      return;
+    }
+    showToast('Erro ao publicar.', 'error');
+  }
 }
 
 async function rejectPending(id) {
@@ -2071,12 +2081,57 @@ async function rejectPending(id) {
 }
 
 function showApproveModal(item) {
-  modalPendingId = item.id;
-  document.getElementById('approveModalBody').innerHTML = `
-    <div style="font-weight:700;font-size:.9rem;margin-bottom:8px">${item.title}</div>
-    <div style="font-size:.75rem;color:var(--dim);margin-bottom:8px">${item.cat} · ${item.source||'Web'} · <strong style="color:${item.verified?'var(--g3)':'var(--y)'}">${item.verified?'Verificado':'Revisar'}</strong> (${item.confidence||0}%)</div>
-    <div style="font-size:.78rem;line-height:1.6">${item.lead||''}</div>`;
-  document.getElementById('approveModal').classList.add('open');
+  previewPending(item.id, item);
+}
+
+function renderPreviewHtml(item) {
+  const title = item.title || 'Sem título';
+  const lead = item.lead || '';
+  const content = item.content || `<p>${lead}</p>`;
+  const cat = item.cat || 'Notícias';
+  const img = item.img || '../assets/images/pains-acontece-logo.png';
+  const verified = item.verified;
+  const conf = item.confidence || 0;
+  return `
+    <div style="background:#080808;border-radius:8px;overflow:hidden;border:1px solid rgba(255,255,255,.06)">
+      <div style="position:relative;height:200px;overflow:hidden">
+        <img src="${escHtml(img)}" style="width:100%;height:100%;object-fit:cover" alt="" onerror="this.style.display='none'"/>
+        <div style="position:absolute;inset:0;background:linear-gradient(to top,rgba(8,8,8,.9),transparent)"></div>
+        <span style="position:absolute;bottom:12px;left:16px;background:rgba(29,122,29,.8);padding:4px 10px;border-radius:2px;font-size:.6rem;font-weight:800;letter-spacing:1px;text-transform:uppercase">${escHtml(cat)}</span>
+      </div>
+      <div style="padding:24px">
+        ${verified !== undefined ? `<div style="margin-bottom:12px;padding:6px 12px;border-radius:20px;display:inline-block;font-size:.65rem;font-weight:800;background:${verified ? 'rgba(46,204,46,.12)' : 'rgba(201,162,39,.12)'};color:${verified ? '#2ecc2e' : '#c9a227'}">${verified ? '✓ VERIFICADO' : '⚠ REVISAR'} — ${conf}% confiança</div>` : ''}
+        <h2 style="font-family:'Playfair Display',serif;font-size:1.6rem;line-height:1.25;margin-bottom:12px">${escHtml(title)}</h2>
+        <p style="color:rgba(255,255,255,.5);font-size:.95rem;margin-bottom:20px;line-height:1.6">${escHtml(lead)}</p>
+        <div style="font-size:.75rem;color:#555;margin-bottom:20px;display:flex;gap:16px;flex-wrap:wrap">
+          <span><i class="fas fa-robot"></i> IA Pains Acontece</span>
+          <span><i class="fas fa-calendar"></i> ${new Date().toLocaleDateString('pt-BR')}</span>
+          ${item.source ? `<span><i class="fas fa-link"></i> ${escHtml(item.source)}</span>` : ''}
+        </div>
+        <div style="font-size:.88rem;line-height:1.8;color:rgba(255,255,255,.8)">${content}</div>
+      </div>
+    </div>`;
+}
+
+async function previewPending(id, cached) {
+  try {
+    const item = cached || (await PAAPI.getPending()).find(p => p.id === id);
+    if (!item || !item.title) {
+      showToast('Notícia não encontrada ou já foi processada.', 'info');
+      return;
+    }
+    pendingPreviewId = id;
+    const body = document.getElementById('previewModalBody');
+    const btn = document.getElementById('btnConfirmPreview');
+    if (body) body.innerHTML = renderPreviewHtml(item);
+    if (btn) {
+      btn.innerHTML = '<i class="fas fa-check"></i> Aprovar e Publicar';
+      btn.style.display = '';
+    }
+    document.getElementById('previewModal')?.classList.add('open');
+  } catch {
+    showToast('Erro ao carregar preview.', 'error');
+  }
 }
 
 function approveFromModal() {
@@ -2110,7 +2165,7 @@ async function pollPending() {
             body: `<strong>${escHtml(item.title)}</strong><br><span style="font-size:.68rem;opacity:.75">${escHtml(item.cat)} · ${item.confidence || 0}% confiança</span>`,
             icon: 'fa-newspaper',
             actions: [
-              { id: 'pub', label: 'Sim, publicar', kind: 'yes', onClick: () => approvePending(item.id) },
+              { id: 'prev', label: 'Ver preview', kind: 'yes', onClick: () => previewPending(item.id, item) },
               { id: 'rej', label: 'Não publicar', kind: 'no', onClick: () => rejectPending(item.id) },
               { id: 'panel', label: 'Ver painel', kind: 'no', onClick: () => { showPanel('ia', document.getElementById('sbIA')); renderPending(); } }
             ]
@@ -2291,12 +2346,29 @@ function openAIChat() {
 
 function previewBeforePublish() {
   const title = document.getElementById('artTitle').value.trim();
+  const lead = document.getElementById('artLead').value.trim();
+  const content = document.getElementById('artContent')?.innerHTML?.trim() || '';
   if (!title) { showToast('Adicione um título antes do preview.', 'error'); return; }
+  if (!lead && !content.replace(/<[^>]*>/g, '').trim()) {
+    showToast('Preview disponível apenas quando há conteúdo na matéria.', 'info');
+    return;
+  }
+  pendingPreviewId = null;
+  const btn = document.getElementById('btnConfirmPreview');
+  if (btn) {
+    btn.innerHTML = '<i class="fas fa-paper-plane"></i> Confirmar Publicação';
+    btn.style.display = '';
+  }
   if (typeof PAIA !== 'undefined') PAIA.showPreview();
   else showToast('Preview disponível após carregar a IA.', 'info');
 }
 
-async function confirmPublish() {
+async function confirmPublishFromPreview() {
+  if (pendingPreviewId) {
+    closeModal('previewModal');
+    await approvePending(pendingPreviewId);
+    return;
+  }
   closeModal('previewModal');
   await publishArticle(true);
 }
@@ -2304,10 +2376,6 @@ async function confirmPublish() {
 async function publishArticle(skipPreview) {
   const title = document.getElementById('artTitle').value.trim();
   if (!title) { showToast('Adicione um título antes de publicar.', 'error'); return; }
-  if (!skipPreview && document.getElementById('artStatus')?.value === 'pub') {
-    previewBeforePublish();
-    return;
-  }
   const payload = {
     title,
     lead: document.getElementById('artLead').value.trim(),

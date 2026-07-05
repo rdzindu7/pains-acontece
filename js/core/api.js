@@ -51,6 +51,45 @@ const PAAPI = (function () {
     return s;
   }
 
+  function normTitle(t) {
+    return (t || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ').trim();
+  }
+
+  function articleKey(item) {
+    if (!item) return '';
+    const url = (item.source_url || item.link || '').trim().toLowerCase();
+    if (url) return 'url:' + url;
+    const title = normTitle(item.title);
+    return title ? 'title:' + title : '';
+  }
+
+  function buildExistingKeys(articles, pending) {
+    const keys = new Set();
+    [...(articles || []), ...(pending || [])].forEach(item => {
+      const k = articleKey(item);
+      if (k) keys.add(k);
+      const t = normTitle(item.title);
+      if (t) keys.add('title:' + t);
+    });
+    return keys;
+  }
+
+  function isDuplicateArticle(item, keys) {
+    const k = articleKey(item);
+    const t = normTitle(item.title);
+    return (k && keys.has(k)) || (t && keys.has('title:' + t));
+  }
+
+  function dedupePending(list) {
+    const seen = new Set();
+    return (list || []).filter(p => {
+      const k = articleKey(p) || ('title:' + normTitle(p.title));
+      if (!k || seen.has(k)) return false;
+      seen.add(k);
+      return true;
+    });
+  }
+
   function getState() {
     const s = loadAdminState();
     if (!s.pending) s.pending = [];
@@ -306,7 +345,13 @@ const PAAPI = (function () {
     },
 
     getPending() {
-      return Promise.resolve(getState().pending);
+      const state = getState();
+      const deduped = dedupePending(state.pending);
+      if (deduped.length !== state.pending.length) {
+        state.pending = deduped;
+        saveAdminState(state);
+      }
+      return Promise.resolve(deduped);
     },
 
     scannerStatus() {
@@ -317,19 +362,21 @@ const PAAPI = (function () {
     async runScanner() {
       const state = getState();
       const { items, seenUrls } = await PAScanner.scanNewsQuick(state.scanner.seen_urls || []);
-      const existing = new Set([
-        ...(await fetchJson('articles.json')).map(a => a.title.toLowerCase()),
-        ...state.articles?.map(a => a.title.toLowerCase()) || [],
-        ...state.pending.map(p => p.title.toLowerCase())
-      ]);
+      const baseArts = await fetchJson('articles.json');
+      const mergedArts = mergeArticles(baseArts, state.articles);
+      const existing = buildExistingKeys(mergedArts, state.pending);
       let found = 0;
       for (const item of items) {
-        if (existing.has(item.title.toLowerCase())) continue;
+        if (isDuplicateArticle(item, existing)) continue;
         state.pending.unshift({ id: 'p-' + Date.now() + '-' + found, ...item, found_at: new Date().toISOString() });
-        existing.add(item.title.toLowerCase());
+        const k = articleKey(item);
+        if (k) existing.add(k);
+        const t = normTitle(item.title);
+        if (t) existing.add('title:' + t);
         found++;
         if (found >= 8) break;
       }
+      state.pending = dedupePending(state.pending);
       state.scanner.seen_urls = seenUrls.slice(-500);
       state.scanner.last_scan = new Date().toISOString();
       state.scanner.interval_minutes = SCAN_INTERVAL_MINUTES;
@@ -341,7 +388,15 @@ const PAAPI = (function () {
       const state = getState();
       const idx = state.pending.findIndex(p => p.id === id);
       if (idx < 0) throw new Error('Não encontrado');
-      const p = state.pending.splice(idx, 1)[0];
+      const p = state.pending[idx];
+      const baseArts = await fetchJson('articles.json');
+      const mergedArts = mergeArticles(baseArts, state.articles);
+      if (isDuplicateArticle(p, buildExistingKeys(mergedArts, []))) {
+        state.pending.splice(idx, 1);
+        saveAdminState(state);
+        throw new Error('duplicate');
+      }
+      state.pending.splice(idx, 1);
       const art = await this.addArticle({
         title: p.title, lead: p.lead, content: p.content, cat: p.cat, status: 'pub',
         img: p.img, author: p.author || 'IA Pains Acontece', verified: p.verified, confidence: p.confidence,
@@ -547,7 +602,7 @@ const PAAPI = (function () {
     async getPending() {
       const { data, error } = await sb().from('pending_articles').select('*').order('found_at', { ascending: false });
       if (error) throw error;
-      return (data || []).map(rowToPending);
+      return dedupePending((data || []).map(rowToPending));
     },
 
     async scannerStatus() {
@@ -568,21 +623,24 @@ const PAAPI = (function () {
       const { items, seenUrls: newSeen } = await PAScanner.scanNewsQuick(seenUrls);
 
       const [{ data: articles }, { data: pending }] = await Promise.all([
-        sb().from('articles').select('title'),
-        sb().from('pending_articles').select('title')
+        sb().from('articles').select('title,source_url'),
+        sb().from('pending_articles').select('title,source_url')
       ]);
-      const existing = new Set([
-        ...(articles || []).map(a => a.title.toLowerCase()),
-        ...(pending || []).map(p => p.title.toLowerCase())
-      ]);
+      const existing = buildExistingKeys(
+        (articles || []).map(a => ({ title: a.title, source_url: a.source_url })),
+        (pending || []).map(p => ({ title: p.title, source_url: p.source_url }))
+      );
 
       let found = 0;
       const toInsert = [];
       for (const item of items) {
-        if (existing.has(item.title.toLowerCase())) continue;
+        if (isDuplicateArticle(item, existing)) continue;
         const row = pendingToRow({ id: 'p-' + Date.now() + '-' + found, ...item, found_at: new Date().toISOString() });
         toInsert.push(row);
-        existing.add(item.title.toLowerCase());
+        const k = articleKey(item);
+        if (k) existing.add(k);
+        const t = normTitle(item.title);
+        if (t) existing.add('title:' + t);
         found++;
         if (found >= 8) break;
       }
@@ -607,6 +665,12 @@ const PAAPI = (function () {
       const { data: p, error: e1 } = await sb().from('pending_articles').select('*').eq('id', id).maybeSingle();
       if (e1) throw e1;
       if (!p) throw new Error('Não encontrado');
+
+      const { data: published } = await sb().from('articles').select('title,source_url');
+      if (isDuplicateArticle({ title: p.title, source_url: p.source_url }, buildExistingKeys(published || [], []))) {
+        await sb().from('pending_articles').delete().eq('id', id);
+        throw new Error('duplicate');
+      }
 
       const art = await this.addArticle({
         title: p.title, lead: p.lead, content: p.content, cat: p.cat, status: 'pub',
