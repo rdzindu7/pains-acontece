@@ -3,6 +3,16 @@ const PAAPI = (function () {
   const ADMIN_PASS = 'Pains@2026';
   const LS_ADMIN = 'pa_admin_state_v2';
 
+  function resolveRole(email) {
+    const e = (email || '').toLowerCase().trim();
+    if (e === ADMIN_USER.toLowerCase()) return 'owner';
+    return 'editor';
+  }
+
+  function isOwner() {
+    return sessionStorage.getItem('pa_role') === 'owner';
+  }
+
   function siteRoot() {
     const path = location.pathname;
     if (path.includes('/pages/')) return new URL('../', location.href);
@@ -171,9 +181,18 @@ const PAAPI = (function () {
   function staticAdminLogin(user, pass) {
     if (user === ADMIN_USER && pass === ADMIN_PASS) {
       sessionStorage.setItem('pa_auth_mode', 'local');
-      return { ok: true, token: 'local-admin-' + Date.now(), user, mode: 'local' };
+      const role = resolveRole(user);
+      sessionStorage.setItem('pa_role', role);
+      return { ok: true, token: 'local-admin-' + Date.now(), user, mode: 'local', role };
     }
     return null;
+  }
+
+  function mergeById(base, extra) {
+    if (!extra?.length) return base || [];
+    const map = new Map((base || []).map(item => [String(item.id), item]));
+    extra.forEach(item => map.set(String(item.id), item));
+    return [...map.values()].sort((a, b) => (b.id || 0) - (a.id || 0));
   }
 
   /* ── Backend local (JSON + localStorage) ── */
@@ -319,8 +338,60 @@ const PAAPI = (function () {
       return Promise.resolve({ ok: true, message: 'Pauta recebida!' });
     },
 
-    getEvents: () => fetchJson('events.json'),
-    getJobs: () => fetchJson('jobs.json'),
+    async getEvents() {
+      const base = await fetchJson('events.json');
+      return mergeById(base, getState().events);
+    },
+
+    async getJobs() {
+      const base = await fetchJson('jobs.json');
+      return mergeById(base, getState().jobs);
+    },
+
+    async addEvent(data) {
+      const state = getState();
+      if (!state.events) state.events = [];
+      const ev = {
+        id: Date.now(),
+        active: true,
+        date: data.date || '',
+        title: data.title || '',
+        place: data.place || '',
+        time: data.time || ''
+      };
+      state.events.unshift(ev);
+      saveAdminState(state);
+      return ev;
+    },
+
+    async deleteEvent(id) {
+      const state = getState();
+      state.events = (state.events || []).filter(e => String(e.id) !== String(id));
+      saveAdminState(state);
+      return { ok: true };
+    },
+
+    async addJob(data) {
+      const state = getState();
+      if (!state.jobs) state.jobs = [];
+      const job = {
+        id: Date.now(),
+        active: true,
+        title: data.title || '',
+        company: data.company || '',
+        type: data.type || 'CLT'
+      };
+      state.jobs.unshift(job);
+      saveAdminState(state);
+      return job;
+    },
+
+    async deleteJob(id) {
+      const state = getState();
+      state.jobs = (state.jobs || []).filter(j => String(j.id) !== String(id));
+      saveAdminState(state);
+      return { ok: true };
+    },
 
     exportForGitHub() {
       const state = getState();
@@ -357,8 +428,10 @@ const PAAPI = (function () {
         const { data, error } = await sb().auth.signInWithPassword({ email: user, password: pass });
         if (!error && data?.session) {
           sessionStorage.setItem('pa_auth_mode', 'cloud');
+          const role = resolveRole(data.user.email);
+          sessionStorage.setItem('pa_role', role);
           cloudOk = null;
-          return { ok: true, token: data.session.access_token, user: data.user.email, mode: 'cloud' };
+          return { ok: true, token: data.session.access_token, user: data.user.email, mode: 'cloud', role };
         }
       } catch {}
       const fallback = staticAdminLogin(user, pass);
@@ -558,6 +631,12 @@ const PAAPI = (function () {
     sendPauta: async (d) => (await getBackend()).sendPauta(d),
     getEvents: async () => (await getBackend()).getEvents(),
     getJobs: async () => (await getBackend()).getJobs(),
+    addEvent: async (d) => (await getBackend()).addEvent?.(d) ?? Promise.reject(new Error('Não disponível')),
+    deleteEvent: async (id) => (await getBackend()).deleteEvent?.(id) ?? Promise.reject(new Error('Não disponível')),
+    addJob: async (d) => (await getBackend()).addJob?.(d) ?? Promise.reject(new Error('Não disponível')),
+    deleteJob: async (id) => (await getBackend()).deleteJob?.(id) ?? Promise.reject(new Error('Não disponível')),
+    resolveRole,
+    isOwner,
     exportForGitHub: async () => (await getBackend()).exportForGitHub(),
     importFromFile: async (f) => (await getBackend()).importFromFile(f),
     getAuthMode: () => sessionStorage.getItem('pa_auth_mode') || (supabaseConfigured() ? 'cloud' : 'local')

@@ -19,6 +19,10 @@
   let allPub = [];
   let currentNav = 'home';
 
+  function isOwnerView() {
+    return typeof PAAPI !== 'undefined' && PAAPI.isOwner();
+  }
+
   function esc(s) {
     const d = document.createElement('div');
     d.textContent = s || '';
@@ -103,7 +107,9 @@
     </a>`;
   }
 
-  const emptyMsg = '<p style="color:var(--dim);font-size:.82rem;padding:20px 0">Nenhuma notícia nesta seção. A IA está buscando fatos verificados…</p>';
+  const emptyMsg = isOwnerView()
+    ? '<p style="color:var(--dim);font-size:.82rem;padding:20px 0">Nenhuma notícia nesta seção. A IA está buscando fatos verificados…</p>'
+    : '<p style="color:var(--dim);font-size:.82rem;padding:20px 0">Nenhuma notícia nesta seção no momento. Volte em breve!</p>';
 
   function filterByCats(arts, cats) {
     if (!cats) return arts;
@@ -115,15 +121,20 @@
     if (!el) return;
     const hero = arts[0];
     if (!hero) {
+      const iaBtn = isOwnerView()
+        ? '<button type="button" class="btn-hero" onclick="PAPublicIA.runSearch()">Buscar agora <i class="fas fa-rss arr"></i></button>'
+        : '';
       el.innerHTML = `
         <div class="hero-text">
           <div class="hero-eyebrow">
             <span class="dot"></span>
-            <span class="label">IA Ativa</span>
+            <span class="label">${isOwnerView() ? 'IA Ativa' : 'Pains Acontece'}</span>
           </div>
-          <h1 class="hero-title">Buscando notícias <em>verificadas</em> de Pains</h1>
-          <p class="hero-lead">Nossa IA editorial está varrendo fontes de Pains MG, região, Brasil e mundo. As matérias aparecem aqui automaticamente.</p>
-          <button type="button" class="btn-hero" onclick="PAPublicIA.runSearch()">Buscar agora <i class="fas fa-rss arr"></i></button>
+          <h1 class="hero-title">${isOwnerView() ? 'Buscando notícias <em>verificadas</em> de Pains' : 'Notícias de <em>Pains</em> e região'}</h1>
+          <p class="hero-lead">${isOwnerView()
+            ? 'Nossa IA editorial está varrendo fontes de Pains MG, região, Brasil e mundo. As matérias aparecem aqui automaticamente.'
+            : 'O portal de notícias hiperlocal do Sudoeste Mineiro. Fique por dentro do que acontece na sua cidade.'}</p>
+          ${iaBtn}
         </div>`;
       return;
     }
@@ -196,11 +207,14 @@
     if (!featEl || !gridEl) return;
 
     if (!arts.length) {
+      const iaBtn = isOwnerView()
+        ? '<button type="button" onclick="PAPublicIA.runSearch()" style="margin-top:16px;padding:10px 20px;background:var(--g);border:none;color:#fff;border-radius:3px;cursor:pointer;font-size:.75rem;font-weight:700">Buscar com IA</button>'
+        : '';
       featEl.innerHTML = '';
       gridEl.innerHTML = `<div style="grid-column:1/-1;padding:40px 0;text-align:center;color:var(--dim)">
         <i class="fas fa-satellite-dish" style="font-size:2rem;opacity:.3;margin-bottom:12px;display:block"></i>
         Nenhuma notícia nesta categoria ainda.<br>
-        <button type="button" onclick="PAPublicIA.runSearch()" style="margin-top:16px;padding:10px 20px;background:var(--g);border:none;color:#fff;border-radius:3px;cursor:pointer;font-size:.75rem;font-weight:700">Buscar com IA</button>
+        ${iaBtn}
       </div>`;
       return;
     }
@@ -374,6 +388,7 @@
   }
 
   async function runBackgroundSearch() {
+    if (!isOwnerView()) return;
     setLoading(true, 'IA buscando novas notícias…');
     try {
       if (typeof PAAutoPublisher !== 'undefined') {
@@ -432,7 +447,7 @@
           applyNav('ultimas');
           showToast(`${matches.length} resultados para "${this.value}"`, 'success');
         } else {
-          showToast('Nenhuma notícia encontrada. Tente "buscar" na IA.', 'error');
+          showToast(isOwnerView() ? 'Nenhuma notícia encontrada. Tente "buscar" na IA.' : 'Nenhuma notícia encontrada.', 'error');
         }
       });
     }

@@ -238,6 +238,7 @@ const PAIA = (function () {
 
   function init() {
     if (!document.getElementById('panel-nova')) return;
+    if (typeof PAAPI !== 'undefined' && !PAAPI.isOwner()) return;
     createUI();
   }
 

@@ -492,6 +492,66 @@ body{background:var(--k2);font-family:var(--fb);color:var(--w);display:flex}
 .modal h3{font-family:var(--ff);font-size:1.4rem;letter-spacing:1.5px;margin-bottom:8px}
 .modal p{font-size:.82rem;color:var(--muted);margin-bottom:24px;line-height:1.6}
 .modal-actions{display:flex;gap:10px;justify-content:flex-end}
+.modal-form{display:flex;flex-direction:column;gap:14px;margin-bottom:20px}
+.modal-form .inp-field{padding:0;margin:0}
+.modal-form label{font-size:.65rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.4);margin-bottom:6px;display:block}
+.modal-form input,.modal-form textarea,.modal-form select{
+  width:100%;background:rgba(255,255,255,.05);border:1px solid var(--border);
+  border-radius:4px;padding:10px 14px;color:#fff;font-family:var(--fb);font-size:.82rem;outline:none;
+}
+.modal-form input:focus,.modal-form textarea:focus{border-color:var(--g);box-shadow:0 0 0 2px rgba(29,122,29,.2)}
+.modal-form textarea{min-height:72px;resize:vertical}
+
+.empty-state{
+  padding:48px 24px;text-align:center;color:var(--dim);
+  display:flex;flex-direction:column;align-items:center;gap:12px;
+}
+.empty-state i{font-size:2.4rem;opacity:.25;color:var(--g3)}
+.empty-state h4{font-family:var(--ff);font-size:1.1rem;letter-spacing:1.5px;color:rgba(255,255,255,.55)}
+.empty-state p{font-size:.78rem;line-height:1.6;max-width:320px}
+
+.media-empty{
+  grid-column:1/-1;border:2px dashed rgba(255,255,255,.08);border-radius:8px;
+  padding:56px 24px;text-align:center;background:rgba(255,255,255,.02);
+}
+.media-empty i{font-size:2.8rem;color:var(--dim);opacity:.35;margin-bottom:14px;display:block}
+.media-card{
+  aspect-ratio:1;border-radius:6px;overflow:hidden;border:1px solid var(--border);
+  position:relative;transition:transform .2s,border-color .2s;
+}
+.media-card:hover{transform:scale(1.02);border-color:rgba(29,122,29,.5)}
+.media-card img,.media-card video{width:100%;height:100%;object-fit:cover}
+.media-card .media-actions{
+  position:absolute;inset:0;background:rgba(0,0,0,.55);opacity:0;
+  display:flex;align-items:center;justify-content:center;gap:8px;transition:opacity .2s;
+}
+.media-card:hover .media-actions{opacity:1}
+
+.ads-hero{
+  background:linear-gradient(135deg,rgba(29,122,29,.15),rgba(201,162,39,.08));
+  border:1px solid rgba(29,122,29,.25);border-radius:8px;padding:28px 32px;
+  margin-bottom:24px;display:flex;align-items:center;gap:24px;flex-wrap:wrap;
+}
+.ads-hero h3{font-family:var(--ff);font-size:1.8rem;letter-spacing:2px;flex:1;min-width:200px}
+.ads-hero p{font-size:.82rem;color:var(--dim);line-height:1.6;max-width:480px}
+.ads-table{width:100%;border-collapse:collapse}
+.ads-table th,.ads-table td{
+  padding:14px 18px;text-align:left;border-bottom:1px solid var(--border);font-size:.82rem;
+}
+.ads-table th{
+  font-size:.62rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
+  color:rgba(255,255,255,.35);background:rgba(255,255,255,.02);
+}
+.ads-table tr:hover td{background:rgba(255,255,255,.02)}
+.ads-table .price{font-family:var(--ff);font-size:1.2rem;color:var(--y);letter-spacing:1px;white-space:nowrap}
+.ads-table .pos{font-weight:600;color:var(--w)}
+.ads-table .desc{color:var(--dim);font-size:.75rem}
+.ads-badge{
+  display:inline-block;background:rgba(201,162,39,.15);border:1px solid rgba(201,162,39,.35);
+  color:var(--y2);font-size:.58rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;
+  padding:3px 10px;border-radius:20px;margin-left:8px;
+}
+.owner-only.hidden{display:none!important}
 
 /* RESPONSIVO */
 @media(max-width:900px){
@@ -537,7 +597,7 @@ body{background:var(--k2);font-family:var(--fb);color:var(--w);display:flex}
     <div class="sb-item" onclick="showPanel('nova',this)">
       <i class="fas fa-plus-circle"></i> Nova Notícia
     </div>
-    <div class="sb-item" onclick="showPanel('ia',this)" id="sbIA">
+    <div class="sb-item owner-only" onclick="showPanel('ia',this)" id="sbIA">
       <i class="fas fa-robot"></i> IA Scanner
       <span class="sb-badge" id="iaBadge" style="display:none">0</span>
     </div>
@@ -555,6 +615,9 @@ body{background:var(--k2);font-family:var(--fb);color:var(--w);display:flex}
     <div class="sb-item" onclick="showPanel('empregos_adm',this)">
       <i class="fas fa-briefcase"></i> Empregos
     </div>
+    <div class="sb-item" onclick="showPanel('publicidades',this)">
+      <i class="fas fa-ad"></i> Publicidades
+    </div>
 
     <div class="sb-section">Configurações</div>
     <div class="sb-item" onclick="showPanel('perfil',this)">
@@ -571,7 +634,7 @@ body{background:var(--k2);font-family:var(--fb);color:var(--w);display:flex}
     <div class="sb-avatar" id="sbAvatar">A</div>
     <div class="sb-user-info">
       <div class="name" id="sbName">Administrador</div>
-      <div class="role">Editor-Chefe</div>
+      <div class="role" id="sbRole">Editor-Chefe</div>
     </div>
     <button class="sb-logout" onclick="confirmLogout()" title="Sair"><i class="fas fa-sign-out-alt"></i></button>
   </div>
@@ -808,7 +871,7 @@ body{background:var(--k2);font-family:var(--fb);color:var(--w);display:flex}
                 <button class="btn-pub green" onclick="previewBeforePublish()"><i class="fas fa-eye"></i> Ver Preview</button>
                 <button class="btn-pub green" onclick="publishArticle()"><i class="fas fa-paper-plane"></i> Publicar Direto</button>
                 <button class="btn-pub outline" onclick="saveDraft()"><i class="fas fa-save"></i> Salvar Rascunho</button>
-                <button class="btn-pub outline" onclick="openAIChat()" style="border-color:rgba(29,122,29,.3);color:var(--g3)"><i class="fas fa-robot"></i> Abrir IA</button>
+                <button class="btn-pub outline owner-only" onclick="openAIChat()" style="border-color:rgba(29,122,29,.3);color:var(--g3)"><i class="fas fa-robot"></i> Abrir IA</button>
                 <button class="btn-pub red-btn" onclick="clearEditor()"><i class="fas fa-trash"></i> Descartar</button>
               </div>
             </div>
@@ -993,9 +1056,7 @@ body{background:var(--k2);font-family:var(--fb);color:var(--w);display:flex}
           <h3 style="font-family:var(--ff);font-size:1.4rem;letter-spacing:2px;flex:1">Agenda de Eventos</h3>
           <button class="tb-btn primary" onclick="showAddEvent()"><i class="fas fa-plus"></i> Novo Evento</button>
         </div>
-        <div class="box" id="eventList">
-          <div style="padding:24px;text-align:center;color:var(--dim);font-size:.82rem">Nenhum evento cadastrado.</div>
-        </div>
+        <div class="box" id="eventList"></div>
       </div>
     </div>
 
@@ -1006,9 +1067,79 @@ body{background:var(--k2);font-family:var(--fb);color:var(--w);display:flex}
           <h3 style="font-family:var(--ff);font-size:1.4rem;letter-spacing:2px;flex:1">Vagas de Emprego</h3>
           <button class="tb-btn primary" onclick="showAddJob()"><i class="fas fa-plus"></i> Nova Vaga</button>
         </div>
-        <div class="box" id="jobList">
-          <div style="padding:24px;text-align:center;color:var(--dim);font-size:.82rem">Nenhuma vaga cadastrada.</div>
+        <div class="box" id="jobList"></div>
+      </div>
+    </div>
+
+    <!-- ══ PUBLICIDADES ══ -->
+    <div class="panel" id="panel-publicidades">
+      <div class="ads-hero">
+        <div>
+          <h3><i class="fas fa-ad" style="color:var(--y);margin-right:8px"></i> Anuncie no Pains Acontece</h3>
+          <p>Alcance moradores de Pains e região com visibilidade no portal mais acessado do Sudoeste Mineiro. Valores atualizados para 2026.</p>
         </div>
+        <button class="tb-btn primary" onclick="showToast('Entre em contato pelo WhatsApp do portal!','info')"><i class="fab fa-whatsapp"></i> Solicitar Orçamento</button>
+      </div>
+      <div class="box">
+        <div class="box-head">
+          <h3>Tabela de Preços</h3>
+          <span class="ads-badge">Valores mensais</span>
+        </div>
+        <div style="overflow-x:auto">
+          <table class="ads-table">
+            <thead>
+              <tr><th>Posição</th><th>Descrição</th><th>Alcance</th><th>Valor</th></tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td class="pos">Banner Principal</td>
+                <td class="desc">Destaque no topo da home — primeira dobra, visível em desktop e mobile</td>
+                <td>~15.000 views/mês</td>
+                <td class="price">R$ 800</td>
+              </tr>
+              <tr>
+                <td class="pos">Sidebar Lateral</td>
+                <td class="desc">Bloco fixo na coluna direita em todas as páginas de notícias</td>
+                <td>~8.000 views/mês</td>
+                <td class="price">R$ 350</td>
+              </tr>
+              <tr>
+                <td class="pos">Destaque Editorial</td>
+                <td class="desc">Matéria patrocinada com selo "Conteúdo Patrocinado" na seção principal</td>
+                <td>~12.000 views/mês</td>
+                <td class="price">R$ 1.200</td>
+              </tr>
+              <tr>
+                <td class="pos">Ticker / Faixa</td>
+                <td class="desc">Faixa animada abaixo do menu com texto e link do anunciante</td>
+                <td>~20.000 impressões/mês</td>
+                <td class="price">R$ 450</td>
+              </tr>
+              <tr>
+                <td class="pos">Newsletter</td>
+                <td class="desc">Inclusão no boletim semanal enviado por e-mail e WhatsApp</td>
+                <td>~2.500 envios/mês</td>
+                <td class="price">R$ 200</td>
+              </tr>
+              <tr>
+                <td class="pos">Redes Sociais</td>
+                <td class="desc">Post patrocinado no Instagram, Facebook e WhatsApp do portal</td>
+                <td>~5.000 alcance/post</td>
+                <td class="price">R$ 150</td>
+              </tr>
+              <tr>
+                <td class="pos">Pacote Completo</td>
+                <td class="desc">Banner + Sidebar + Destaque + Redes — máxima visibilidade com 20% de desconto</td>
+                <td>Combo premium</td>
+                <td class="price">R$ 2.100</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div style="margin-top:16px;padding:16px 20px;background:rgba(29,122,29,.08);border:1px solid rgba(29,122,29,.2);border-radius:6px;font-size:.78rem;color:var(--dim);line-height:1.6">
+        <i class="fas fa-info-circle" style="color:var(--g3);margin-right:6px"></i>
+        Valores sujeitos a negociação para contratos trimestrais ou anuais. Materiais gráficos podem ser produzidos pela redação mediante taxa adicional.
       </div>
     </div>
 
@@ -1108,6 +1239,77 @@ body{background:var(--k2);font-family:var(--fb);color:var(--w);display:flex}
   </div>
 </div>
 
+<!-- MODAL CATEGORIA -->
+<div class="modal-backdrop" id="categoryModal">
+  <div class="modal" style="max-width:440px">
+    <h3 id="categoryModalTitle"><i class="fas fa-tags" style="color:var(--g3)"></i> Nova Categoria</h3>
+    <p id="categoryModalDesc">Adicione uma categoria para organizar as publicações do portal.</p>
+    <div class="modal-form">
+      <div class="inp-field">
+        <label>Nome da Categoria</label>
+        <input type="text" id="catNameInput" placeholder="Ex: Cultura, Economia…" maxlength="40"/>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-pub outline" style="padding:10px 20px" onclick="closeModal('categoryModal')">Cancelar</button>
+      <button class="btn-pub green" style="padding:10px 20px" onclick="saveCategory()"><i class="fas fa-check"></i> Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL EVENTO -->
+<div class="modal-backdrop" id="eventModal">
+  <div class="modal" style="max-width:480px">
+    <h3><i class="fas fa-calendar-plus" style="color:var(--y)"></i> Novo Evento</h3>
+    <p>Cadastre um evento para aparecer na agenda do portal.</p>
+    <div class="modal-form">
+      <div class="inp-field"><label>Título</label><input type="text" id="evTitle" placeholder="Nome do evento"/></div>
+      <div class="inp-field"><label>Data (ex: 15 JUL)</label><input type="text" id="evDate" placeholder="15 JUL"/></div>
+      <div class="inp-field"><label>Local</label><input type="text" id="evPlace" placeholder="Praça Central, Pains MG"/></div>
+      <div class="inp-field"><label>Horário</label><input type="text" id="evTime" placeholder="19h00"/></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-pub outline" style="padding:10px 20px" onclick="closeModal('eventModal')">Cancelar</button>
+      <button class="btn-pub green" style="padding:10px 20px" onclick="saveEvent()"><i class="fas fa-save"></i> Cadastrar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL VAGA -->
+<div class="modal-backdrop" id="jobModal">
+  <div class="modal" style="max-width:480px">
+    <h3><i class="fas fa-briefcase" style="color:#a29bfe"></i> Nova Vaga</h3>
+    <p>Publique uma oportunidade de emprego na seção Empregos do portal.</p>
+    <div class="modal-form">
+      <div class="inp-field"><label>Cargo / Título</label><input type="text" id="jobTitle" placeholder="Ex: Auxiliar Administrativo"/></div>
+      <div class="inp-field"><label>Empresa</label><input type="text" id="jobCompany" placeholder="Nome da empresa"/></div>
+      <div class="inp-field"><label>Tipo</label>
+        <select id="jobType" class="pa-select-native">
+          <option>CLT</option><option>Temporário</option><option>Estágio</option><option>Freelance</option><option>Meio período</option>
+        </select>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-pub outline" style="padding:10px 20px" onclick="closeModal('jobModal')">Cancelar</button>
+      <button class="btn-pub green" style="padding:10px 20px" onclick="saveJob()"><i class="fas fa-save"></i> Publicar Vaga</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL LINK -->
+<div class="modal-backdrop" id="linkModal">
+  <div class="modal" style="max-width:400px">
+    <h3><i class="fas fa-link" style="color:var(--g3)"></i> Inserir Link</h3>
+    <div class="modal-form">
+      <div class="inp-field"><label>URL</label><input type="url" id="linkUrlInput" placeholder="https://…"/></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-pub outline" style="padding:10px 20px" onclick="closeModal('linkModal')">Cancelar</button>
+      <button class="btn-pub green" style="padding:10px 20px" onclick="confirmInsertLink()"><i class="fas fa-check"></i> Inserir</button>
+    </div>
+  </div>
+</div>
+
 <!-- MODAL DELETE -->
 <div class="modal-backdrop" id="deleteModal">
   <div class="modal">
@@ -1134,6 +1336,28 @@ body{background:var(--k2);font-family:var(--fb);color:var(--w);display:flex}
 <script src="../js/ai/assistant.js"></script>
 <script>
 /* ════ AUTH GUARD ════ */
+let isOwnerUser = false;
+
+function applyRoleRestrictions() {
+  isOwnerUser = PAAPI.isOwner();
+  document.querySelectorAll('.owner-only').forEach(el => {
+    el.classList.toggle('hidden', !isOwnerUser);
+  });
+  const roleEl = document.getElementById('sbRole');
+  const badge = document.querySelector('.role-badge');
+  const roleLabel = isOwnerUser ? 'Proprietário' : 'Editor';
+  if (roleEl) roleEl.textContent = roleLabel;
+  if (badge) badge.textContent = roleLabel + ' · Pains Acontece';
+  if (!isOwnerUser) {
+    const iaPanel = document.getElementById('panel-ia');
+    if (iaPanel?.classList.contains('active')) {
+      showPanel('dashboard', document.querySelector('.sb-item'));
+    }
+    document.getElementById('paiaFab')?.remove();
+    document.getElementById('paiaPanel')?.remove();
+  }
+}
+
 (async function(){
   if (!sessionStorage.getItem('pa_logged')) {
     if (PASupabase.isConfigured()) {
@@ -1142,6 +1366,7 @@ body{background:var(--k2);font-family:var(--fb);color:var(--w);display:flex}
         sessionStorage.setItem('pa_logged', '1');
         sessionStorage.setItem('pa_user', session.user.email);
         sessionStorage.setItem('pa_auth_mode', 'cloud');
+        sessionStorage.setItem('pa_role', PAAPI.resolveRole(session.user.email));
       } else {
         window.location.href = 'login.html';
         return;
@@ -1152,16 +1377,25 @@ body{background:var(--k2);font-family:var(--fb);color:var(--w);display:flex}
     }
   }
   const u = sessionStorage.getItem('pa_user') || 'admin@painsacontece.com.br';
+  if (!sessionStorage.getItem('pa_role')) {
+    sessionStorage.setItem('pa_role', PAAPI.resolveRole(u));
+  }
   const name = u.split('@')[0].charAt(0).toUpperCase() + u.split('@')[0].slice(1);
   document.getElementById('sbName').textContent = name;
   document.getElementById('sbAvatar').textContent = name.charAt(0).toUpperCase();
   document.getElementById('bigAvatar').textContent = name.charAt(0).toUpperCase();
   document.getElementById('phName').textContent = name.charAt(0).toUpperCase() + name.slice(1);
   document.getElementById('phEmail').textContent = u;
+  applyRoleRestrictions();
 })();
 
 /* ════ NAVIGATION ════ */
 function showPanel(id, el) {
+  if (id === 'ia' && !isOwnerUser) {
+    showToast('IA Scanner disponível apenas para o proprietário.', 'info');
+    id = 'dashboard';
+    el = document.querySelector('.sb-item');
+  }
   document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
   document.querySelectorAll('.sb-item').forEach(i => i.classList.remove('active'));
   const panel = document.getElementById('panel-' + id);
@@ -1173,7 +1407,10 @@ function showPanel(id, el) {
   if (id === 'publicacoes') renderPubs();
   if (id === 'midia') renderMedia();
   if (id === 'nova') initEditor();
-  if (id === 'ia') renderPending();
+  if (id === 'ia' && isOwnerUser) renderPending();
+  if (id === 'categorias') renderCategories();
+  if (id === 'agenda') renderEvents();
+  if (id === 'empregos_adm') renderJobs();
   document.querySelector('.main').scrollTop = 0;
 }
 
@@ -1472,8 +1709,14 @@ function initEditor() {
 }
 function fmt(cmd) { document.execCommand(cmd, false, null); document.getElementById('artContent').focus(); }
 function insertLink() {
-  const url = prompt('URL do link:');
+  document.getElementById('linkUrlInput').value = '';
+  document.getElementById('linkModal').classList.add('open');
+  setTimeout(() => document.getElementById('linkUrlInput')?.focus(), 100);
+}
+function confirmInsertLink() {
+  const url = document.getElementById('linkUrlInput').value.trim();
   if (url) document.execCommand('createLink', false, url);
+  closeModal('linkModal');
 }
 
 function openAIChat() {
@@ -1571,43 +1814,69 @@ function addTag(e) {
 }
 
 /* ════ MEDIA ════ */
-const DEMO_IMGS = [
-  'https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=200&q=60',
-  'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=200&q=60',
-  'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=200&q=60',
-  'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=200&q=60',
-  'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=200&q=60',
-  'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=200&q=60',
-];
+const LS_MEDIA = 'pa_media_library_v1';
+
+function loadMedia() {
+  try { return JSON.parse(localStorage.getItem(LS_MEDIA)) || []; } catch { return []; }
+}
+function saveMedia(items) {
+  localStorage.setItem(LS_MEDIA, JSON.stringify(items));
+}
+
 function renderMedia() {
   const grid = document.getElementById('mediaGrid');
-  grid.innerHTML = DEMO_IMGS.map(src => `
-    <div style="aspect-ratio:1;border-radius:4px;overflow:hidden;border:1px solid var(--border);cursor:pointer;transition:transform .2s,border-color .2s;position:relative"
-         onmouseover="this.style.transform='scale(1.03)';this.style.borderColor='var(--g)'"
-         onmouseout="this.style.transform='';this.style.borderColor='var(--border)'">
-      <img src="${src}" style="width:100%;height:100%;object-fit:cover" alt=""/>
-      <div style="position:absolute;inset:0;background:rgba(0,0,0,0);transition:background .2s;display:flex;align-items:center;justify-content:center;gap:8px;opacity:0"
-           onmouseover="this.style.background='rgba(0,0,0,.5)';this.style.opacity=1"
-           onmouseout="this.style.background='';this.style.opacity=0">
-        <button class="icon-btn view" style="width:34px;height:34px" onclick="showToast('Imagem copiada!','success')"><i class="fas fa-copy"></i></button>
-        <button class="icon-btn del" style="width:34px;height:34px" onclick="this.closest('div[style]').remove();showToast('Imagem excluída','error')"><i class="fas fa-trash"></i></button>
+  const items = loadMedia();
+  if (!items.length) {
+    grid.innerHTML = `<div class="media-empty">
+      <i class="fas fa-photo-film"></i>
+      <h4 style="font-family:var(--ff);font-size:1.2rem;letter-spacing:1.5px;color:rgba(255,255,255,.5);margin-bottom:6px">Biblioteca vazia</h4>
+      <p style="font-size:.78rem;color:var(--dim);max-width:280px;line-height:1.6">Faça upload de fotos e vídeos para usar nas publicações. Nenhuma imagem de demonstração será exibida.</p>
+      <button class="tb-btn primary" style="margin-top:12px" onclick="document.getElementById('mediaInput').click()"><i class="fas fa-upload"></i> Enviar Arquivo</button>
+    </div>`;
+    return;
+  }
+  grid.innerHTML = items.map(m => `
+    <div class="media-card" data-id="${m.id}">
+      ${m.type === 'video' ? `<video src="${m.src}" muted></video>` : `<img src="${m.src}" alt="${m.name}"/>`}
+      <div class="media-actions">
+        <button class="icon-btn view" style="width:34px;height:34px" onclick="copyMediaUrl('${m.id}')" title="Copiar URL"><i class="fas fa-copy"></i></button>
+        <button class="icon-btn del" style="width:34px;height:34px" onclick="deleteMedia('${m.id}')" title="Excluir"><i class="fas fa-trash"></i></button>
       </div>
     </div>`).join('');
 }
 
+function copyMediaUrl(id) {
+  const item = loadMedia().find(m => String(m.id) === String(id));
+  if (!item) return;
+  navigator.clipboard?.writeText(item.src).then(() => showToast('URL copiada!', 'success')).catch(() => showToast('Copie manualmente da biblioteca.', 'info'));
+}
+
+function deleteMedia(id) {
+  const items = loadMedia().filter(m => String(m.id) !== String(id));
+  saveMedia(items);
+  renderMedia();
+  showToast('Arquivo removido da biblioteca.', 'info');
+}
+
 function handleMediaUpload(input) {
-  const grid = document.getElementById('mediaGrid');
+  const items = loadMedia();
   Array.from(input.files).forEach(f => {
     const reader = new FileReader();
     reader.onload = e => {
-      const div = document.createElement('div');
-      div.style.cssText = 'aspect-ratio:1;border-radius:4px;overflow:hidden;border:1px solid var(--g);cursor:pointer;transition:transform .2s';
-      div.innerHTML = `<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover"/>`;
-      grid.prepend(div);
+      items.unshift({
+        id: 'm-' + Date.now() + '-' + Math.random().toString(36).slice(2, 6),
+        src: e.target.result,
+        name: f.name,
+        type: f.type.startsWith('video') ? 'video' : 'image',
+        date: new Date().toISOString()
+      });
+      saveMedia(items);
+      renderMedia();
       showToast(`"${f.name}" enviado!`, 'success');
     };
     reader.readAsDataURL(f);
   });
+  input.value = '';
 }
 
 /* ════ PROFILE ════ */
@@ -1630,19 +1899,234 @@ function changePassword() {
   document.getElementById('confPass').value = '';
 }
 
-/* ════ OUTROS ════ */
-function addCategory() {
-  const name = prompt('Nome da nova categoria:');
-  if (!name) return;
-  const list = document.getElementById('catList');
-  const div = document.createElement('div');
-  div.className = 'art-row';
-  div.innerHTML = `<div class="info"><div class="title">${name}</div><div class="meta">0 artigos</div></div><div style="display:flex;gap:6px"><button class="icon-btn edit"><i class="fas fa-edit"></i></button><button class="icon-btn del" onclick="this.closest('.art-row').remove();showToast('Categoria excluída','error')"><i class="fas fa-trash"></i></button></div>`;
-  list.appendChild(div);
-  showToast(`Categoria "${name}" criada!`, 'success');
+/* ════ CATEGORIAS ════ */
+const LS_CATS = 'pa_categories_v1';
+const DEFAULT_CATS = ['Últimas Notícias','Pains','Região','Brasil / Mundo','Polícia','Política','Saúde','Educação','Agenda','Empregos','Gastronomia','Esportes'];
+let editingCatIndex = null;
+
+function loadCategories() {
+  try {
+    const stored = JSON.parse(localStorage.getItem(LS_CATS));
+    if (stored?.length) return stored;
+  } catch {}
+  return DEFAULT_CATS.map(name => ({ name, count: 0 }));
 }
-function showAddEvent() { showToast('Formulário de evento em breve…', 'info'); }
-function showAddJob() { showToast('Formulário de vaga em breve…', 'info'); }
+function saveCategories(cats) {
+  localStorage.setItem(LS_CATS, JSON.stringify(cats));
+}
+
+function renderCategories() {
+  const list = document.getElementById('catList');
+  const cats = loadCategories();
+  const arts = getArticles();
+  list.innerHTML = cats.map((c, i) => {
+    const count = arts.filter(a => a.cat === c.name).length;
+    return `<div class="art-row" data-idx="${i}">
+      <div class="info"><div class="title">${c.name}</div><div class="meta">${count} artigo${count !== 1 ? 's' : ''}</div></div>
+      <div style="display:flex;gap:6px">
+        <button class="icon-btn edit" onclick="editCategory(${i})" title="Editar"><i class="fas fa-edit"></i></button>
+        <button class="icon-btn del" onclick="deleteCategory(${i})" title="Excluir"><i class="fas fa-trash"></i></button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function addCategory() {
+  editingCatIndex = null;
+  document.getElementById('categoryModalTitle').innerHTML = '<i class="fas fa-tags" style="color:var(--g3)"></i> Nova Categoria';
+  document.getElementById('categoryModalDesc').textContent = 'Adicione uma categoria para organizar as publicações do portal.';
+  document.getElementById('catNameInput').value = '';
+  document.getElementById('categoryModal').classList.add('open');
+  setTimeout(() => document.getElementById('catNameInput')?.focus(), 100);
+}
+
+function editCategory(idx) {
+  const cats = loadCategories();
+  editingCatIndex = idx;
+  document.getElementById('categoryModalTitle').innerHTML = '<i class="fas fa-edit" style="color:var(--g3)"></i> Editar Categoria';
+  document.getElementById('categoryModalDesc').textContent = 'Altere o nome da categoria selecionada.';
+  document.getElementById('catNameInput').value = cats[idx]?.name || '';
+  document.getElementById('categoryModal').classList.add('open');
+  setTimeout(() => document.getElementById('catNameInput')?.focus(), 100);
+}
+
+function saveCategory() {
+  const name = document.getElementById('catNameInput').value.trim();
+  if (!name) { showToast('Digite o nome da categoria.', 'error'); return; }
+  const cats = loadCategories();
+  if (editingCatIndex !== null) {
+    cats[editingCatIndex].name = name;
+    showToast(`Categoria atualizada para "${name}"!`, 'success');
+  } else {
+    if (cats.some(c => c.name.toLowerCase() === name.toLowerCase())) {
+      showToast('Esta categoria já existe.', 'error'); return;
+    }
+    cats.push({ name, count: 0 });
+    showToast(`Categoria "${name}" criada!`, 'success');
+  }
+  saveCategories(cats);
+  closeModal('categoryModal');
+  renderCategories();
+  syncCategorySelect();
+}
+
+function deleteCategory(idx) {
+  const cats = loadCategories();
+  const name = cats[idx]?.name;
+  if (!name) return;
+  cats.splice(idx, 1);
+  saveCategories(cats);
+  renderCategories();
+  syncCategorySelect();
+  showToast(`Categoria "${name}" excluída.`, 'info');
+}
+
+function syncCategorySelect() {
+  const sel = document.getElementById('artCat');
+  if (!sel) return;
+  const cats = loadCategories();
+  const current = sel.value;
+  sel.innerHTML = cats.map(c => `<option>${c.name}</option>`).join('');
+  if (cats.some(c => c.name === current)) sel.value = current;
+  else if (cats.length) sel.selectedIndex = 0;
+  const wrap = sel.closest('.pa-select');
+  if (wrap) {
+    const menu = wrap.querySelector('.pa-select-menu');
+    if (menu) {
+      menu.innerHTML = '';
+      [...sel.options].forEach(opt => {
+        const li = document.createElement('li');
+        li.className = 'pa-select-item' + (opt.selected ? ' active' : '');
+        li.textContent = opt.textContent;
+        li.addEventListener('click', () => {
+          sel.value = opt.value || opt.textContent;
+          wrap.querySelector('.pa-select-label').textContent = opt.textContent;
+          menu.querySelectorAll('.pa-select-item').forEach(i => i.classList.remove('active'));
+          li.classList.add('active');
+          wrap.classList.remove('open');
+          sel.dispatchEvent(new Event('change', { bubbles: true }));
+        });
+        menu.appendChild(li);
+      });
+    }
+    const label = wrap.querySelector('.pa-select-label');
+    if (label) label.textContent = sel.options[sel.selectedIndex]?.textContent || '';
+  }
+}
+
+/* ════ AGENDA ════ */
+function emptyState(icon, title, desc, btnLabel, btnFn) {
+  return `<div class="empty-state">
+    <i class="fas ${icon}"></i>
+    <h4>${title}</h4>
+    <p>${desc}</p>
+    ${btnLabel ? `<button class="tb-btn primary" style="margin-top:4px" onclick="${btnFn}"><i class="fas fa-plus"></i> ${btnLabel}</button>` : ''}
+  </div>`;
+}
+
+async function renderEvents() {
+  const list = document.getElementById('eventList');
+  try {
+    const events = await PAAPI.getEvents();
+    if (!events.length) {
+      list.innerHTML = emptyState('fa-calendar-alt', 'Nenhum evento cadastrado', 'Adicione shows, feiras, reuniões e outros eventos da região para exibir na agenda do portal.', 'Novo Evento', 'showAddEvent()');
+      return;
+    }
+    list.innerHTML = events.map(e => `
+      <div class="art-row">
+        <div style="width:52px;text-align:center;flex-shrink:0">
+          <div style="font-family:var(--ff);font-size:1.4rem;color:var(--y);line-height:1">${(e.date||'').split(' ')[0]||'—'}</div>
+          <div style="font-size:.6rem;color:var(--dim);text-transform:uppercase">${(e.date||'').split(' ')[1]||''}</div>
+        </div>
+        <div class="info" style="flex:1">
+          <div class="title">${e.title}</div>
+          <div class="meta"><i class="fas fa-map-marker-alt"></i> ${e.place||'—'} · ${e.time||'—'}</div>
+        </div>
+        <button class="icon-btn del" onclick="deleteEventItem(${e.id})" title="Excluir"><i class="fas fa-trash"></i></button>
+      </div>`).join('');
+  } catch {
+    list.innerHTML = emptyState('fa-calendar-alt', 'Erro ao carregar', 'Recarregue a página para tentar novamente.', null, null);
+  }
+}
+
+function showAddEvent() {
+  ['evTitle','evDate','evPlace','evTime'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  document.getElementById('eventModal').classList.add('open');
+  setTimeout(() => document.getElementById('evTitle')?.focus(), 100);
+}
+
+async function saveEvent() {
+  const title = document.getElementById('evTitle').value.trim();
+  const date = document.getElementById('evDate').value.trim();
+  const place = document.getElementById('evPlace').value.trim();
+  const time = document.getElementById('evTime').value.trim();
+  if (!title || !date) { showToast('Preencha título e data do evento.', 'error'); return; }
+  try {
+    await PAAPI.addEvent({ title, date, place, time });
+    closeModal('eventModal');
+    showToast('Evento cadastrado na agenda!', 'success');
+    renderEvents();
+  } catch { showToast('Erro ao salvar evento.', 'error'); }
+}
+
+async function deleteEventItem(id) {
+  try {
+    await PAAPI.deleteEvent(id);
+    showToast('Evento removido.', 'info');
+    renderEvents();
+  } catch { showToast('Erro ao excluir.', 'error'); }
+}
+
+/* ════ EMPREGOS ════ */
+async function renderJobs() {
+  const list = document.getElementById('jobList');
+  try {
+    const jobs = await PAAPI.getJobs();
+    if (!jobs.length) {
+      list.innerHTML = emptyState('fa-briefcase', 'Nenhuma vaga cadastrada', 'Publique oportunidades de emprego para aparecer na seção Empregos do portal.', 'Nova Vaga', 'showAddJob()');
+      return;
+    }
+    list.innerHTML = jobs.map(j => `
+      <div class="art-row">
+        <div class="info" style="flex:1">
+          <div class="title">${j.title}</div>
+          <div class="meta"><i class="fas fa-building"></i> ${j.company||'—'} · ${j.type||'CLT'}</div>
+        </div>
+        <button class="icon-btn del" onclick="deleteJobItem(${j.id})" title="Excluir"><i class="fas fa-trash"></i></button>
+      </div>`).join('');
+  } catch {
+    list.innerHTML = emptyState('fa-briefcase', 'Erro ao carregar', 'Recarregue a página para tentar novamente.', null, null);
+  }
+}
+
+function showAddJob() {
+  ['jobTitle','jobCompany'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  const type = document.getElementById('jobType');
+  if (type) type.selectedIndex = 0;
+  document.getElementById('jobModal').classList.add('open');
+  setTimeout(() => document.getElementById('jobTitle')?.focus(), 100);
+}
+
+async function saveJob() {
+  const title = document.getElementById('jobTitle').value.trim();
+  const company = document.getElementById('jobCompany').value.trim();
+  const type = document.getElementById('jobType').value;
+  if (!title || !company) { showToast('Preencha cargo e empresa.', 'error'); return; }
+  try {
+    await PAAPI.addJob({ title, company, type });
+    closeModal('jobModal');
+    showToast('Vaga publicada!', 'success');
+    renderJobs();
+  } catch { showToast('Erro ao salvar vaga.', 'error'); }
+}
+
+async function deleteJobItem(id) {
+  try {
+    await PAAPI.deleteJob(id);
+    showToast('Vaga removida.', 'info');
+    renderJobs();
+  } catch { showToast('Erro ao excluir.', 'error'); }
+}
 
 function updateSupabaseStatus(connected, msg) {
   const dot = document.getElementById('supabaseDot');
@@ -1820,8 +2304,11 @@ if (artStatusEl) {
   } catch {}
   setScanUI(false);
   iaScanning = false;
-  iaPollTimer = setInterval(pollPending, 30000);
-  pollPending();
+  if (isOwnerUser) {
+    iaPollTimer = setInterval(pollPending, 30000);
+    pollPending();
+  }
+  syncCategorySelect();
 })();
 </script>
 </body>

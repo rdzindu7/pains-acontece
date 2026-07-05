@@ -249,6 +249,7 @@ const PAPublicIA = (function () {
 
   function init() {
     if (!document.getElementById('heroDynamic')) return;
+    if (typeof PAAPI !== 'undefined' && !PAAPI.isOwner()) return;
     createUI();
   }
 

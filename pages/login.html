@@ -260,6 +260,7 @@ async function doLogin(e) {
       sessionStorage.setItem('pa_user', u);
       sessionStorage.setItem('pa_token', res.token);
       if (res.mode) sessionStorage.setItem('pa_auth_mode', res.mode);
+      sessionStorage.setItem('pa_role', res.role || PAAPI.resolveRole(u));
       ok = true;
     }
   } catch {}
