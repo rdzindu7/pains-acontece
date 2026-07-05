@@ -225,11 +225,13 @@ body{
   </div>
 </div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/core/config.js"></script>
+<script src="../js/core/supabase-client.js"></script>
 <script src="../js/ai/scanner.js"></script>
 <script src="../js/ai/engine.js"></script>
 <script src="../js/core/api.js"></script>
 <script>
-const CREDENTIALS = { user: 'admin@painsacontece.com.br', pass: 'Pains@2026' };
 
 async function doLogin(e) {
   e.preventDefault();

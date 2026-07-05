@@ -990,17 +990,34 @@ body{background:var(--k2);font-family:var(--fb);color:var(--w);display:flex}
     <div class="panel" id="panel-config">
       <div style="max-width:700px;display:flex;flex-direction:column;gap:16px">
         <div class="profile-sec">
-          <div class="profile-sec-head"><i class="fab fa-github"></i><h3>Publicar no GitHub Pages</h3></div>
+          <div class="profile-sec-head"><i class="fas fa-database"></i><h3>Banco de Dados Supabase</h3></div>
           <div class="profile-sec-body">
+            <div id="supabaseStatus" style="display:flex;align-items:center;gap:10px;margin-bottom:14px;padding:12px 16px;border-radius:6px;background:var(--k4);border:1px solid var(--border)">
+              <span id="supabaseDot" style="width:10px;height:10px;border-radius:50%;background:#888;flex-shrink:0"></span>
+              <span id="supabaseStatusText" style="font-size:.82rem;color:var(--dim)">Verificando conexão…</span>
+            </div>
             <p style="font-size:.8rem;color:var(--dim);line-height:1.6;margin-bottom:14px">
-              O site roda 100% no GitHub, sem servidor. As edições ficam salvas no seu navegador até você exportar o JSON e enviar para o repositório.
+              Com o Supabase configurado, notícias, pautas e dados do scanner ficam salvos na nuvem em tempo real — sem precisar exportar JSON manualmente.
             </p>
             <ol style="font-size:.75rem;color:var(--muted);line-height:1.8;margin-bottom:16px;padding-left:18px">
-              <li>Edite e publique notícias no painel</li>
-              <li>Clique em <strong>Exportar JSON</strong> abaixo</li>
-              <li>No GitHub, substitua o arquivo <code>data/articles.json</code></li>
-              <li>Faça commit — o site atualiza em ~1 minuto</li>
+              <li>Crie um projeto grátis em <a href="https://supabase.com" target="_blank" rel="noopener" style="color:var(--g3)">supabase.com</a></li>
+              <li>Execute o arquivo <code>supabase/schema.sql</code> no SQL Editor</li>
+              <li>Em <strong>Settings → API</strong>, copie URL e anon key para <code>js/core/config.js</code></li>
+              <li>Em <strong>Authentication → Users</strong>, crie o admin: <code>admin@painsacontece.com.br</code></li>
+              <li>Faça commit no GitHub — o site atualiza automaticamente</li>
             </ol>
+            <div style="display:flex;gap:10px;flex-wrap:wrap">
+              <button class="btn-pub green" onclick="testSupabase()"><i class="fas fa-plug"></i> Testar Conexão</button>
+              <button class="btn-pub outline" onclick="exportGitHub()"><i class="fas fa-download"></i> Exportar Backup JSON</button>
+            </div>
+          </div>
+        </div>
+        <div class="profile-sec" id="githubFallbackSec">
+          <div class="profile-sec-head"><i class="fab fa-github"></i><h3>Modo Offline (sem Supabase)</h3></div>
+          <div class="profile-sec-body">
+            <p style="font-size:.8rem;color:var(--dim);line-height:1.6;margin-bottom:14px">
+              Se o Supabase não estiver configurado, as edições ficam no navegador. Exporte o JSON e envie para o GitHub manualmente.
+            </p>
             <div style="display:flex;gap:10px;flex-wrap:wrap">
               <button class="btn-pub green" onclick="exportGitHub()"><i class="fas fa-download"></i> Exportar JSON</button>
               <button class="btn-pub outline" onclick="document.getElementById('importJson').click()"><i class="fas fa-upload"></i> Importar JSON</button>
@@ -1076,6 +1093,9 @@ body{background:var(--k2);font-family:var(--fb);color:var(--w);display:flex}
     </div>
   </div>
 </div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/core/config.js"></script>
+<script src="../js/core/supabase-client.js"></script>
 <script src="../js/ai/scanner.js"></script>
 <script src="../js/ai/engine.js"></script>
 <script src="../js/core/api.js"></script>
@@ -1083,9 +1103,20 @@ body{background:var(--k2);font-family:var(--fb);color:var(--w);display:flex}
 <script src="../js/ai/assistant.js"></script>
 <script>
 /* ════ AUTH GUARD ════ */
-(function(){
-  if (!sessionStorage.getItem('pa_logged')) {
+(async function(){
+  if (PASupabase.isConfigured()) {
+    const session = await PASupabase.getSession();
+    if (!session && !sessionStorage.getItem('pa_logged')) {
+      window.location.href = 'login.html';
+      return;
+    }
+    if (session) {
+      sessionStorage.setItem('pa_logged', '1');
+      sessionStorage.setItem('pa_user', session.user.email);
+    }
+  } else if (!sessionStorage.getItem('pa_logged')) {
     window.location.href = 'login.html';
+    return;
   }
   const u = sessionStorage.getItem('pa_user') || 'admin@painsacontece.com.br';
   const name = u.split('@')[0].charAt(0).toUpperCase() + u.split('@')[0].slice(1);
@@ -1127,7 +1158,11 @@ window.addEventListener('resize', () => {
 /* ════ MODAL ════ */
 function closeModal(id) { document.getElementById(id).classList.remove('open'); }
 function confirmLogout() { document.getElementById('logoutModal').classList.add('open'); }
-function doLogout() { sessionStorage.clear(); window.location.href = 'login.html'; }
+async function doLogout() {
+  try { await PAAPI.logout(); } catch {}
+  sessionStorage.clear();
+  window.location.href = 'login.html';
+}
 
 /* ════ TOAST ════ */
 function showToast(msg, type = 'success', dur = 3500) {
@@ -1509,6 +1544,40 @@ function addCategory() {
 function showAddEvent() { showToast('Formulário de evento em breve…', 'info'); }
 function showAddJob() { showToast('Formulário de vaga em breve…', 'info'); }
 
+function updateSupabaseStatus(connected, msg) {
+  const dot = document.getElementById('supabaseDot');
+  const txt = document.getElementById('supabaseStatusText');
+  const fallback = document.getElementById('githubFallbackSec');
+  if (!dot || !txt) return;
+  if (!PASupabase.isConfigured()) {
+    dot.style.background = '#888';
+    txt.textContent = 'Não configurado — edite js/core/config.js com URL e chave do Supabase';
+    if (fallback) fallback.style.display = '';
+    return;
+  }
+  dot.style.background = connected ? '#22c55e' : '#ef4444';
+  txt.textContent = msg || (connected ? 'Conectado ao Supabase — dados na nuvem' : 'Erro de conexão');
+  if (fallback) fallback.style.display = connected ? 'none' : '';
+}
+
+async function testSupabase() {
+  if (!PASupabase.isConfigured()) {
+    updateSupabaseStatus(false, 'Configure js/core/config.js primeiro');
+    showToast('Cole a URL e a chave anon do Supabase em config.js', 'error', 5000);
+    return;
+  }
+  try {
+    const { count, error } = await PASupabase.getClient()
+      .from('articles').select('*', { count: 'exact', head: true });
+    if (error) throw error;
+    updateSupabaseStatus(true, `Conectado — ${count ?? 0} artigos no banco`);
+    showToast('Supabase conectado com sucesso!', 'success');
+  } catch (e) {
+    updateSupabaseStatus(false, 'Falha: ' + (e.message || 'verifique URL, chave e schema.sql'));
+    showToast('Erro ao conectar. Execute schema.sql no Supabase.', 'error', 5000);
+  }
+}
+
 async function exportGitHub() {
   try {
     const data = await PAAPI.exportForGitHub();
@@ -1517,7 +1586,10 @@ async function exportGitHub() {
     a.href = URL.createObjectURL(blob);
     a.download = 'articles.json';
     a.click();
-    showToast('JSON exportado! Substitua data/articles.json no GitHub.', 'success', 5000);
+    const msg = PAAPI.isSupabaseMode()
+      ? 'Backup JSON exportado!'
+      : 'JSON exportado! Substitua data/articles.json no GitHub.';
+    showToast(msg, 'success', 5000);
   } catch { showToast('Erro ao exportar.', 'error'); }
 }
 
@@ -1551,6 +1623,8 @@ if (artStatusEl) {
 }
 
 (async function initAdmin() {
+  if (PASupabase.isConfigured()) await testSupabase();
+  else updateSupabaseStatus(false);
   await PAStore.init();
   renderPubs();
   await updateScannerStatus();
