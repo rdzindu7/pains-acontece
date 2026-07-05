@@ -7,7 +7,7 @@
 <link rel="apple-touch-icon" href="../assets/images/favicon.jpg"/>
 <title>Painel – Pains Acontece</title>
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
-<meta name="pa-build" content="2026.07.05-v18"/>
+<meta name="pa-build" content="2026.07.05-v32"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
@@ -632,6 +632,50 @@ body{background:var(--k2);font-family:var(--fb);color:var(--w);display:flex}
 .profile-sec-head h3{font-family:var(--ff);font-size:1rem;letter-spacing:1.5px}
 .profile-sec-body{padding:18px;display:flex;flex-direction:column;gap:14px}
 .pf-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+/* ════════════════ SELO VERIFICADO ════════════════ */
+.verified-panel{display:flex;flex-direction:column;gap:20px;max-width:920px}
+.verified-grant{
+  padding:24px 26px;
+  background:linear-gradient(135deg,rgba(29,155,240,.14),rgba(29,122,29,.08));
+  border:2px solid rgba(29,155,240,.35);
+  border-radius:14px;
+  box-shadow:0 8px 32px rgba(29,155,240,.12);
+}
+.verified-grant h3{
+  font-family:var(--ff);letter-spacing:2px;font-size:1.25rem;color:#1d9bf0;
+  margin-bottom:8px;display:flex;align-items:center;gap:10px;
+}
+.verified-grant p{font-size:.82rem;color:rgba(255,255,255,.55);margin-bottom:18px;line-height:1.55}
+.verified-grant-row{display:flex;gap:12px;flex-wrap:wrap;align-items:stretch}
+.verified-grant-row input{
+  flex:1;min-width:260px;background:rgba(0,0,0,.35);border:1px solid rgba(29,155,240,.35);
+  border-radius:8px;padding:14px 16px;color:#fff;font-size:.88rem;outline:none;
+}
+.verified-grant-row input:focus{border-color:#1d9bf0;box-shadow:0 0 0 3px rgba(29,155,240,.2)}
+.verified-grant-row input::placeholder{color:rgba(255,255,255,.3)}
+.verified-grant-actions{display:flex;gap:10px;flex-wrap:wrap}
+.verified-grant-actions .btn-pub{padding:12px 20px;font-size:.78rem}
+.verified-hint{font-size:.72rem;color:rgba(255,255,255,.4);margin-top:12px}
+.verified-hint code{background:rgba(255,255,255,.08);padding:2px 6px;border-radius:4px;font-size:.68rem}
+.verified-section-title{
+  font-family:var(--ff);letter-spacing:1.5px;font-size:1rem;color:var(--y);
+  margin-bottom:12px;display:flex;align-items:center;gap:8px;
+}
+.verified-user-card{
+  display:flex;align-items:center;gap:14px;padding:14px 16px;
+  background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);
+  border-radius:10px;margin-bottom:10px;
+}
+.verified-user-card .info{flex:1;min-width:0}
+.verified-user-card strong{font-size:.86rem;display:block}
+.verified-user-card span{font-size:.7rem;color:rgba(255,255,255,.4)}
+.verified-user-card .uid{font-size:.62rem;color:rgba(255,255,255,.28);margin-top:4px;word-break:break-all}
+.verified-empty{
+  text-align:center;padding:32px 20px;color:rgba(255,255,255,.35);
+  font-size:.85rem;background:rgba(255,255,255,.02);border:1px dashed rgba(255,255,255,.08);
+  border-radius:10px;
+}
 
 /* ════════════════ TOASTS ════════════════ */
 .toast-wrap{position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:8px}
@@ -1532,21 +1576,33 @@ body.pa-owner .owner-only.btn-pub{display:flex!important}
       <div class="cat-hero">
         <div>
           <h2><i class="fas fa-check-circle" style="color:#1d9bf0;font-size:1.2rem;margin-right:8px"></i>Selo Verificado</h2>
-          <p>Aprove ou recuse solicitações de leitores. Somente você concede o selo verificado no portal.</p>
+          <p>Conceda o selo por ID ou e-mail, aprove solicitações e gerencie contas verificadas.</p>
         </div>
-        <button class="tb-btn outline" onclick="renderVerifiedRequests()"><i class="fas fa-sync"></i> Atualizar</button>
+        <button class="tb-btn outline" onclick="renderVerifiedPanel()"><i class="fas fa-sync"></i> Atualizar</button>
       </div>
-      <div style="margin-top:20px;padding:20px;background:rgba(29,155,240,.06);border:1px solid rgba(29,155,240,.2);border-radius:10px">
-        <h3 style="font-family:'Bebas Neue',sans-serif;letter-spacing:1.5px;color:#1d9bf0;margin-bottom:8px;font-size:1.05rem"><i class="fas fa-id-card"></i> Conceder selo manualmente</h3>
-        <p style="font-size:.78rem;color:rgba(255,255,255,.5);margin-bottom:14px">Informe o <strong>ID (UUID)</strong> do usuário ou o <strong>e-mail</strong> da conta Google. O selo vale por 1 ano.</p>
-        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
-          <input id="verifiedManualId" type="text" placeholder="UUID ou e-mail do usuário" style="flex:1;min-width:220px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:6px;padding:10px 14px;color:#fff;font-size:.82rem"/>
-          <button class="btn-pub green" onclick="grantVerifiedManual()"><i class="fas fa-check-circle"></i> Conceder</button>
-          <button class="btn-pub red-btn" onclick="revokeVerifiedManual()"><i class="fas fa-ban"></i> Remover selo</button>
+      <div class="verified-panel">
+        <div class="verified-grant">
+          <h3><i class="fas fa-id-card"></i> Conceder selo manualmente</h3>
+          <p>Cole o <strong>ID (UUID)</strong> do usuário ou o <strong>e-mail</strong> da conta Google. O selo fica ativo por <strong>1 ano</strong>. O ID aparece em <em>Meu Perfil</em> após o login.</p>
+          <div class="verified-grant-row">
+            <input id="verifiedManualId" type="text" placeholder="Ex: a1b2c3d4-… ou leitor@gmail.com" autocomplete="off"/>
+            <div class="verified-grant-actions">
+              <button type="button" class="btn-pub green" onclick="grantVerifiedManual()"><i class="fas fa-check-circle"></i> Conceder selo</button>
+              <button type="button" class="btn-pub red-btn" onclick="revokeVerifiedManual()"><i class="fas fa-ban"></i> Remover</button>
+            </div>
+          </div>
+          <p class="verified-hint">Dica: peça ao leitor que abra <code>Meu Perfil</code> e copie o ID exibido abaixo do e-mail.</p>
+          <p id="verifiedManualMsg" style="font-size:.78rem;margin-top:10px;display:none;font-weight:600"></p>
         </div>
-        <p id="verifiedManualMsg" style="font-size:.75rem;margin-top:10px;display:none"></p>
+        <div>
+          <h4 class="verified-section-title"><i class="fas fa-inbox"></i> Solicitações pendentes</h4>
+          <div id="verifiedRequestsList"></div>
+        </div>
+        <div>
+          <h4 class="verified-section-title"><i class="fas fa-user-check"></i> Contas com selo ativo</h4>
+          <div id="verifiedActiveList"></div>
+        </div>
       </div>
-      <div id="verifiedRequestsList" style="margin-top:20px"></div>
     </div>
 
     <!-- ══ CATEGORIAS ══ -->
@@ -2058,7 +2114,7 @@ body.pa-owner .owner-only.btn-pub{display:flex!important}
 <script src="../js/ai/agents/rafaela.js"></script>
 <script src="../js/ai/divulgacao-assistant.js"></script>
 <script src="../js/ui/dialog.js?v=20260705v25"></script>
-<script src="../js/core/social.js?v=20260705v31"></script>
+<script src="../js/core/social.js?v=20260705v32"></script>
 <script>
 /* ════ AUTH GUARD ════ */
 let isOwnerUser = false;
@@ -2146,7 +2202,7 @@ function showPanel(id, el) {
     if (mount && typeof PADivulgacaoIA !== 'undefined') PADivulgacaoIA.mountInline(mount);
   }
   if (id === 'perfil') renderProfile();
-  if (id === 'verificado_adm' && isOwnerUser) renderVerifiedRequests();
+  if (id === 'verificado_adm' && isOwnerUser) renderVerifiedPanel();
   if (id === 'categorias') renderCategories();
   if (id === 'agenda') renderEvents();
   if (id === 'empregos_adm') renderJobs();
@@ -3900,45 +3956,79 @@ if (artStatusEl) {
   });
 }
 
-async function renderVerifiedRequests() {
-  const el = document.getElementById('verifiedRequestsList');
-  if (!el || typeof PASocial === 'undefined') return;
-  el.innerHTML = '<p style="color:rgba(255,255,255,.4);font-size:.82rem">Carregando solicitações…</p>';
+async function renderVerifiedPanel() {
+  const reqEl = document.getElementById('verifiedRequestsList');
+  const actEl = document.getElementById('verifiedActiveList');
+  if (!reqEl || typeof PASocial === 'undefined') return;
+  reqEl.innerHTML = '<p class="verified-empty">Carregando solicitações…</p>';
+  if (actEl) actEl.innerHTML = '<p class="verified-empty">Carregando contas…</p>';
   try {
-    await PASocial.init();
-    const list = await PASocial.getVerifiedRequests();
+    await Promise.race([
+      PASocial.init(),
+      new Promise((_, r) => setTimeout(() => r(new Error('timeout')), 6000))
+    ]);
+    const [list, active] = await Promise.all([
+      PASocial.getVerifiedRequests(),
+      PASocial.getVerifiedProfiles ? PASocial.getVerifiedProfiles() : Promise.resolve([])
+    ]);
     if (!list.length) {
-      el.innerHTML = '<p style="color:rgba(255,255,255,.4);font-size:.85rem;padding:24px;text-align:center">Nenhuma solicitação pendente.</p>';
-      return;
-    }
-    el.innerHTML = list.map(r => {
-      const p = r.profiles || {};
-      const name = PASocial.esc(p.display_name || 'Leitor');
-      const email = PASocial.esc(p.email || '');
-      const msg = PASocial.esc(r.message || '(sem mensagem)');
-      const date = PASocial.formatDate(r.created_at);
-      const amount = Number(r.amount || 29.9).toFixed(2).replace('.', ',');
-      return `<div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:18px;margin-bottom:12px;display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start">
-        <div style="flex:1;min-width:200px">
-          <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
-            ${PASocial.avatarHtml(p.avatar_url, p.display_name, 44)}
-            <div>
-              <strong style="font-size:.9rem">${name}</strong><br>
-              <span style="font-size:.72rem;color:rgba(255,255,255,.4)">${email}</span>
-            </div>
+      reqEl.innerHTML = '<p class="verified-empty">Nenhuma solicitação pendente no momento.</p>';
+    } else {
+      reqEl.innerHTML = list.map(r => {
+        const p = r.profiles || {};
+        const name = PASocial.esc(p.display_name || 'Leitor');
+        const email = PASocial.esc(p.email || '');
+        const msg = PASocial.esc(r.message || '(sem mensagem)');
+        const date = PASocial.formatDate(r.created_at);
+        const amount = Number(r.amount || 29.9).toFixed(2).replace('.', ',');
+        return `<div class="verified-user-card" style="flex-wrap:wrap">
+          ${PASocial.avatarHtml(p.avatar_url, p.display_name, 44)}
+          <div class="info">
+            <strong>${name} ${PASocial.verifiedBadgeHtml(true)}</strong>
+            <span>${email}</span>
+            <p style="font-size:.78rem;color:rgba(255,255,255,.65);margin:8px 0 4px">${msg}</p>
+            <span style="font-size:.68rem;color:rgba(255,255,255,.35)">${date} · Plano ${PASocial.esc(r.plan || 'anual')} · R$ ${amount}</span>
           </div>
-          <p style="font-size:.8rem;color:rgba(255,255,255,.7);margin-bottom:6px">${msg}</p>
-          <span style="font-size:.68rem;color:rgba(255,255,255,.35)">${date} · Plano ${PASocial.esc(r.plan || 'anual')} · R$ ${amount}</span>
-        </div>
-        <div style="display:flex;gap:8px;flex-shrink:0">
-          <button class="btn-pub green" onclick="approveVerifiedReq(${r.id})"><i class="fas fa-check"></i> Aprovar</button>
-          <button class="btn-pub red-btn" onclick="rejectVerifiedReq(${r.id})"><i class="fas fa-times"></i> Recusar</button>
-        </div>
-      </div>`;
-    }).join('');
+          <div style="display:flex;gap:8px;flex-shrink:0">
+            <button type="button" class="btn-pub green" onclick="approveVerifiedReq(${r.id})"><i class="fas fa-check"></i> Aprovar</button>
+            <button type="button" class="btn-pub red-btn" onclick="rejectVerifiedReq(${r.id})"><i class="fas fa-times"></i> Recusar</button>
+          </div>
+        </div>`;
+      }).join('');
+    }
+    if (actEl) {
+      if (!active.length) {
+        actEl.innerHTML = '<p class="verified-empty">Nenhuma conta com selo ativo ainda.</p>';
+      } else {
+        actEl.innerHTML = active.map(p => {
+          const until = p.verified_until ? PASocial.formatDate(p.verified_until) : '—';
+          return `<div class="verified-user-card">
+            ${PASocial.avatarHtml(p.avatar_url, p.display_name, 40)}
+            <div class="info">
+              <strong>${PASocial.esc(p.display_name || 'Leitor')} ${PASocial.verifiedBadgeHtml(true)}</strong>
+              <span>${PASocial.esc(p.email || '')}</span>
+              <div class="uid">ID: ${PASocial.esc(p.id)} · válido até ${PASocial.esc(until)}</div>
+            </div>
+            <button type="button" class="btn-pub red-btn" style="font-size:.7rem;padding:8px 12px" onclick="revokeVerifiedById(${JSON.stringify(String(p.id))})"><i class="fas fa-ban"></i></button>
+          </div>`;
+        }).join('');
+      }
+    }
   } catch (e) {
-    el.innerHTML = `<p style="color:#e74c3c;font-size:.82rem">${PASocial.esc(e.message)}</p>`;
+    reqEl.innerHTML = `<p class="verified-empty" style="color:#e74c3c">${PASocial.esc(e.message)}</p>`;
+    if (actEl) actEl.innerHTML = '';
   }
+}
+
+async function renderVerifiedRequests() { return renderVerifiedPanel(); }
+
+async function revokeVerifiedById(uid) {
+  if (!await PADialog.confirm({ title: 'Remover selo', message: 'Remover selo deste usuário?', confirmText: 'Remover', variant: 'danger' })) return;
+  try {
+    await PASocial.revokeVerifiedByUserId(uid);
+    showToast('Selo removido.', 'info');
+    renderVerifiedPanel();
+  } catch (e) { showToast(e.message, 'error'); }
 }
 
 async function approveVerifiedReq(id) {
@@ -3946,7 +4036,7 @@ async function approveVerifiedReq(id) {
   try {
     await PASocial.approveVerified(id);
     showToast('Selo verificado concedido!', 'success');
-    renderVerifiedRequests();
+    renderVerifiedPanel();
   } catch (e) { showToast(e.message, 'error'); }
 }
 
@@ -3955,7 +4045,7 @@ async function rejectVerifiedReq(id) {
   try {
     await PASocial.rejectVerified(id);
     showToast('Solicitação recusada.', 'info');
-    renderVerifiedRequests();
+    renderVerifiedPanel();
   } catch (e) { showToast(e.message, 'error'); }
 }
 
@@ -3978,7 +4068,7 @@ async function grantVerifiedManual() {
     setVerifiedManualMsg('Selo concedido a ' + (prof.display_name || prof.email || id) + '.', true);
     showToast('Selo verificado concedido!', 'success');
     if (input) input.value = '';
-    renderVerifiedRequests();
+    renderVerifiedPanel();
   } catch (e) {
     setVerifiedManualMsg(e.message, false);
     showToast(e.message, 'error');
@@ -3996,7 +4086,7 @@ async function revokeVerifiedManual() {
     setVerifiedManualMsg('Selo removido de ' + (prof.display_name || prof.email || id) + '.', true);
     showToast('Selo removido.', 'info');
     if (input) input.value = '';
-    renderVerifiedRequests();
+    renderVerifiedPanel();
   } catch (e) {
     setVerifiedManualMsg(e.message, false);
     showToast(e.message, 'error');

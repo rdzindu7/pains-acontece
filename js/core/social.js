@@ -414,6 +414,20 @@ const PASocial = (function () {
     return row;
   }
 
+  async function getVerifiedProfiles() {
+    const client = PASupabase?.getClient?.();
+    if (client) {
+      const { data, error } = await client
+        .from('profiles')
+        .select('*')
+        .eq('verified_badge', true)
+        .order('verified_at', { ascending: false });
+      if (!error && data) return data.filter(p => isVerified(p));
+    }
+    const local = ensureLocal();
+    return Object.values(local.profiles).filter(p => isVerified(p));
+  }
+
   async function getVerifiedRequests() {
     const client = PASupabase?.getClient?.();
     if (client) {
@@ -607,6 +621,7 @@ const PASocial = (function () {
     setReaction,
     requestVerified,
     getVerifiedRequests,
+    getVerifiedProfiles,
     approveVerified,
     rejectVerified,
     resolveUserId,
