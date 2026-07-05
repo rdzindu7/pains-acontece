@@ -12,7 +12,9 @@ const PAScanner = (function () {
     { url: 'https://news.google.com/rss/search?q=site:g1.globo.com+Brasil&hl=pt-BR&gl=BR&ceid=BR:pt-419', region: 'Brasil / Mundo', priority: 1 },
     { url: 'https://news.google.com/rss/search?q=mundo+internacional&hl=pt-BR&gl=BR&ceid=BR:pt-419', region: 'Brasil / Mundo', priority: 1, world: true },
     { url: 'https://news.google.com/rss/search?q=world+news&hl=en-US&gl=US&ceid=US:en', region: 'Brasil / Mundo', priority: 1, world: true },
-    { url: 'https://feeds.bbci.co.uk/portuguese/rss.xml', region: 'Brasil / Mundo', priority: 1, world: true },
+    { url: 'https://feeds.bbci.co.uk/portuguese/rss.xml', region: 'Brasil / Mundo', priority: 2, world: true },
+    { url: 'https://g1.globo.com/rss/g1/minas-gerais/', region: 'Região', priority: 2 },
+    { url: 'https://g1.globo.com/rss/g1/', region: 'Brasil / Mundo', priority: 2 },
     { url: 'https://news.google.com/rss/search?q=economia+Brasil&hl=pt-BR&gl=BR&ceid=BR:pt-419', region: 'Brasil / Mundo', priority: 1 },
     { url: 'https://news.google.com/rss/search?q=pol%C3%ADtica+Brasil&hl=pt-BR&gl=BR&ceid=BR:pt-419', region: 'Brasil / Mundo', priority: 1 }
   ];
@@ -77,6 +79,10 @@ const PAScanner = (function () {
     return `Há ${Math.floor(hrs / 24)} dia(s)`;
   }
 
+  const imageCache = new Map();
+  let ogFetchCount = 0;
+  const OG_FETCH_MAX = 20;
+
   function pickImage(cat) {
     const imgs = {
       'Polícia': 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=800&q=80',
@@ -89,6 +95,139 @@ const PAScanner = (function () {
       'Brasil / Mundo': 'https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?w=800&q=80'
     };
     return imgs[cat] || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&q=80';
+  }
+
+  function decodeEntities(s) {
+    if (!s) return '';
+    return s
+      .replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>')
+      .replace(/&quot;/g, '"').replace(/&#39;/g, "'").replace(/&nbsp;/g, ' ');
+  }
+
+  function isValidNewsImage(url) {
+    if (!url || typeof url !== 'string') return false;
+    const u = url.trim();
+    if (!/^https?:\/\//i.test(u) && !u.startsWith('//')) return false;
+    if (/pixel|tracker|1x1|spacer|avatar|favicon|logo\.(svg|png)/i.test(u)) return false;
+    if (/google\.com\/images\/branding|gstatic\.com\/images/i.test(u)) return false;
+    return /(\.(jpg|jpeg|png|webp|gif)(\?|$))|\/(image|images|photo|thumb|media|upload|cpsprodpb|internal_photos|glbimg)/i.test(u);
+  }
+
+  function normalizeImageUrl(url) {
+    if (!url) return '';
+    let u = decodeEntities(url.trim()).replace(/^\/\//, 'https://');
+    if (!/^https?:\/\//i.test(u)) return '';
+    u = u.replace(/&amp;/g, '&');
+    if (/ichef\.bbci\.co\.uk/i.test(u)) {
+      u = u.replace(/\/ace\/ws\/\d+\//, '/ace/ws/976/');
+    }
+    if (/\.(jpg|jpeg|png|webp)/i.test(u) && !/\?/.test(u)) {
+      u += (u.includes('?') ? '&' : '?') + 'w=800&q=80';
+    }
+    return isValidNewsImage(u) ? u : '';
+  }
+
+  function extractImagesFromHtml(html) {
+    if (!html) return '';
+    const h = decodeEntities(html);
+    const patterns = [
+      /<img[^>]+src=["']([^"']+)["']/gi,
+      /property=["']og:image(?::secure_url)?["'][^>]*content=["']([^"']+)["']/gi,
+      /content=["']([^"']+)["'][^>]*property=["']og:image/gi,
+      /<media:thumbnail[^>]+url=["']([^"']+)["']/gi,
+      /<media:content[^>]+url=["']([^"']+)["']/gi,
+      /<enclosure[^>]+url=["']([^"']+)["'][^>]*type=["']image/gi
+    ];
+    for (const re of patterns) {
+      let m;
+      while ((m = re.exec(h)) !== null) {
+        const norm = normalizeImageUrl(m[1]);
+        if (norm) return norm;
+      }
+    }
+    return '';
+  }
+
+  function extractImageFromRssBlock(block) {
+    if (!block) return '';
+    const patterns = [
+      /<media:content[^>]+medium=["']image["'][^>]+url=["']([^"']+)["']/i,
+      /<media:content[^>]+url=["']([^"']+)["'][^>]+medium=["']image/i,
+      /<media:thumbnail[^>]+url=["']([^"']+)["']/i,
+      /<enclosure[^>]+url=["']([^"']+)["'][^>]+type=["']image[^"']*["']/i
+    ];
+    for (const re of patterns) {
+      const m = block.match(re);
+      if (m) {
+        const norm = normalizeImageUrl(m[1]);
+        if (norm) return norm;
+      }
+    }
+    return extractImagesFromHtml(block);
+  }
+
+  function extractArticleUrl(summary, link) {
+    const candidates = [];
+    if (link && !/news\.google\.com/i.test(link)) candidates.push(link);
+    const h = decodeEntities(summary || '');
+    const hrefRe = /href=["'](https?:\/\/[^"']+)["']/gi;
+    let m;
+    while ((m = hrefRe.exec(h)) !== null) {
+      if (!/news\.google\.com|google\.com\/url/i.test(m[1])) candidates.push(m[1]);
+    }
+    return candidates[0] || link || '';
+  }
+
+  async function fetchHtml(url) {
+    const attempts = [
+      'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(url),
+      'https://corsproxy.io/?' + encodeURIComponent(url),
+      'https://api.allorigins.win/raw?url=' + encodeURIComponent(url)
+    ];
+    for (const u of attempts) {
+      try {
+        const res = await fetch(u, { signal: AbortSignal.timeout(14000) });
+        const text = await res.text();
+        if (text && text.length > 200 && !/^<!DOCTYPE html>\s*<html[^>]*>\s*<head>\s*<title>50[03]/i.test(text)) {
+          return text;
+        }
+      } catch {}
+    }
+    return null;
+  }
+
+  async function fetchOgImage(pageUrl) {
+    if (!pageUrl) return '';
+    if (imageCache.has(pageUrl)) return imageCache.get(pageUrl);
+    const html = await fetchHtml(pageUrl);
+    let img = '';
+    if (html) {
+      img = extractImagesFromHtml(html);
+      if (!img) {
+        const m = html.match(/<meta[^>]+property=["']twitter:image(?::src)?["'][^>]+content=["']([^"']+)["']/i)
+          || html.match(/content=["']([^"']+)["'][^>]+property=["']twitter:image/i);
+        if (m) img = normalizeImageUrl(m[1]);
+      }
+    }
+    imageCache.set(pageUrl, img || '');
+    return img;
+  }
+
+  async function resolveItemImage(item, cat) {
+    if (item.image) {
+      const direct = normalizeImageUrl(item.image);
+      if (direct) return direct;
+    }
+    const fromSummary = extractImagesFromHtml(item.summary);
+    if (fromSummary) return fromSummary;
+
+    const articleUrl = extractArticleUrl(item.summary, item.link);
+    if (ogFetchCount < OG_FETCH_MAX && articleUrl && !/news\.google\.com\/rss/i.test(articleUrl)) {
+      ogFetchCount++;
+      const og = await fetchOgImage(articleUrl);
+      if (og) return og;
+    }
+    return pickImage(cat);
   }
 
   function stripHtml(raw) {
@@ -137,13 +276,35 @@ const PAScanner = (function () {
   }
 
   function parseRssXml(xml, cfg) {
+    const blocks = [...xml.matchAll(/<item>([\s\S]*?)<\/item>/gi)];
+    if (blocks.length) {
+      return blocks.map(m => {
+        const block = m[1];
+        const get = (tag) => {
+          const cdata = block.match(new RegExp(`<${tag}><!\\[CDATA\\[(.*?)\\]\\]><\\/${tag}>`, 's'))?.[1];
+          const plain = block.match(new RegExp(`<${tag}>(.*?)<\\/${tag}>`, 's'))?.[1];
+          return decodeEntities((cdata || plain || '').trim());
+        };
+        const link = get('link');
+        const title = get('title').replace(/ - .+$/, '').trim();
+        const summary = get('description');
+        const pub = get('pubDate');
+        const image = extractImageFromRssBlock(block);
+        return {
+          title, summary, link, image,
+          pubDate: pub ? new Date(pub) : new Date(),
+          region: cfg.region, source: extractSource(link)
+        };
+      }).filter(i => i.title && i.link);
+    }
     const doc = new DOMParser().parseFromString(xml, 'text/xml');
     return [...doc.querySelectorAll('item')].map(item => {
       const link = item.querySelector('link')?.textContent?.trim() || '';
       const title = (item.querySelector('title')?.textContent || '').replace(/ - .+$/, '').trim();
       const summary = item.querySelector('description')?.textContent || '';
       const pub = item.querySelector('pubDate')?.textContent;
-      return { title, summary, link, pubDate: pub ? new Date(pub) : new Date(), region: cfg.region, source: extractSource(link) };
+      const image = extractImagesFromHtml(summary);
+      return { title, summary, link, image, pubDate: pub ? new Date(pub) : new Date(), region: cfg.region, source: extractSource(link) };
     }).filter(i => i.title && i.link);
   }
 
@@ -155,26 +316,35 @@ const PAScanner = (function () {
     } catch { return []; }
   }
 
-  function processItems(all, seen, limit) {
-    const items = [];
-    const sorted = [...all].sort((a, b) => (b.feedPriority || 0) - (a.feedPriority || 0) || b.pubDate - a.pubDate);
+  async function processItems(all, seen, limit) {
+    const sorted = [...all].sort((a, b) => {
+      const imgScore = i => (i.image ? 3 : 0);
+      return imgScore(b) - imgScore(a) || (b.feedPriority || 0) - (a.feedPriority || 0) || b.pubDate - a.pubDate;
+    });
+    const batch = [];
     for (const item of sorted) {
       if (seen.has(item.link)) continue;
       const confidence = calcConfidence(item, all);
       const cat = detectCategory(item.title, item.summary, item.region, item.world);
-      items.push({
+      batch.push({ item, confidence, cat });
+      seen.add(item.link);
+      if (limit && batch.length >= limit) break;
+    }
+
+    ogFetchCount = 0;
+    const items = await Promise.all(batch.map(async ({ item, confidence, cat }) => {
+      const img = await resolveItemImage(item, cat);
+      return {
         title: item.title,
         lead: makeLead(item.title, item.summary),
         content: buildContent(item.title, item.summary, item.source, item.link),
-        cat, img: pickImage(cat), author: 'IA Pains Acontece',
+        cat, img, author: 'IA Pains Acontece',
         date: item.pubDate.toLocaleDateString('pt-BR'),
         timeAgo: formatDate(item.pubDate),
         source: item.source, source_url: item.link, region: item.region,
         verified: confidence >= 65, confidence, status: 'pending'
-      });
-      seen.add(item.link);
-      if (limit && items.length >= limit) break;
-    }
+      };
+    }));
     items.sort((a, b) => b.confidence - a.confidence);
     return items;
   }
@@ -224,14 +394,16 @@ const PAScanner = (function () {
   async function scanNews(seenUrls = []) {
     const all = await fetchAllFeeds();
     const seen = new Set(seenUrls);
-    const items = processItems(all, seen, null);
+    const items = await processItems(all, seen, null);
     return { items, seenUrls: [...seen] };
   }
 
   async function scanNewsFull(seenUrls = []) {
+    ogFetchCount = 0;
+    imageCache.clear();
     const all = await fetchAllFeeds();
     const seen = new Set(seenUrls);
-    const items = processItems(all, seen, null);
+    const items = await processItems(all, seen, null);
     return { items, seenUrls: [...seen], total: all.length };
   }
 
@@ -323,7 +495,7 @@ const PAScanner = (function () {
 
   return {
     scanNews, scanNewsFull, verifyText, searchHeadlines, searchPublished,
-    detectCategory, pickImage, formatDate, keywords, RSS_FEEDS,
-    invalidateCache: () => { feedCache = null; feedCacheAt = 0; }
+    detectCategory, pickImage, resolveItemImage, formatDate, keywords, RSS_FEEDS,
+    invalidateCache: () => { feedCache = null; feedCacheAt = 0; imageCache.clear(); ogFetchCount = 0; }
   };
 })();

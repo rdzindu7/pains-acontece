@@ -98,12 +98,20 @@ const PAEngine = (function () {
     if (!text?.trim()) return { error: 'Envie o conteúdo da notícia.' };
     const verification = await PAScanner.verifyText(text);
     const entities = extractEntities(text);
+    const cat = hints.cat || PAScanner.detectCategory(hints.title || buildTitle(text), text);
+    let img = hints.img || '';
+    if (!img && verification.sources?.length) {
+      const src = verification.sources.find(s => s.url && !s.local);
+      if (src) {
+        img = await PAScanner.resolveItemImage({ summary: text, link: src.url, title: hints.title || buildTitle(text) }, cat);
+      }
+    }
+    if (!img) img = PAScanner.pickImage(cat);
     return {
       title: hints.title || buildTitle(text),
       lead: hints.lead || buildLead(text),
       content: buildContent(text, entities, verification),
-      cat: hints.cat || PAScanner.detectCategory(hints.title || buildTitle(text), text),
-      img: PAScanner.pickImage(hints.cat || 'Últimas Notícias'),
+      cat, img,
       author: 'Redação Pains Acontece',
       verified: verification.verified,
       confidence: verification.confidence,

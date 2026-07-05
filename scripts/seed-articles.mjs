@@ -18,6 +18,8 @@ const RSS_FEEDS = [
   { url: 'https://news.google.com/rss/search?q=Brasil+not%C3%ADcias&hl=pt-BR&gl=BR&ceid=BR:pt-419', region: 'Brasil / Mundo', priority: 1 },
   { url: 'https://news.google.com/rss/search?q=mundo+internacional&hl=pt-BR&gl=BR&ceid=BR:pt-419', region: 'Brasil / Mundo', priority: 1, world: true },
   { url: 'https://feeds.bbci.co.uk/portuguese/rss.xml', region: 'Brasil / Mundo', priority: 2, world: true },
+  { url: 'https://g1.globo.com/rss/g1/minas-gerais/', region: 'Região', priority: 2 },
+  { url: 'https://g1.globo.com/rss/g1/', region: 'Brasil / Mundo', priority: 2 },
   { url: 'https://news.google.com/rss/search?q=pol%C3%ADtica+Brasil&hl=pt-BR&gl=BR&ceid=BR:pt-419', region: 'Brasil / Mundo', priority: 1 },
   { url: 'https://news.google.com/rss/search?q=pol%C3%ADcia+Minas+Gerais&hl=pt-BR&gl=BR&ceid=BR:pt-419', region: 'Polícia', priority: 2 }
 ];
@@ -99,6 +101,108 @@ function stripHtml(raw) {
   return t.replace(/\s+/g, ' ').trim();
 }
 
+const imageCache = new Map();
+let ogFetchCount = 0;
+
+function decodeEntities(s) {
+  if (!s) return '';
+  return s.replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&nbsp;/g, ' ');
+}
+
+function isValidNewsImage(url) {
+  if (!url) return false;
+  const u = url.trim();
+  if (!/^https?:\/\//i.test(u) && !u.startsWith('//')) return false;
+  if (/pixel|tracker|1x1|favicon|logo\.(svg|png)/i.test(u)) return false;
+  return /(\.(jpg|jpeg|png|webp|gif)(\?|$))|\/(image|images|photo|thumb|media|upload|cpsprodpb)/i.test(u);
+}
+
+function normalizeImageUrl(url) {
+  if (!url) return '';
+  let u = decodeEntities(url.trim()).replace(/^\/\//, 'https://');
+  if (!/^https?:\/\//i.test(u)) return '';
+  if (/ichef\.bbci\.co\.uk/i.test(u)) u = u.replace(/\/ace\/ws\/\d+\//, '/ace/ws/976/');
+  return isValidNewsImage(u) ? u : '';
+}
+
+function extractImagesFromHtml(html) {
+  if (!html) return '';
+  const h = decodeEntities(html);
+  const patterns = [
+    /<img[^>]+src=["']([^"']+)["']/gi,
+    /property=["']og:image["'][^>]*content=["']([^"']+)["']/gi,
+    /<media:thumbnail[^>]+url=["']([^"']+)["']/gi,
+    /<media:content[^>]+url=["']([^"']+)["']/gi
+  ];
+  for (const re of patterns) {
+    let m;
+    while ((m = re.exec(h)) !== null) {
+      const norm = normalizeImageUrl(m[1]);
+      if (norm) return norm;
+    }
+  }
+  return '';
+}
+
+function extractImageFromRssBlock(block) {
+  const patterns = [
+    /<media:content[^>]+url=["']([^"']+)["']/i,
+    /<media:thumbnail[^>]+url=["']([^"']+)["']/i,
+    /<enclosure[^>]+url=["']([^"']+)["'][^>]+type=["']image/i
+  ];
+  for (const re of patterns) {
+    const m = block.match(re);
+    if (m) { const n = normalizeImageUrl(m[1]); if (n) return n; }
+  }
+  return extractImagesFromHtml(block);
+}
+
+function extractArticleUrl(summary, link) {
+  if (link && !/news\.google\.com/i.test(link)) return link;
+  const hrefRe = /href=["'](https?:\/\/[^"']+)["']/gi;
+  let m;
+  while ((m = hrefRe.exec(decodeEntities(summary || ''))) !== null) {
+    if (!/news\.google\.com/i.test(m[1])) return m[1];
+  }
+  return link || '';
+}
+
+async function fetchHtml(url) {
+  const attempts = [
+    'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(url),
+    'https://corsproxy.io/?' + encodeURIComponent(url)
+  ];
+  for (const u of attempts) {
+    try {
+      const res = await fetch(u, { signal: AbortSignal.timeout(14000) });
+      const text = await res.text();
+      if (text && text.length > 200) return text;
+    } catch {}
+  }
+  return null;
+}
+
+async function fetchOgImage(pageUrl) {
+  if (!pageUrl || imageCache.has(pageUrl)) return imageCache.get(pageUrl) || '';
+  const html = await fetchHtml(pageUrl);
+  const img = html ? extractImagesFromHtml(html) : '';
+  imageCache.set(pageUrl, img);
+  return img;
+}
+
+async function resolveItemImage(item, cat) {
+  if (item.image) { const d = normalizeImageUrl(item.image); if (d) return d; }
+  const fromSummary = extractImagesFromHtml(item.summary);
+  if (fromSummary) return fromSummary;
+  const articleUrl = extractArticleUrl(item.summary, item.link);
+  if (ogFetchCount < 25 && articleUrl && !/news\.google\.com/i.test(articleUrl)) {
+    ogFetchCount++;
+    const og = await fetchOgImage(articleUrl);
+    if (og) return og;
+  }
+  return IMGS[cat] || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&q=80';
+}
+
 function makeLead(title, summary) {
   const clean = stripHtml(summary);
   if (!clean || clean.length < 30 || /news\.google\.com\/rss/i.test(clean)) {
@@ -139,7 +243,7 @@ function parseItems(xml, cfg) {
     const pub = get('pubDate');
     if (title && link) {
       items.push({
-        title, summary, link,
+        title, summary, link, image: extractImageFromRssBlock(block),
         pubDate: pub ? new Date(pub) : new Date(),
         region: cfg.region, world: !!cfg.world,
         feedPriority: cfg.priority || 0, source: extractSource(link)
@@ -175,11 +279,18 @@ async function main() {
     .filter(item => !seen.has(item.link))
     .map(item => ({ ...item, confidence: calcConfidence(item, all), cat: detectCategory(item.title, item.summary, item.region, item.world) }))
     .filter(item => item.confidence >= 55)
-    .sort((a, b) => (b.feedPriority || 0) - (a.feedPriority || 0) || b.confidence - a.confidence || b.pubDate - a.pubDate);
+    .sort((a, b) => {
+      const imgScore = i => (i.image ? 3 : 0);
+      return imgScore(b) - imgScore(a)
+        || (b.feedPriority || 0) - (a.feedPriority || 0)
+        || b.confidence - a.confidence
+        || b.pubDate - a.pubDate;
+    });
 
-  function pushArticle(item) {
+  async function pushArticle(item) {
     if (seen.has(item.link)) return false;
     const lead = makeLead(item.title, item.summary);
+    const img = await resolveItemImage(item, item.cat);
     articles.push({
       id: Date.now() + articles.length,
       title: item.title,
@@ -187,7 +298,7 @@ async function main() {
       content: `<p>${lead}</p><p>Fonte: <em>${item.source}</em>. Matéria verificada pela IA editorial do Pains Acontece.</p>`,
       cat: item.cat,
       status: 'pub',
-      img: IMGS[item.cat] || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&q=80',
+      img,
       author: 'IA Pains Acontece',
       date: item.pubDate.toLocaleDateString('pt-BR'),
       timeAgo: formatDate(item.pubDate),
@@ -204,14 +315,17 @@ async function main() {
     for (const item of candidates) {
       if ((counts[cat] || 0) >= max) break;
       if (item.cat !== cat) continue;
-      pushArticle(item);
+      await pushArticle(item);
     }
   }
 
   for (const item of candidates) {
     if (articles.length >= 22) break;
-    pushArticle(item);
+    await pushArticle(item);
   }
+
+  const realImgs = articles.filter(a => !/unsplash\.com/i.test(a.img)).length;
+  console.log(`Imagens reais: ${realImgs}/${articles.length}`);
 
   articles.sort((a, b) => b.id - a.id);
   writeFileSync(OUT, JSON.stringify(articles, null, 2), 'utf8');
