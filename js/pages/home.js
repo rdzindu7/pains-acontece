@@ -140,7 +140,7 @@
           <h1 class="hero-title">${isOwnerView() ? 'Buscando notícias <em>verificadas</em> de Pains' : 'Notícias de <em>Pains</em> e região'}</h1>
           <p class="hero-lead">${isOwnerView()
             ? 'Nossa IA editorial está varrendo fontes de Pains MG, região, Brasil e mundo. As matérias aparecem aqui automaticamente.'
-            : 'O portal de notícias hiperlocal do Sudoeste Mineiro. Fique por dentro do que acontece na sua cidade.'}</p>
+            : 'O portal de notícias hiperlocal do Sudoeste Mineiro. <strong>Dúvidas sobre alguma matéria?</strong> Clique no botão verde <i class="fas fa-users"></i> no canto da tela — nossa equipe IA responde na hora.'}</p>
           ${iaBtn}
         </div>`;
       return;

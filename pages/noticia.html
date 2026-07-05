@@ -109,6 +109,11 @@ footer{text-align:center;padding:28px clamp(12px,3vw,28px);font-size:.72rem;colo
 <script src="../js/core/api.js"></script>
 <script src="../js/core/store.js"></script>
 <script src="../js/ui/scroll-nav.js"></script>
+<script src="../js/ai/agents/sofia.js"></script>
+<script src="../js/ai/agents/lucas.js"></script>
+<script src="../js/ai/agents/camila.js"></script>
+<script src="../js/ai/orchestrator.js"></script>
+<script src="../js/ai/public-assistant.js"></script>
 <script>
 (async function(){
   const params = new URLSearchParams(location.search);
@@ -132,6 +137,8 @@ footer{text-align:center;padding:28px clamp(12px,3vw,28px);font-size:.72rem;colo
 
   await PAStore.incrementViews(id);
   document.title = art.title + ' – Pains Acontece';
+  window.PACurrentArticle = art;
+  if (typeof PAPublicIA !== 'undefined') PAPublicIA.init();
 
   const related = PAStore.getArticles('pub').filter(a => a.id !== art.id && a.cat === art.cat).slice(0,3);
   let quickText = art.quickLead || art.lead || art.title;
