@@ -7,7 +7,7 @@
 <link rel="apple-touch-icon" href="../assets/images/favicon.jpg"/>
 <title>Painel – Pains Acontece</title>
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
-<meta name="pa-build" content="2026.07.05-v27"/>
+<meta name="pa-build" content="2026.07.05-v28"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
@@ -2185,10 +2185,10 @@ body.pa-owner .owner-only.btn-pub{display:flex!important}
 <script src="../js/ai/agents/camila.js"></script>
 <script src="../js/ai/orchestrator.js"></script>
 <script src="../js/ai/engine.js"></script>
-<script src="../js/core/purge.js?v=20260705v27"></script>
+<script src="../js/core/purge.js?v=20260705v28"></script>
 <script src="../js/core/auto-reload.js?v=20260705v21"></script>
 <script src="../js/core/pains-media.js?v=20260705v44"></script>
-<script src="../js/core/article-images.js?v=20260705v45"></script>
+<script src="../js/core/article-images.js?v=20260705v46"></script>
 <script src="../js/core/views-tracker.js?v=20260705v40"></script>
 <script src="../js/ai/agents/tiago.js?v=20260705v26"></script>
 <script src="../js/ai/bus-assistant.js?v=20260705v26"></script>
@@ -2931,7 +2931,10 @@ async function publishArticle(skipPreview) {
     clearEditor();
     await PAStore.initAdmin();
     PAStore.syncLocalCache?.();
-    if (payload.status === 'pub') autoSyncSiteNotice();
+    if (payload.status === 'pub') {
+      autoSyncSiteNotice();
+      try { await exportGitHub(true); } catch {}
+    }
     renderDashboard();
     renderPubs();
     showPanel('publicacoes', document.querySelectorAll('.sb-item')[1]);
@@ -3984,7 +3987,7 @@ function autoSyncSiteNotice() {
   showToast('Publicado! As abas abertas do portal atualizam sozinhas.', 'success', 5000);
 }
 
-async function exportGitHub() {
+async function exportGitHub(silent) {
   try {
     const data = await PAAPI.exportForGitHub();
     const blob = new Blob([JSON.stringify(data.articles, null, 2)], { type: 'application/json' });
@@ -3992,12 +3995,18 @@ async function exportGitHub() {
     a.href = URL.createObjectURL(blob);
     a.download = 'articles.json';
     a.click();
-    const cloud = await PAAPI.isSupabaseMode();
-    const msg = cloud
-      ? 'Backup JSON exportado!'
-      : 'JSON exportado! Substitua data/articles.json no GitHub.';
-    showToast(msg, 'success', 5000);
-  } catch { showToast('Erro ao exportar.', 'error'); }
+    if (!silent) {
+      const cloud = await PAAPI.isSupabaseMode();
+      const msg = cloud
+        ? 'Backup JSON exportado!'
+        : 'JSON exportado! Substitua data/articles.json no GitHub.';
+      showToast(msg, 'success', 5000);
+    }
+    return data.articles;
+  } catch {
+    if (!silent) showToast('Erro ao exportar.', 'error');
+    return null;
+  }
 }
 
 async function importGitHub(input) {

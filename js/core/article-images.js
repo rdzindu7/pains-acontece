@@ -135,12 +135,19 @@ const PAArticleImages = (function () {
     if (source && isRemote(source)) out.img_source = source;
     else if (data.img && data.img.startsWith('data:')) out.img_source = data.img;
 
-    out.img = localRelPath(id, ext);
-
     const toFetch = source && isRemote(source) ? source : (data.img?.startsWith('data:') ? data.img : '');
     if (toFetch) {
       const blob = await downloadBlob(toFetch);
-      if (blob) await idbSave(String(id), blob);
+      if (blob) {
+        await idbSave(String(id), blob);
+        out.img = localRelPath(id, ext);
+      } else if (isRemote(toFetch)) {
+        out.img = toFetch;
+      } else {
+        out.img = localRelPath(id, ext);
+      }
+    } else {
+      out.img = data.img || localRelPath(id, ext);
     }
 
     return out;

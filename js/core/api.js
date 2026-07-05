@@ -354,8 +354,11 @@ const PAAPI = (function () {
       } catch {}
     }
     const jsonList = await fetchArticlesFromJson(status);
-    if (remoteList.length) return mergeArticles(jsonList, remoteList);
-    return jsonList;
+    const state = getState();
+    const localPub = (state.articles || []).filter(a => !status || a.status === status);
+    let merged = mergeArticles(jsonList, localPub);
+    if (remoteList.length) merged = mergeArticles(merged, remoteList);
+    return merged;
   }
 
   async function getArticlesAdmin(status) {

@@ -629,21 +629,27 @@
     }
   }
 
+  function mergePubLists(jsonList, extra) {
+    const map = new Map((jsonList || []).map(a => [String(a.id), a]));
+    (extra || []).forEach(a => {
+      if (a && a.status === 'pub') map.set(String(a.id), a);
+    });
+    return [...map.values()].sort((a, b) => (Number(b.id) || 0) - (Number(a.id) || 0));
+  }
+
   async function init() {
     let raw = await fetchPubFromJson();
+    const hasAuth = !!(sessionStorage.getItem('pa_auth_mode') || sessionStorage.getItem('pa_token'));
+    if (hasAuth || isOwnerView()) {
+      try {
+        await PAStore.init({ admin: hasAuth });
+        raw = mergePubLists(raw, PAStore.getArticles('pub'));
+      } catch {}
+    }
     if (!raw.length) {
       try { localStorage.removeItem('pa_articles_cache_v2'); } catch {}
-      applyArticles([], []);
-    } else {
-      try {
-        await PAStore.init();
-        raw = PAStore.getArticles('pub');
-        if (!raw.length) raw = await fetchPubFromJson();
-      } catch {
-        raw = await fetchPubFromJson();
-      }
-      applyArticles(raw, filterForDisplay(raw));
     }
+    applyArticles(raw, filterForDisplay(raw));
 
     setupNav();
     setupPhoneSearch();
