@@ -266,7 +266,7 @@ async function main() {
   console.log(`Total bruto: ${all.length} itens`);
 
   const seen = new Set();
-  const articles = [];
+  let articles = [];
   const quotas = { 'Pains': 4, 'Região': 4, 'Brasil / Mundo': 10, 'Polícia': 2, 'Política': 2 };
   const counts = {};
 

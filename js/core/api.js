@@ -357,6 +357,21 @@ const PAAPI = (function () {
     return local;
   }
 
+  async function callBackend(method, ...args) {
+    const b = await getBackend();
+    if (typeof b[method] === 'function') {
+      try {
+        const result = await b[method](...args);
+        if (result !== undefined) return result;
+      } catch (err) {
+        console.warn(`[api] ${method}:`, err?.message || err);
+      }
+    }
+    if (typeof local[method] === 'function') return local[method](...args);
+    if (method.startsWith('get')) return [];
+    throw new Error('Não disponível');
+  }
+
   async function getArticlesPublic(status) {
     let remoteList = [];
     if (supabaseConfigured() && sessionStorage.getItem('pa_auth_mode')) {
@@ -1079,9 +1094,14 @@ const PAAPI = (function () {
 
     async updateArticle(id, data) {
       const row = articleToRow(data);
-      const { data: updated, error } = await sb().from('articles').update(row).eq('id', id).select().maybeSingle();
-      if (error) throw error;
-      return rowToArticle(updated);
+      try {
+        const { data: updated, error } = await sb().from('articles').update(row).eq('id', id).select().maybeSingle();
+        if (!error && updated) return rowToArticle(updated);
+        if (error) console.warn('[api] supabase update:', error.message);
+      } catch (e) {
+        console.warn('[api] supabase update:', e);
+      }
+      return local.updateArticle(id, data);
     },
 
     async deleteArticle(id) {
@@ -1337,34 +1357,34 @@ const PAAPI = (function () {
     sendPauta: async (d) => (await getBackend()).sendPauta(d),
     getEvents: async () => (await getBackend()).getEvents(),
     getJobs: async () => (await getBackend()).getJobs(),
-    addEvent: async (d) => (await getBackend()).addEvent?.(d) ?? Promise.reject(new Error('Não disponível')),
-    deleteEvent: async (id) => (await getBackend()).deleteEvent?.(id) ?? Promise.reject(new Error('Não disponível')),
-    addJob: async (d) => (await getBackend()).addJob?.(d) ?? Promise.reject(new Error('Não disponível')),
-    deleteJob: async (id) => (await getBackend()).deleteJob?.(id) ?? Promise.reject(new Error('Não disponível')),
-    getAds: async () => (await getBackend()).getAds?.() ?? [],
-    addAd: async (d) => (await getBackend()).addAd?.(d) ?? Promise.reject(new Error('Não disponível')),
-    updateAd: async (id, d) => (await getBackend()).updateAd?.(id, d) ?? Promise.reject(new Error('Não disponível')),
-    deleteAd: async (id) => (await getBackend()).deleteAd?.(id) ?? Promise.reject(new Error('Não disponível')),
-    getServices: async () => (await getBackend()).getServices?.() ?? [],
-    getServicesAdmin: async () => (await getBackend()).getServicesAdmin?.() ?? [],
-    addService: async (d) => (await getBackend()).addService?.(d) ?? Promise.reject(new Error('Não disponível')),
-    updateService: async (id, d) => (await getBackend()).updateService?.(id, d) ?? Promise.reject(new Error('Não disponível')),
-    deleteService: async (id) => (await getBackend()).deleteService?.(id) ?? Promise.reject(new Error('Não disponível')),
-    getRestaurants: async () => (await getBackend()).getRestaurants?.() ?? [],
-    getRestaurantsAdmin: async () => (await getBackend()).getRestaurantsAdmin?.() ?? [],
-    addRestaurant: async (d) => (await getBackend()).addRestaurant?.(d) ?? Promise.reject(new Error('Não disponível')),
-    updateRestaurant: async (id, d) => (await getBackend()).updateRestaurant?.(id, d) ?? Promise.reject(new Error('Não disponível')),
-    deleteRestaurant: async (id) => (await getBackend()).deleteRestaurant?.(id) ?? Promise.reject(new Error('Não disponível')),
-    getBuses: async () => (await getBackend()).getBuses?.() ?? [],
-    getBusesAdmin: async () => (await getBackend()).getBusesAdmin?.() ?? [],
-    addBus: async (d) => (await getBackend()).addBus?.(d) ?? Promise.reject(new Error('Não disponível')),
-    updateBus: async (id, d) => (await getBackend()).updateBus?.(id, d) ?? Promise.reject(new Error('Não disponível')),
+    addEvent: async (d) => callBackend('addEvent', d),
+    deleteEvent: async (id) => callBackend('deleteEvent', id),
+    addJob: async (d) => callBackend('addJob', d),
+    deleteJob: async (id) => callBackend('deleteJob', id),
+    getAds: async () => callBackend('getAds'),
+    addAd: async (d) => callBackend('addAd', d),
+    updateAd: async (id, d) => callBackend('updateAd', id, d),
+    deleteAd: async (id) => callBackend('deleteAd', id),
+    getServices: async () => callBackend('getServices'),
+    getServicesAdmin: async () => callBackend('getServicesAdmin'),
+    addService: async (d) => callBackend('addService', d),
+    updateService: async (id, d) => callBackend('updateService', id, d),
+    deleteService: async (id) => callBackend('deleteService', id),
+    getRestaurants: async () => callBackend('getRestaurants'),
+    getRestaurantsAdmin: async () => callBackend('getRestaurantsAdmin'),
+    addRestaurant: async (d) => callBackend('addRestaurant', d),
+    updateRestaurant: async (id, d) => callBackend('updateRestaurant', id, d),
+    deleteRestaurant: async (id) => callBackend('deleteRestaurant', id),
+    getBuses: async () => callBackend('getBuses'),
+    getBusesAdmin: async () => callBackend('getBusesAdmin'),
+    addBus: async (d) => callBackend('addBus', d),
+    updateBus: async (id, d) => callBackend('updateBus', id, d),
     deleteBus: async (id) => (await getBackend()).deleteBus?.(id) ?? Promise.reject(new Error('Não disponível')),
     resolveRole,
     isOwner,
     getAdminAccounts,
     exportForGitHub: async () => (await getBackend()).exportForGitHub(),
     importFromFile: async (f) => (await getBackend()).importFromFile(f),
-    getAuthMode: () => sessionStorage.getItem('pa_auth_mode') || (supabaseConfigured() ? 'cloud' : 'local')
+    getAuthMode: () => sessionStorage.getItem('pa_auth_mode') || 'local'
   };
 })();

@@ -92,10 +92,13 @@
   }
 
   function filterForDisplay(arts) {
-    const verified = (arts || []).filter(a => a.verified !== false && (a.confidence || 0) >= 55);
-    if (!verified.length) return [];
-    if (isOwnerView()) return filterRecent(verified);
-    return sortByRecent(verified);
+    const pool = (arts || []).filter(a => a.status !== 'draft' && a.status !== 'rejected' && a.status !== 'pending');
+    const quality = pool.filter(a => a.verified !== false && (a.confidence ?? 70) >= 45);
+    const list = quality.length ? quality : pool.filter(a => a.verified !== false);
+    const fallback = list.length ? list : pool;
+    if (!fallback.length) return [];
+    if (isOwnerView()) return filterRecent(fallback);
+    return sortByRecent(fallback);
   }
 
   function quickBtn(id) {

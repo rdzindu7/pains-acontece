@@ -6,9 +6,7 @@
  *    - Project URL  → supabaseUrl
  *    - anon public  → supabaseAnonKey
  * 3. Execute supabase/schema.sql no SQL Editor
- * 4. Vá em Authentication → Users → Add user:
- *    Email: admin@painsacontece.com.br
- *    Senha: Pains@2026
+ * 4. Crie usuário admin em Authentication → Users (não commite senhas)
  * 5. Cole as chaves abaixo e faça commit no GitHub
  */
 const PAConfig = {

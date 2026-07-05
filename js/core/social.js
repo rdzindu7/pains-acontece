@@ -34,11 +34,15 @@ const PASocial = (function () {
   }
 
   function siteBase() {
-    const cfg = PAConfig?.siteUrl?.replace(/\/$/, '');
-    if (cfg) return cfg;
     const path = location.pathname;
-    if (path.includes('/pages/')) return location.origin + path.replace(/\/pages\/.*$/, '');
-    return location.origin + path.replace(/\/[^/]*$/, '') || location.origin;
+    const localRoot = path.includes('/pages/')
+      ? location.origin + path.replace(/\/pages\/.*$/, '')
+      : location.origin + (path.replace(/\/[^/]*$/, '') || '');
+    if (location.hostname === 'localhost' || location.hostname === '127.0.0.1') {
+      return localRoot || location.origin;
+    }
+    const cfg = PAConfig?.siteUrl?.replace(/\/$/, '');
+    return cfg || localRoot || location.origin;
   }
 
   function authCallbackUrl() {
