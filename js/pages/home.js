@@ -1,4 +1,24 @@
 (function () {
+  const NAV_MAP = {
+    home:        { type: 'all' },
+    ultimas:     { type: 'news', title: 'Últimas Notícias', cats: null },
+    pains:       { type: 'news', title: 'Pains', cats: ['Pains'] },
+    regiao:      { type: 'news', title: 'Região', cats: ['Região'] },
+    brasil:      { type: 'news', title: 'Brasil / Mundo', cats: ['Brasil / Mundo'] },
+    policia:     { type: 'news', title: 'Polícia', cats: ['Polícia'] },
+    politica:    { type: 'news', title: 'Política', cats: ['Política'] },
+    saude:       { type: 'news', title: 'Saúde', cats: ['Saúde'] },
+    agenda:      { type: 'news', title: 'Agenda', cats: ['Agenda'] },
+    empregos:    { type: 'news', title: 'Empregos', cats: ['Empregos'] },
+    restaurantes:{ type: 'news', title: 'Restaurantes & Gastronomia', cats: ['Gastronomia'] },
+    telefones:   { type: 'scroll', target: '#telefones' },
+    clima:       { type: 'scroll', target: '#clima' },
+    contato:     { type: 'scroll', target: '#contato' }
+  };
+
+  let allPub = [];
+  let currentNav = 'home';
+
   function esc(s) {
     const d = document.createElement('div');
     d.textContent = s || '';
@@ -39,6 +59,11 @@
   }
 
   const emptyMsg = '<p style="color:var(--dim);font-size:.82rem;padding:20px 0">Nenhuma notícia nesta seção.</p>';
+
+  function filterByCats(arts, cats) {
+    if (!cats) return arts;
+    return arts.filter(a => cats.includes(a.cat));
+  }
 
   function renderHero(arts) {
     const el = document.getElementById('heroDynamic');
@@ -101,10 +126,43 @@
   function renderSection(id, arts, mode) {
     const el = document.getElementById(id);
     if (!el) return;
-    if (!arts.length) { el.innerHTML = '<p style="color:var(--dim);font-size:.82rem;padding:20px 0">Nenhuma notícia nesta seção.</p>'; return; }
+    if (!arts.length) { el.innerHTML = emptyMsg; return; }
     if (mode === 'grid') el.innerHTML = arts.map(a => card(a)).join('');
     else if (mode === 'xl') el.innerHTML = card(arts[0], 'xl');
     else el.innerHTML = arts.map(a => listRow(a)).join('');
+  }
+
+  function renderCategoryView(arts, title) {
+    const titleEl = document.getElementById('categoryTitle');
+    const countEl = document.getElementById('categoryCount');
+    const featEl = document.getElementById('categoryFeatured');
+    const gridEl = document.getElementById('categoryGrid');
+    const viewEl = document.getElementById('categoryView');
+
+    if (titleEl) titleEl.textContent = title;
+    if (countEl) {
+      countEl.textContent = arts.length
+        ? `${arts.length} notícia${arts.length > 1 ? 's' : ''} encontrada${arts.length > 1 ? 's' : ''}`
+        : 'Nenhuma notícia publicada nesta categoria ainda';
+    }
+    if (viewEl) viewEl.setAttribute('aria-hidden', 'false');
+
+    if (!featEl || !gridEl) return;
+
+    if (!arts.length) {
+      featEl.innerHTML = '';
+      gridEl.innerHTML = `<div style="grid-column:1/-1;padding:40px 0;text-align:center;color:var(--dim)">
+        <i class="fas fa-newspaper" style="font-size:2rem;opacity:.3;margin-bottom:12px;display:block"></i>
+        Nenhuma notícia nesta categoria.<br><span style="font-size:.78rem;margin-top:8px;display:inline-block">Publique pelo painel admin com a categoria <strong>${esc(title)}</strong>.</span>
+      </div>`;
+      return;
+    }
+
+    featEl.innerHTML = card(arts[0], 'xl');
+    const rest = arts.slice(1);
+    gridEl.innerHTML = rest.length
+      ? rest.map(a => card(a)).join('')
+      : `<div style="grid-column:1/-1;color:var(--dim);font-size:.8rem;padding:8px 0">Esta é a única notícia nesta categoria.</div>`;
   }
 
   function renderJobs(jobs) {
@@ -135,9 +193,8 @@
       </div>`).join('');
   }
 
-  async function init() {
-    await PAStore.init();
-    const pub = PAStore.getArticles('pub');
+  function renderHome() {
+    const pub = allPub;
     const byCat = (cat, n) => pub.filter(a => a.cat === cat).slice(0, n);
 
     renderHero(pub);
@@ -145,15 +202,88 @@
     renderBreaking(pub);
     renderSection('ultimasGrid', pub.slice(0, 6), 'grid');
     renderSection('policiaFeatured', byCat('Polícia', 1), 'xl');
-    renderSection('policiaList', byCat('Polícia', 1).slice(1, 4).concat(byCat('Polícia', 4).slice(1)), 'list');
+    renderSection('policiaList', byCat('Polícia', 4).slice(1), 'list');
     if (!byCat('Polícia', 1).length) {
-      document.getElementById('policiaFeatured').innerHTML = '';
-      document.getElementById('policiaList').innerHTML = pub.slice(0, 3).map(a => listRow(a)).join('');
+      const pf = document.getElementById('policiaFeatured');
+      const pl = document.getElementById('policiaList');
+      if (pf) pf.innerHTML = emptyMsg;
+      if (pl) pl.innerHTML = '';
     }
     renderSection('politicaList', byCat('Política', 4), 'list');
     renderSection('saudeGrid', byCat('Saúde', 3), 'grid');
-    renderSection('brasilList', byCat('Brasil / Mundo', 4).concat(byCat('Últimas Notícias', 2)), 'list');
-    renderSection('regiaoGrid', byCat('Região', 3).concat(byCat('Pains', 3)), 'grid');
+    renderSection('brasilList', byCat('Brasil / Mundo', 4), 'list');
+    renderSection('regiaoGrid', byCat('Região', 6), 'grid');
+  }
+
+  function setActiveNav(navKey) {
+    document.querySelectorAll('.nav-item a[data-nav]').forEach(a => {
+      a.classList.toggle('active', a.dataset.nav === navKey);
+    });
+  }
+
+  function applyNav(navKey, scrollTo) {
+    const cfg = NAV_MAP[navKey] || NAV_MAP.home;
+    currentNav = navKey;
+    setActiveNav(navKey);
+
+    if (cfg.type === 'all') {
+      document.body.classList.remove('cat-filter-mode');
+      const viewEl = document.getElementById('categoryView');
+      if (viewEl) viewEl.setAttribute('aria-hidden', 'true');
+      renderHome();
+      if (scrollTo) {
+        const el = document.querySelector(scrollTo);
+        if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } else {
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+      }
+      return;
+    }
+
+    if (cfg.type === 'scroll') {
+      document.body.classList.remove('cat-filter-mode');
+      const viewEl = document.getElementById('categoryView');
+      if (viewEl) viewEl.setAttribute('aria-hidden', 'true');
+      renderHome();
+      const el = document.querySelector(cfg.target);
+      if (el) setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
+      return;
+    }
+
+    if (cfg.type === 'news') {
+      document.body.classList.add('cat-filter-mode');
+      const filtered = filterByCats(allPub, cfg.cats);
+      renderCategoryView(filtered, cfg.title);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
+  }
+
+  function setupNav() {
+    document.querySelectorAll('.nav-item a[data-nav]').forEach(link => {
+      link.addEventListener('click', e => {
+        e.preventDefault();
+        const navKey = link.dataset.nav;
+        applyNav(navKey);
+        document.getElementById('navInner')?.classList.remove('open');
+        if (navKey !== 'home') {
+          history.replaceState(null, '', '#' + navKey);
+        } else {
+          history.replaceState(null, '', location.pathname);
+        }
+      });
+    });
+
+    const hash = location.hash.replace('#', '');
+    if (hash && NAV_MAP[hash]) {
+      applyNav(hash);
+    }
+  }
+
+  async function init() {
+    await PAStore.init();
+    allPub = PAStore.getArticles('pub');
+    renderHome();
+    setupNav();
 
     try {
       const [jobs, events] = await Promise.all([PAAPI.getJobs(), PAAPI.getEvents()]);
@@ -169,7 +299,7 @@
       search.addEventListener('input', function () {
         const q = this.value.toLowerCase();
         if (!q) return;
-        const match = pub.find(a => a.title.toLowerCase().includes(q) || a.cat.toLowerCase().includes(q));
+        const match = allPub.find(a => a.title.toLowerCase().includes(q) || a.cat.toLowerCase().includes(q));
         if (match) location.href = 'pages/noticia.html?id=' + match.id;
       });
     }

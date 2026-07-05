@@ -220,6 +220,18 @@ body::before {
 }
 .nav-item a:hover, .nav-item a.active { color: var(--y); }
 .nav-item a:hover::after, .nav-item a.active::after { transform: scaleX(1); }
+
+/* Modo filtro por categoria */
+body.cat-filter-mode .home-only { display: none !important; }
+body.cat-filter-mode .hero { display: none; }
+body.cat-filter-mode .breaking-strip { display: none; }
+body.cat-filter-mode .category-view { padding-top: 100px; }
+.category-view { display: none; padding: 24px 0 60px; }
+body.cat-filter-mode .category-view { display: block; }
+.category-view .cat-count {
+  font-size: .75rem; color: var(--dim); margin-top: 4px;
+}
+.category-view .cat-featured { margin-bottom: 28px; }
 .hamburger {
   display: none; background: none; border: none;
   color: #fff; font-size: 1.3rem; cursor: pointer; padding: 10px 0 10px 14px;
@@ -953,25 +965,39 @@ body::before {
 <nav class="main-nav" id="mainNav">
   <button class="hamburger" onclick="toggleNav()" aria-label="Menu"><i class="fas fa-bars"></i></button>
   <div class="nav-inner" id="navInner">
-    <div class="nav-item"><a href="index.html" class="active">Home</a></div>
-    <div class="nav-item"><a href="#ultimas">Últimas</a></div>
-    <div class="nav-item"><a href="#pains">Pains</a></div>
-    <div class="nav-item"><a href="#regiao">Região</a></div>
-    <div class="nav-item"><a href="#brasil">Brasil/Mundo</a></div>
-    <div class="nav-item"><a href="#policia">Polícia</a></div>
-    <div class="nav-item"><a href="#politica">Política</a></div>
-    <div class="nav-item"><a href="#saude">Saúde</a></div>
-    <div class="nav-item"><a href="#agenda">Agenda</a></div>
-    <div class="nav-item"><a href="#empregos">Empregos</a></div>
-    <div class="nav-item"><a href="#restaurantes">Restaurantes</a></div>
-    <div class="nav-item"><a href="#telefones">Telefones</a></div>
-    <div class="nav-item"><a href="#clima">Clima</a></div>
-    <div class="nav-item"><a href="#contato">Pauta</a></div>
+    <div class="nav-item"><a href="index.html" data-nav="home" class="active">Home</a></div>
+    <div class="nav-item"><a href="#ultimas" data-nav="ultimas">Últimas</a></div>
+    <div class="nav-item"><a href="#pains" data-nav="pains">Pains</a></div>
+    <div class="nav-item"><a href="#regiao" data-nav="regiao">Região</a></div>
+    <div class="nav-item"><a href="#brasil" data-nav="brasil">Brasil/Mundo</a></div>
+    <div class="nav-item"><a href="#policia" data-nav="policia">Polícia</a></div>
+    <div class="nav-item"><a href="#politica" data-nav="politica">Política</a></div>
+    <div class="nav-item"><a href="#saude" data-nav="saude">Saúde</a></div>
+    <div class="nav-item"><a href="#agenda" data-nav="agenda">Agenda</a></div>
+    <div class="nav-item"><a href="#empregos" data-nav="empregos">Empregos</a></div>
+    <div class="nav-item"><a href="#restaurantes" data-nav="restaurantes">Restaurantes</a></div>
+    <div class="nav-item"><a href="#telefones" data-nav="telefones">Telefones</a></div>
+    <div class="nav-item"><a href="#clima" data-nav="clima">Clima</a></div>
+    <div class="nav-item"><a href="#contato" data-nav="contato">Pauta</a></div>
   </div>
 </nav>
 
+<!-- VISÃO POR CATEGORIA (abas do menu) -->
+<section class="category-view wrap" id="categoryView" aria-hidden="true">
+  <div class="sec-head reveal">
+    <div class="line-v"></div>
+    <div>
+      <h2 id="categoryTitle">Notícias</h2>
+      <div class="cat-count" id="categoryCount"></div>
+    </div>
+    <div class="rule"></div>
+  </div>
+  <div class="cat-featured" id="categoryFeatured"></div>
+  <div class="grid-3 gap" id="categoryGrid"></div>
+</section>
+
 <!-- HERO -->
-<section class="hero">
+<section class="hero home-only">
   <div class="hero-reel"></div>
   <div class="hero-vignette"></div>
   <div class="hero-scan"></div>
@@ -987,7 +1013,7 @@ body::before {
   </div>
 </section>
 <!-- BREAKING STRIP -->
-<div class="breaking-strip">
+<div class="breaking-strip home-only">
   <div class="breaking-inner">
     <div class="breaking-tag"><i class="fas fa-bolt"></i> Destaques</div>
     <div class="breaking-items" id="breakingDynamic"></div>
@@ -995,7 +1021,7 @@ body::before {
 </div>
 
 <!-- ÚLTIMAS NOTÍCIAS -->
-<section class="section wrap" id="ultimas">
+<section class="section wrap home-only" id="ultimas">
   <div class="sec-head reveal">
     <div class="line-v"></div>
     <h2>Últimas Notícias</h2>
@@ -1006,7 +1032,7 @@ body::before {
 </section>
 
 <!-- SOCIAL BAND -->
-<div class="social-band">
+<div class="social-band home-only">
   <div class="social-band-inner">
     <span style="font-size:.75rem;color:var(--dim);font-weight:600;letter-spacing:1px;text-transform:uppercase;">Siga o portal:</span>
     <a href="#" class="social-cta wa"><i class="fab fa-whatsapp"></i> Grupo WhatsApp</a>
@@ -1015,7 +1041,7 @@ body::before {
   </div>
 </div>
 <!-- EDITORIAL + SIDEBAR -->
-<section class="wrap" style="padding-bottom:80px;" id="policia">
+<section class="wrap home-only" style="padding-bottom:80px;" id="policia">
   <div class="ed-layout">
     <div class="main-feed">
 
@@ -1114,7 +1140,7 @@ body::before {
   </div><!-- /ed-layout -->
 </section>
 <!-- SERVIÇOS DE PAINS -->
-<section class="section wrap" style="padding-top:0;" id="pains">
+<section class="section wrap home-only" style="padding-top:0;" id="pains">
   <div class="sec-head reveal">
     <div class="line-v"></div>
     <h2>Serviços de Pains</h2>
@@ -1218,7 +1244,7 @@ body::before {
   </div>
 </section>
 <!-- REGIÃO -->
-<section class="section wrap" style="padding-top:0;" id="regiao">
+<section class="section wrap home-only" style="padding-top:0;" id="regiao">
   <div class="sec-head reveal">
     <div class="line-v"></div>
     <h2>Pains e Região</h2>
@@ -1332,19 +1358,7 @@ window.addEventListener('scroll', () => {
   btt.classList.toggle('show', window.scrollY > 500);
 });
 
-/* ── NAV ACTIVE ── */
-const sections = document.querySelectorAll('section[id], div[id]');
-const navAs = document.querySelectorAll('.nav-item a');
-const secObs = new IntersectionObserver(entries => {
-  entries.forEach(e => {
-    if (e.isIntersecting) {
-      navAs.forEach(a => a.classList.remove('active'));
-      const active = document.querySelector(`.nav-item a[href="#${e.target.id}"]`);
-      if (active) active.classList.add('active');
-    }
-  });
-}, { threshold: 0.3, rootMargin: '-80px 0px -40% 0px' });
-sections.forEach(s => secObs.observe(s));
+/* ── NAV ACTIVE gerenciado por home.js (filtro por categoria) ── */
 
 /* ── TICKER PAUSE ON HOVER ── */
 const tickerEl = document.querySelector('.ticker-items');
