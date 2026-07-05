@@ -1,7 +1,7 @@
 const PAAPI = (function () {
   const ADMIN_USER = 'admin@painsacontece.com.br';
   const ADMIN_PASS = 'Pains@2026';
-  const LS_ADMIN = 'pa_admin_state';
+  const LS_ADMIN = 'pa_admin_state_v2';
 
   function siteRoot() {
     const path = location.pathname;

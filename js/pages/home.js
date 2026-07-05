@@ -38,11 +38,25 @@
     </a>`;
   }
 
+  const emptyMsg = '<p style="color:var(--dim);font-size:.82rem;padding:20px 0">Nenhuma notícia nesta seção.</p>';
+
   function renderHero(arts) {
-    const hero = arts[0];
-    if (!hero) return;
     const el = document.getElementById('heroDynamic');
     if (!el) return;
+    const hero = arts[0];
+    if (!hero) {
+      el.innerHTML = `
+        <div class="hero-text">
+          <div class="hero-eyebrow">
+            <span class="dot"></span>
+            <span class="label">Pains Acontece</span>
+          </div>
+          <h1 class="hero-title">Seu portal de notícias está <em>pronto</em></h1>
+          <p class="hero-lead">Publique a primeira matéria pelo painel administrativo e ela aparecerá aqui automaticamente.</p>
+          <a href="pages/login.html" class="btn-hero">Acessar painel <i class="fas fa-arrow-right arr"></i></a>
+        </div>`;
+      return;
+    }
     el.innerHTML = `
       <div class="hero-text">
         <div class="hero-eyebrow">
@@ -96,6 +110,7 @@
   function renderJobs(jobs) {
     const el = document.getElementById('jobsDynamic');
     if (!el) return;
+    if (!jobs.length) { el.innerHTML = emptyMsg; return; }
     el.innerHTML = jobs.map(j => `
       <div class="job-item" style="padding:12px 0;border-bottom:1px solid rgba(255,255,255,.04)">
         <div style="font-size:.82rem;font-weight:600">${esc(j.title)}</div>
@@ -106,6 +121,7 @@
   function renderAgenda(events) {
     const el = document.getElementById('agendaDynamic');
     if (!el) return;
+    if (!events.length) { el.innerHTML = emptyMsg; return; }
     el.innerHTML = events.map(e => `
       <div class="ag-item" style="display:flex;gap:12px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.04)">
         <div style="background:rgba(29,122,29,.15);border-radius:4px;padding:8px 10px;text-align:center;flex-shrink:0;min-width:52px">
@@ -144,8 +160,8 @@
       renderJobs(jobs);
       renderAgenda(events);
     } catch {
-      renderJobs([{ title: 'Auxiliar Administrativo', type: 'CLT', company: 'Comércio Local' }]);
-      renderAgenda([{ title: 'Festival Gastronômico', date: '12 Jul', time: '17h', place: 'Praça Central' }]);
+      renderJobs([]);
+      renderAgenda([]);
     }
 
     const search = document.getElementById('siteSearch');

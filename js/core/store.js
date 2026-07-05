@@ -1,5 +1,5 @@
 const PAStore = (function () {
-  const LS_KEY = 'pa_articles_cache';
+  const LS_KEY = 'pa_articles_cache_v2';
   let articles = [];
 
   async function init() {

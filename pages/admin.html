@@ -554,27 +554,27 @@ body{background:var(--k2);font-family:var(--fb);color:var(--w);display:flex}
       <div class="dash-grid">
         <div class="stat-card" style="--accent:#2ecc71">
           <div class="ic"><i class="fas fa-newspaper"></i></div>
-          <div class="val">247</div>
+          <div class="val" id="statPub">0</div>
           <div class="lbl">Publicações no Ar</div>
-          <div class="delta up"><i class="fas fa-arrow-up"></i> +12 este mês</div>
+          <div class="delta up" id="statPubDelta"><i class="fas fa-check"></i> Pronto para publicar</div>
         </div>
         <div class="stat-card" style="--accent:#3498db">
           <div class="ic"><i class="fas fa-eye"></i></div>
-          <div class="val">18.4K</div>
-          <div class="lbl">Visualizações Hoje</div>
-          <div class="delta up"><i class="fas fa-arrow-up"></i> +34% vs ontem</div>
+          <div class="val" id="statViews">0</div>
+          <div class="lbl">Total de Visualizações</div>
+          <div class="delta up" id="statViewsDelta"><i class="fas fa-chart-line"></i> —</div>
         </div>
         <div class="stat-card" style="--accent:var(--y)">
           <div class="ic"><i class="fas fa-file-alt"></i></div>
-          <div class="val">6</div>
+          <div class="val" id="statDraft">0</div>
           <div class="lbl">Rascunhos Pendentes</div>
-          <div class="delta down"><i class="fas fa-arrow-down"></i> 2 aguardam revisão</div>
+          <div class="delta down" id="statDraftDelta"><i class="fas fa-pen"></i> —</div>
         </div>
         <div class="stat-card" style="--accent:#e74c3c">
           <div class="ic"><i class="fas fa-bullhorn"></i></div>
-          <div class="val">14</div>
-          <div class="lbl">Pautas Enviadas</div>
-          <div class="delta up"><i class="fas fa-arrow-up"></i> +3 hoje</div>
+          <div class="val" id="statReview">0</div>
+          <div class="lbl">Em Revisão</div>
+          <div class="delta up" id="statReviewDelta"><i class="fas fa-clock"></i> —</div>
         </div>
       </div>
 
@@ -584,30 +584,8 @@ body{background:var(--k2);font-family:var(--fb);color:var(--w);display:flex}
             <h3>Últimas Publicações</h3>
             <span class="see-all" onclick="showPanel('publicacoes',document.querySelectorAll('.sb-item')[1])">Ver todas →</span>
           </div>
-          <div class="art-row" onclick="editArticle(1)">
-            <div class="thumb"><img src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=200&q=60" alt=""/></div>
-            <div class="info"><div class="title">UBS de Pains amplia atendimento com novos serviços especializados</div><div class="meta">Saúde · Há 1 hora · 523 views</div></div>
-            <div class="status"><span class="pill pub">Publicado</span></div>
-          </div>
-          <div class="art-row" onclick="editArticle(2)">
-            <div class="thumb"><img src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=200&q=60" alt=""/></div>
-            <div class="info"><div class="title">Festival de inverno movimenta comércio em Pains</div><div class="meta">Agenda · Há 2 horas · 891 views</div></div>
-            <div class="status"><span class="pill pub">Publicado</span></div>
-          </div>
-          <div class="art-row" onclick="editArticle(3)">
-            <div class="thumb"><img src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=200&q=60" alt=""/></div>
-            <div class="info"><div class="title">Sine regional abre 30 vagas para moradores de Pains</div><div class="meta">Empregos · Há 6 horas · 2.240 views</div></div>
-            <div class="status"><span class="pill pub">Publicado</span></div>
-          </div>
-          <div class="art-row" onclick="editArticle(4)">
-            <div class="thumb"><img src="https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=200&q=60" alt=""/></div>
-            <div class="info"><div class="title">Câmara vota projeto de apoio ao comércio local [RASCUNHO]</div><div class="meta">Política · Há 1 dia</div></div>
-            <div class="status"><span class="pill draft">Rascunho</span></div>
-          </div>
-          <div class="art-row" onclick="editArticle(5)">
-            <div class="thumb"><img src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=200&q=60" alt=""/></div>
-            <div class="info"><div class="title">Alerta dengue: casos sobem 40% na microrregião</div><div class="meta">Saúde · Em revisão</div></div>
-            <div class="status"><span class="pill review">Revisão</span></div>
+          <div id="dashRecentList">
+            <div style="padding:24px;text-align:center;color:var(--dim);font-size:.82rem">Nenhuma publicação ainda. Clique em <strong>Nova Notícia</strong> para começar.</div>
           </div>
         </div>
 
@@ -964,9 +942,7 @@ body{background:var(--k2);font-family:var(--fb);color:var(--w);display:flex}
           <button class="tb-btn primary" onclick="showAddEvent()"><i class="fas fa-plus"></i> Novo Evento</button>
         </div>
         <div class="box" id="eventList">
-          <div class="art-row"><div class="info"><div class="title">Sessão Ordinária da Câmara Municipal</div><div class="meta">05 Jul · 18h · Câmara de Pains</div></div><div style="display:flex;gap:6px"><button class="icon-btn edit"><i class="fas fa-edit"></i></button><button class="icon-btn del"><i class="fas fa-trash"></i></button></div></div>
-          <div class="art-row"><div class="info"><div class="title">Mutirão de Saúde – Exames Gratuitos</div><div class="meta">07 Jul · 08h · UBS Central</div></div><div style="display:flex;gap:6px"><button class="icon-btn edit"><i class="fas fa-edit"></i></button><button class="icon-btn del"><i class="fas fa-trash"></i></button></div></div>
-          <div class="art-row"><div class="info"><div class="title">Festival Gastronômico de Inverno</div><div class="meta">12 Jul · 17h · Praça Central</div></div><div style="display:flex;gap:6px"><button class="icon-btn edit"><i class="fas fa-edit"></i></button><button class="icon-btn del"><i class="fas fa-trash"></i></button></div></div>
+          <div style="padding:24px;text-align:center;color:var(--dim);font-size:.82rem">Nenhum evento cadastrado.</div>
         </div>
       </div>
     </div>
@@ -979,9 +955,7 @@ body{background:var(--k2);font-family:var(--fb);color:var(--w);display:flex}
           <button class="tb-btn primary" onclick="showAddJob()"><i class="fas fa-plus"></i> Nova Vaga</button>
         </div>
         <div class="box" id="jobList">
-          <div class="art-row"><div class="info"><div class="title">Auxiliar Administrativo</div><div class="meta">CLT · Comércio Local · Ativa</div></div><div style="display:flex;gap:6px"><span class="pill pub">Ativa</span><button class="icon-btn del" style="margin-left:6px"><i class="fas fa-trash"></i></button></div></div>
-          <div class="art-row"><div class="info"><div class="title">Operador de Máquinas</div><div class="meta">CLT · Ind. Regional · Ativa</div></div><div style="display:flex;gap:6px"><span class="pill pub">Ativa</span><button class="icon-btn del" style="margin-left:6px"><i class="fas fa-trash"></i></button></div></div>
-          <div class="art-row"><div class="info"><div class="title">Técnico em Enfermagem</div><div class="meta">CLT · Santa Casa · Ativa</div></div><div style="display:flex;gap:6px"><span class="pill pub">Ativa</span><button class="icon-btn del" style="margin-left:6px"><i class="fas fa-trash"></i></button></div></div>
+          <div style="padding:24px;text-align:center;color:var(--dim);font-size:.82rem">Nenhuma vaga cadastrada.</div>
         </div>
       </div>
     </div>
@@ -1253,6 +1227,7 @@ async function approvePending(id) {
     await PAStore.init();
     await renderPending();
     await updateScannerStatus();
+    renderDashboard();
     renderPubs();
   } catch { showToast('Erro ao publicar.', 'error'); }
 }
@@ -1316,6 +1291,30 @@ let currentFilter = 'todos';
 let currentSearch = '';
 let editingId = null;
 
+function renderDashboard() {
+  const arts = getArticles();
+  const pub = arts.filter(a => a.status === 'pub');
+  const draft = arts.filter(a => a.status === 'draft');
+  const review = arts.filter(a => a.status === 'review');
+  const views = arts.reduce((s, a) => s + (a.views || 0), 0);
+
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
+  set('statPub', pub.length);
+  set('statViews', views.toLocaleString('pt-BR'));
+  set('statDraft', draft.length);
+  set('statReview', review.length);
+
+  const recent = document.getElementById('dashRecentList');
+  if (!recent) return;
+  const latest = [...arts].slice(0, 5);
+  recent.innerHTML = latest.length ? latest.map(a => `
+    <div class="art-row" onclick="editArticle(${a.id})">
+      <div class="thumb"><img src="${a.img || ''}" alt=""/></div>
+      <div class="info"><div class="title">${a.title}</div><div class="meta">${a.cat} · ${a.date || ''} · ${a.views || 0} views</div></div>
+      <div class="status"><span class="pill ${STATUS_CLASS[a.status] || 'draft'}">${STATUS_LABELS[a.status] || a.status}</span></div>
+    </div>`).join('') : `<div style="padding:24px;text-align:center;color:var(--dim);font-size:.82rem">Nenhuma publicação ainda. Clique em <strong>Nova Notícia</strong> para começar.</div>`;
+}
+
 function renderPubs() {
   const list = document.getElementById('pubList');
   const data = getArticles().filter(a => {
@@ -1369,6 +1368,7 @@ async function confirmDelete() {
   closeModal('deleteModal');
   showToast('Publicação excluída com sucesso.', 'error');
   renderPubs();
+  renderDashboard();
 }
 
 /* ════ EDITOR ════ */
@@ -1424,6 +1424,8 @@ async function publishArticle(skipPreview) {
   }
   editingId = null;
   clearEditor();
+  renderDashboard();
+  renderPubs();
   showPanel('publicacoes', document.querySelectorAll('.sb-item')[1]);
 }
 
@@ -1626,6 +1628,7 @@ if (artStatusEl) {
   if (PASupabase.isConfigured()) await testSupabase();
   else updateSupabaseStatus(false);
   await PAStore.init();
+  renderDashboard();
   renderPubs();
   await updateScannerStatus();
   try {
