@@ -7,7 +7,18 @@ import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 
 const __dirname = dirname(fileURLToPath(import.meta.url));
-const OUT = join(__dirname, '..', 'data', 'articles.json');
+const ROOT = join(__dirname, '..');
+const OUT = join(ROOT, 'data', 'articles.json');
+const CONFIG = join(ROOT, 'js', 'core', 'config.js');
+
+function autoSeedEnabled() {
+  try {
+    const raw = readFileSync(CONFIG, 'utf8');
+    return !/autoSeed:\s*false/.test(raw);
+  } catch {
+    return true;
+  }
+}
 
 const RSS_FEEDS = [
   { url: 'https://news.google.com/rss/search?q=Pains+MG&hl=pt-BR&gl=BR&ceid=BR:pt-419', region: 'Pains', priority: 3 },
@@ -257,6 +268,10 @@ async function fetchFeed(cfg) {
 }
 
 async function main() {
+  if (!autoSeedEnabled()) {
+    console.log('autoSeed desligado — seed ignorado');
+    return;
+  }
   console.log('Buscando feeds RSS (múltiplos proxies)…');
   const results = [];
   for (const cfg of RSS_FEEDS) {

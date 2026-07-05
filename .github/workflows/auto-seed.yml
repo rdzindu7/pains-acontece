@@ -24,7 +24,12 @@ jobs:
           node-version: '20'
 
       - name: Atualizar notícias via RSS
-        run: node scripts/seed-articles.mjs
+        run: |
+          if grep -q 'autoSeed: false' js/core/config.js; then
+            echo "autoSeed desligado — mantendo site sem postagens"
+            exit 0
+          fi
+          node scripts/seed-articles.mjs
 
       - name: Commit e publicar
         run: |

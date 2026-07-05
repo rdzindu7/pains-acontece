@@ -19,7 +19,8 @@ const PAConfig = {
     autoScan: true,
     autoRefresh: true,
     autoSync: true,
-    autoPublishIfEmpty: true,
+    autoSeed: false,
+    autoPublishIfEmpty: false,
     refreshMinutes: 5,
     scanMinutes: 5
   },
