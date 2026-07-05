@@ -44,10 +44,21 @@ img{display:block;max-width:100%}
 .mode-tab.quick.active{background:linear-gradient(135deg,#8b6914,var(--y));border-color:var(--y)}
 .hero-img{border-radius:6px;overflow:hidden;margin-bottom:36px;border:1px solid rgba(255,255,255,.06)}
 .hero-img img{width:100%;max-height:480px;object-fit:cover}
-.content{font-size:1rem;color:rgba(255,255,255,.85)}
-.content p{margin-bottom:18px}
+.content{font-size:1.02rem;color:rgba(255,255,255,.88);line-height:1.85;max-width:72ch}
+.content p{margin:0 0 1.35rem;text-align:justify;hyphens:auto}
+.content p:first-of-type{font-size:1.08rem;color:rgba(255,255,255,.92)}
 .content strong{color:#fff}
-.content ul{margin:12px 0 18px 20px}
+.content h3.art-subhead{font-family:var(--ff-serif);font-size:1.2rem;line-height:1.35;margin:2rem 0 1rem;color:var(--y);border-left:3px solid var(--g);padding-left:14px}
+.content ul{margin:12px 0 18px 20px;list-style:disc}
+.content li{margin-bottom:10px;line-height:1.65}
+.content .art-sources{margin-top:2.5rem;padding:1.25rem 1.4rem;background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:6px}
+.content .art-sources-title{font-family:var(--ff-display);letter-spacing:1.5px;font-size:.9rem;color:var(--y);margin:0 0 12px}
+.content .art-src{color:var(--dim);font-size:.88rem}
+.content .art-meta-note{margin-top:2rem;padding-top:1.25rem;border-top:1px solid rgba(255,255,255,.08);font-size:.88rem;color:var(--dim)}
+.content .art-source-link{display:inline-flex;align-items:center;gap:8px;color:var(--g3);font-weight:600;margin-top:8px}
+.content .article-gallery{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin:1.5rem 0}
+.content .article-gallery figure{margin:0;border-radius:4px;overflow:hidden;border:1px solid rgba(255,255,255,.08)}
+.content .article-gallery img{width:100%;aspect-ratio:16/10;object-fit:cover}
 .quick-box{background:linear-gradient(135deg,rgba(201,162,39,.08),rgba(29,122,29,.06));border:1px solid rgba(201,162,39,.25);border-radius:6px;padding:24px 28px;margin-bottom:28px;animation:fadeIn .5s ease}
 .quick-box .qlabel{font-size:.62rem;font-weight:800;letter-spacing:2px;text-transform:uppercase;color:var(--y);margin-bottom:12px;display:flex;align-items:center;gap:8px}
 .quick-box .qtext{font-size:1.05rem;line-height:1.75;color:rgba(255,255,255,.9)}
@@ -91,6 +102,7 @@ footer{text-align:center;padding:28px clamp(12px,3vw,28px);font-size:.72rem;colo
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="../js/core/config.js"></script>
 <script src="../js/core/supabase-client.js"></script>
+<script src="../js/ui/article-format.js"></script>
 <script src="../js/ai/scanner.js"></script>
 <script src="../js/core/api.js"></script>
 <script src="../js/core/store.js"></script>
@@ -120,11 +132,23 @@ footer{text-align:center;padding:28px clamp(12px,3vw,28px);font-size:.72rem;colo
   document.title = art.title + ' – Pains Acontece';
 
   const related = PAStore.getArticles('pub').filter(a => a.id !== art.id && a.cat === art.cat).slice(0,3);
-  const quickText = art.quickLead || art.lead || art.title;
+  let quickText = art.quickLead || art.lead || art.title;
+  if (quickText.length > 400 && typeof PAArticleFormat !== 'undefined') {
+    quickText = PAArticleFormat.firstParagraph(quickText, 380) || quickText.slice(0, 377) + '…';
+  }
   let currentMode = mode;
+
+  function formatBody(html) {
+    if (!html) return '<p>Conteúdo em breve.</p>';
+    if (typeof PAArticleFormat !== 'undefined') {
+      return PAArticleFormat.reorganizeContent(html);
+    }
+    return html;
+  }
 
   function render(){
     const isQuick = currentMode === 'quick';
+    const bodyHtml = formatBody(art.content);
     main.innerHTML = `
     <article class="article wrap">
       <span class="cat">${esc(art.cat)}</span>
@@ -148,7 +172,7 @@ footer{text-align:center;padding:28px clamp(12px,3vw,28px);font-size:.72rem;colo
           <p class="qctx">Esta é a versão resumida e explicativa. A matéria completa traz todos os detalhes, fontes consultadas e verificação da IA.</p>
         </div>` : `
         ${art.lead && !isQuick ? `<p class="lead">${esc(art.lead)}</p>` : ''}
-        <div class="content">${art.content || '<p>Conteúdo em breve.</p>'}</div>`}
+        <div class="content">${bodyHtml}</div>`}
       <div class="share">
         <h4>Compartilhar</h4>
         <div class="share-btns">

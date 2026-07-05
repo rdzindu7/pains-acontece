@@ -275,11 +275,14 @@ const PAScanner = (function () {
   }
 
   function makeLead(title, summary) {
-    const clean = stripHtml(summary);
+    const fmt = typeof PAArticleFormat !== 'undefined' ? PAArticleFormat : null;
+    const clean = fmt
+      ? fmt.firstParagraph(summary, 220)
+      : stripHtml(summary);
     if (!clean || clean.length < 30 || /news\.google\.com\/rss/i.test(clean)) {
       return `${title}. Informação verificada pela redação do Pains Acontece com base em fontes públicas.`;
     }
-    return clean.length > 220 ? clean.slice(0, 217) + '…' : clean;
+    return clean;
   }
 
   function buildContent(title, summary, source, link) {
@@ -337,27 +340,44 @@ const PAScanner = (function () {
     return (last > 200 ? cut.slice(0, last) : cut) + '…';
   }
 
+  function buildBodyHtml(item, meta) {
+    const fmt = typeof PAArticleFormat !== 'undefined' ? PAArticleFormat : null;
+    if (meta.paragraphs?.length >= 2) {
+      const blocks = meta.paragraphs.map(t => ({ type: 'p', text: t }));
+      return fmt ? fmt.blocksToHtml(blocks) : meta.paragraphs.map(p => `<p>${p}</p>`).join('');
+    }
+    const raw = meta.excerpt || item.summary || item.title;
+    if (fmt) return fmt.formatPlainText(raw);
+    const t = stripHtml(raw);
+    return t ? `<p>${t}</p>` : `<p>${item.title}</p>`;
+  }
+
   function buildDeepContent(item, meta, sources, confidence, audit, mainImg) {
     const articleUrl = extractArticleUrl(item.summary, item.link);
-    const paras = meta.paragraphs?.length ? meta.paragraphs : [meta.excerpt || stripHtml(item.summary) || item.title];
-    let html = paras.map(p => `<p>${p}</p>`).join('');
+    const esc = s => (typeof PAArticleFormat !== 'undefined' ? PAArticleFormat.esc(s) : s);
+    let html = buildBodyHtml(item, meta);
+
     if (meta.images?.length > 1) {
-      html += '<div class="article-gallery" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin:24px 0">';
+      html += '<div class="article-gallery">';
       meta.images.filter(u => u !== mainImg).slice(0, 3).forEach(u => {
-        html += `<figure style="margin:0;border-radius:4px;overflow:hidden;border:1px solid rgba(255,255,255,.08)"><img src="${u}" alt="" loading="lazy" style="width:100%;aspect-ratio:16/10;object-fit:cover"/></figure>`;
+        html += `<figure><img src="${u}" alt="" loading="lazy"/></figure>`;
       });
       html += '</div>';
     }
-    html += `<p><strong>${item.title}</strong> — matéria verificada pela IA editorial do Pains Acontece após busca minuciosa em múltiplas fontes públicas.</p>`;
+
     if (sources.length) {
-      html += `<p><strong>Fontes consultadas (${sources.length}):</strong></p><ul>`;
+      html += `<div class="art-sources"><h4 class="art-sources-title">Fontes consultadas (${sources.length})</h4><ul>`;
       sources.slice(0, 6).forEach(s => {
-        html += `<li><a href="${s.url}" target="_blank" rel="noopener">${s.title}</a> — <em>${s.source}</em></li>`;
+        html += `<li><a href="${s.url}" target="_blank" rel="noopener">${esc(s.title)}</a> <span class="art-src">— ${esc(s.source)}</span></li>`;
       });
-      html += '</ul>';
+      html += '</ul></div>';
     }
-    html += `<p><em>✓ Verificação minuciosa — confiança ${confidence}% · ${audit.corroborations} corroboração(ões) · página ${audit.pageValidated ? 'validada' : 'não validada'} · ${new Date().toLocaleString('pt-BR')}</em></p>`;
-    if (articleUrl) html += `<p><a href="${articleUrl}" target="_blank" rel="noopener">Leia na fonte original</a></p>`;
+
+    html += `<div class="art-meta-note"><p>✓ Verificação editorial — confiança <strong>${confidence}%</strong> · ${audit.corroborations} corroboração(ões) · ${audit.pageValidated ? 'página validada' : 'fonte RSS'}</p>`;
+    if (articleUrl) {
+      html += `<p><a class="art-source-link" href="${articleUrl}" target="_blank" rel="noopener"><i class="fas fa-external-link-alt"></i> Leia na fonte original</a></p>`;
+    }
+    html += '</div>';
     return html;
   }
 
@@ -398,9 +418,12 @@ const PAScanner = (function () {
       quick: true
     };
     const img = normalizeImageUrl(item.image) || extractImagesFromHtml(item.summary) || pickImage(cat);
-    const lead = makeLead(item.title, item.summary);
-    const quickLead = makeQuickLead(item.title, stripHtml(item.summary), []);
-    const pageMeta = { excerpt: stripHtml(item.summary), paragraphs: [], images: [] };
+    const summaryRaw = item.summary || '';
+    const blocks = typeof PAArticleFormat !== 'undefined' ? PAArticleFormat.textToBlocks(summaryRaw) : [];
+    const paraTexts = blocks.filter(b => b.type === 'p').map(b => b.text);
+    const lead = makeLead(item.title, summaryRaw);
+    const quickLead = makeQuickLead(item.title, paraTexts[0] || stripHtml(summaryRaw), paraTexts.slice(0, 2));
+    const pageMeta = { excerpt: paraTexts[0] || stripHtml(summaryRaw), paragraphs: paraTexts.slice(0, 8), images: [] };
 
     return {
       approved,
