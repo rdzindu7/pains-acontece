@@ -8,7 +8,7 @@
 <title>Pains Acontece – Notícias, serviços e o que importa em Pains e região</title>
 <meta name="description" content="Portal de notícias hiperlocal de Pains e região."/>
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
-<meta name="pa-build" content="2026.07.05-v23"/>
+<meta name="pa-build" content="2026.07.05-v36"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,700;0,900;1,700&display=swap" rel="stylesheet"/>
@@ -267,7 +267,8 @@ body.cat-filter-mode .category-view { display: block; }
 .category-view .cat-count {
   font-size: .75rem; color: var(--dim); margin-top: 4px;
 }
-.category-view .cat-featured { margin-bottom: 28px; }
+.category-view .cat-featured { margin-bottom: 28px; min-width: 0; }
+.category-view .cat-featured .ncard-xl { width: 100%; max-height: min(56vh, 480px); }
 .hamburger {
   display: none; align-items: center; justify-content: center;
   width: 40px; height: 40px; border: none; background: rgba(0,0,0,.25);
@@ -334,8 +335,11 @@ body.cat-filter-mode .category-view { display: block; }
   position: relative; z-index: 3;
   max-width: var(--container-max); margin: 0 auto;
   width: 100%; padding: clamp(40px, 8vw, 60px) var(--pad-x) clamp(50px, 8vw, 80px);
-  display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+  display: grid; grid-template-columns: minmax(0, 1fr);
   gap: clamp(24px, 4vw, 48px); align-items: end;
+}
+@media (min-width: 960px) {
+  .hero-content { grid-template-columns: minmax(0, 1.15fr) minmax(280px, 400px); }
 }
 
 /* Texto manchete */
@@ -364,11 +368,13 @@ body.cat-filter-mode .category-view { display: block; }
 
 .hero-title {
   font-family: var(--ff-serif);
-  font-size: clamp(2.2rem, 4.5vw, 4rem);
-  font-weight: 900; line-height: 1.08;
+  font-size: clamp(1.65rem, 4.5vw, 3.2rem);
+  font-weight: 900; line-height: 1.15;
   color: #fff;
   text-shadow: 0 4px 30px rgba(0,0,0,.8);
   margin-bottom: 20px;
+  word-break: normal; overflow-wrap: break-word; hyphens: none;
+  max-width: 100%;
   opacity: 0; transform: translateY(30px);
   animation: fadeUp .9s var(--ease) .2s forwards;
 }
@@ -490,9 +496,11 @@ body.cat-filter-mode .category-view { display: block; }
 #ultimasGrid .ncard,
 #ultimasGrid .ncard-xl,
 #categoryGrid .ncard,
-#categoryFeatured .ncard-xl {
+#categoryFeatured .ncard-xl,
+.feat-main .ncard-xl {
   min-height: 120px;
 }
+#ultimasGrid, #categoryGrid, .feat-2col { min-width: 0; }
 @media (prefers-reduced-motion: reduce) {
   .reveal { opacity: 1; transform: none; }
 }
@@ -640,6 +648,9 @@ body.cat-filter-mode .category-view { display: block; }
   pointer-events: auto;
 }
 .ncard:hover .quick-btn, .ncard-xl:hover .quick-btn { opacity: 1; transform: none; }
+@media (hover: none), (pointer: coarse) {
+  .ncard .quick-btn, .ncard-xl .quick-btn { opacity: 1; transform: none; }
+}
 .ncard .thumb, .ncard-xl { position: relative; }
 
 /* ═══════════════════════════════════════════
@@ -688,6 +699,10 @@ body.cat-filter-mode .category-view { display: block; }
 .grid-3 { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)); gap: 1px; background: rgba(255,255,255,.04); }
 .grid-3.gap { background: transparent; gap: clamp(12px, 2vw, 16px); }
 
+a.ncard, a.ncard-xl {
+  display: block; text-decoration: none; color: inherit; min-width: 0; width: 100%;
+}
+
 .ncard {
   position: relative; overflow: hidden;
   background: var(--k3); cursor: pointer;
@@ -725,6 +740,7 @@ body.cat-filter-mode .category-view { display: block; }
   font-size: .95rem; font-weight: 700;
   line-height: 1.4; color: var(--w);
   margin-bottom: 12px;
+  word-break: normal; overflow-wrap: break-word; hyphens: none;
   transition: color .2s;
 }
 .ncard:hover .card-title { color: var(--y); }
@@ -741,6 +757,7 @@ body.cat-filter-mode .category-view { display: block; }
   aspect-ratio: 16/9; border-radius: 4px;
   border: 1px solid rgba(29,122,29,.2);
   box-shadow: 0 16px 60px rgba(0,0,0,.7);
+  min-height: 200px;
 }
 .ncard-xl img {
   width: 100%; height: 100%; object-fit: cover;
@@ -753,19 +770,24 @@ body.cat-filter-mode .category-view { display: block; }
 }
 .ncard-xl .xl-body {
   position: absolute; bottom: 0; left: 0; right: 0;
-  padding: 28px 28px 24px;
+  padding: clamp(16px, 3vw, 28px);
+  width: 100%; box-sizing: border-box; min-width: 0;
+  pointer-events: none;
 }
 .ncard-xl .xl-cat {
-  font-size: .6rem; font-weight: 900; letter-spacing: 3px;
+  font-size: .62rem; font-weight: 800; letter-spacing: 2px;
   text-transform: uppercase; color: var(--y);
-  margin-bottom: 10px; display: flex; align-items: center; gap: 8px;
+  margin-bottom: 8px; display: flex; align-items: center; gap: 8px;
+  flex-wrap: wrap;
 }
-.ncard-xl .xl-cat::before { content: ''; display: block; width: 24px; height: 2px; background: var(--y); }
+.ncard-xl .xl-cat::before { content: ''; display: block; width: 24px; height: 2px; background: var(--y); flex-shrink: 0; }
 .ncard-xl .xl-title {
   font-family: var(--ff-serif);
-  font-size: 1.4rem; font-weight: 900; line-height: 1.2;
+  font-size: clamp(1.05rem, 2.5vw, 1.45rem); font-weight: 900; line-height: 1.28;
   color: #fff; margin-bottom: 10px;
   text-shadow: 0 2px 12px rgba(0,0,0,.6);
+  word-break: normal; overflow-wrap: break-word; hyphens: none;
+  max-width: 100%;
 }
 .ncard-xl:hover .xl-title { color: var(--y2); }
 .ncard-xl .xl-meta {
@@ -787,7 +809,13 @@ body.cat-filter-mode .category-view { display: block; }
 .nlist-item:hover .t img { transform: scale(1.1); }
 .nlist-item .inf { flex: 1; }
 .nlist-item .inf .tag { font-size: .58rem; font-weight: 800; letter-spacing: 2px; text-transform: uppercase; color: var(--g3); margin-bottom: 4px; }
-.nlist-item .inf .ttl { font-size: .82rem; font-weight: 700; line-height: 1.35; color: var(--w); margin-bottom: 6px; transition: color .2s; }
+.nlist-item .inf { min-width: 0; flex: 1; }
+.nlist-item .inf .ttl {
+  font-size: .82rem; font-weight: 700; line-height: 1.4; color: var(--w); margin-bottom: 6px;
+  word-break: normal; overflow-wrap: break-word; hyphens: none;
+  display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden;
+  transition: color .2s;
+}
 .nlist-item:hover .inf .ttl { color: var(--y); }
 .nlist-item .inf .time { font-size: .65rem; color: var(--dim); }
 /* ═══════════════════════════════════════════
@@ -861,7 +889,22 @@ body.cat-filter-mode .category-view { display: block; }
 /* ═══════════════════════════════════════════
    SEÇÃO DESTAQUE — POLÍCIA / POLÍTICA
 ═══════════════════════════════════════════ */
-.feat-2col { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr)); gap: 16px; }
+.feat-2col {
+  display: grid;
+  grid-template-columns: minmax(0, 1.65fr) minmax(0, 1fr);
+  gap: clamp(14px, 2vw, 20px);
+  align-items: start;
+}
+.feat-2col > .feat-main,
+.feat-2col > .feat-side,
+.feat-2col > div { min-width: 0; width: 100%; }
+.feat-side {
+  display: flex; flex-direction: column;
+  border: 1px solid rgba(255,255,255,.06);
+  border-radius: 4px; overflow: hidden;
+  background: rgba(255,255,255,.02);
+}
+.feat-main .ncard-xl { min-height: clamp(200px, 28vw, 360px); }
 
 /* ═══════════════════════════════════════════
    FAIXA SOCIAL
@@ -1174,8 +1217,11 @@ body.cat-filter-mode .category-view { display: block; }
   .feat-2col .ncard, .feat-2col .ncard-xl {
     opacity: 1 !important; transform: none !important;
   }
-  .ncard-xl .xl-title { font-size: clamp(1.1rem, 4.5vw, 1.35rem); }
-  .ncard-xl .xl-body { padding: 20px 16px; }
+  .feat-2col { grid-template-columns: 1fr; }
+  .feat-side { margin-top: 4px; }
+  .ncard-xl .xl-title { font-size: clamp(1.05rem, 4.5vw, 1.3rem); }
+  .ncard-xl .xl-body { padding: 18px 16px; }
+  .feat-main .ncard-xl { min-height: 200px; max-height: none; }
   .pauta-form .row2 { grid-template-columns: 1fr; }
   .foot-bottom { justify-content: center; text-align: center; }
   .social-band-inner { justify-content: flex-start; flex-wrap: wrap; gap: 8px; }
@@ -1375,8 +1421,8 @@ body.cat-filter-mode .category-view { display: block; }
           <a href="#" class="view-all">Ver mais <i class="fas fa-arrow-right"></i></a>
         </div>
         <div class="feat-2col reveal">
-          <div id="policiaFeatured"></div>
-          <div style="display:flex;flex-direction:column;gap:0;" id="policiaList"></div>
+          <div class="feat-main" id="policiaFeatured"></div>
+          <div class="feat-side" id="policiaList"></div>
         </div>
       </div>
 
