@@ -12,6 +12,13 @@ const PASocial = (function () {
   let listeners = [];
   let profilesCache = {};
 
+  function withTimeout(promise, ms) {
+    return Promise.race([
+      promise,
+      new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), ms || 6000))
+    ]);
+  }
+
   function esc(s) {
     const d = document.createElement('div');
     d.textContent = s || '';
@@ -129,12 +136,16 @@ const PASocial = (function () {
     const local = ensureLocal();
 
     if (PASupabase?.isConfigured?.()) {
-      const s = await PASupabase.getSession();
-      if (s?.user) {
-        session = s;
-        profile = await ensureProfile(userFromSession(s));
-        notify();
-        return { session, profile };
+      try {
+        const s = await withTimeout(PASupabase.getSession(), 5000);
+        if (s?.user) {
+          session = s;
+          profile = await withTimeout(ensureProfile(userFromSession(s)), 5000);
+          notify();
+          return { session, profile };
+        }
+      } catch (err) {
+        console.warn('[PASocial] session', err);
       }
     }
 
@@ -455,6 +466,87 @@ const PASocial = (function () {
     saveLocal(local);
   }
 
+  async function resolveUserId(identifier) {
+    const raw = (identifier || '').trim();
+    if (!raw) throw new Error('Informe o ID ou e-mail do usuário');
+    if (!raw.includes('@')) return raw;
+
+    const email = raw.toLowerCase();
+    const client = PASupabase?.getClient?.();
+    if (client) {
+      const { data, error } = await client.from('profiles').select('id, email, display_name').eq('email', email).maybeSingle();
+      if (error) throw new Error(error.message);
+      if (!data) throw new Error('Nenhum perfil encontrado com este e-mail');
+      return data.id;
+    }
+
+    const local = ensureLocal();
+    const p = Object.values(local.profiles).find(x => (x.email || '').toLowerCase() === email);
+    if (!p) throw new Error('Nenhum perfil encontrado com este e-mail (modo local)');
+    return p.id;
+  }
+
+  async function grantVerifiedByUserId(userId, opts) {
+    const uid = (userId || '').trim();
+    if (!uid) throw new Error('ID do usuário inválido');
+    const years = opts?.years || 1;
+    const until = new Date();
+    until.setFullYear(until.getFullYear() + years);
+    const patch = {
+      verified_badge: true,
+      verified_at: new Date().toISOString(),
+      verified_until: until.toISOString()
+    };
+
+    const client = PASupabase?.getClient?.();
+    if (client) {
+      const { data, error } = await client.from('profiles').update(patch).eq('id', uid).select().maybeSingle();
+      if (error) throw new Error(error.message);
+      if (!data) throw new Error('Perfil não encontrado para este ID');
+      profilesCache[uid] = data;
+      return data;
+    }
+
+    const local = ensureLocal();
+    if (!local.profiles[uid]) throw new Error('Perfil não encontrado para este ID (modo local)');
+    local.profiles[uid] = { ...local.profiles[uid], ...patch };
+    saveLocal(local);
+    profilesCache[uid] = local.profiles[uid];
+    return local.profiles[uid];
+  }
+
+  async function revokeVerifiedByUserId(userId) {
+    const uid = (userId || '').trim();
+    if (!uid) throw new Error('ID do usuário inválido');
+    const patch = { verified_badge: false, verified_at: null, verified_until: null };
+
+    const client = PASupabase?.getClient?.();
+    if (client) {
+      const { data, error } = await client.from('profiles').update(patch).eq('id', uid).select().maybeSingle();
+      if (error) throw new Error(error.message);
+      if (!data) throw new Error('Perfil não encontrado para este ID');
+      profilesCache[uid] = data;
+      return data;
+    }
+
+    const local = ensureLocal();
+    if (!local.profiles[uid]) throw new Error('Perfil não encontrado para este ID (modo local)');
+    local.profiles[uid] = { ...local.profiles[uid], ...patch };
+    saveLocal(local);
+    profilesCache[uid] = local.profiles[uid];
+    return local.profiles[uid];
+  }
+
+  async function grantVerifiedByIdentifier(identifier, opts) {
+    const uid = await resolveUserId(identifier);
+    return grantVerifiedByUserId(uid, opts);
+  }
+
+  async function revokeVerifiedByIdentifier(identifier) {
+    const uid = await resolveUserId(identifier);
+    return revokeVerifiedByUserId(uid);
+  }
+
   async function rejectVerified(requestId) {
     const client = PASupabase?.getClient?.();
     if (client) {
@@ -517,6 +609,11 @@ const PASocial = (function () {
     getVerifiedRequests,
     approveVerified,
     rejectVerified,
+    resolveUserId,
+    grantVerifiedByUserId,
+    revokeVerifiedByUserId,
+    grantVerifiedByIdentifier,
+    revokeVerifiedByIdentifier,
     pagesPath,
     esc
   };

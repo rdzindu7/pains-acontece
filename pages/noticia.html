@@ -6,7 +6,7 @@
 <link rel="icon" type="image/jpeg" href="../assets/images/favicon.jpg"/>
 <link rel="apple-touch-icon" href="../assets/images/favicon.jpg"/>
 <title>Notícia – Pains Acontece</title>
-<meta name="pa-build" content="2026.07.05-v30"/>
+<meta name="pa-build" content="2026.07.05-v31"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,700;0,900;1,700&display=swap" rel="stylesheet"/>
@@ -337,20 +337,20 @@ body.cat-pains{--accent:#1d7a1d;--accent-glow:rgba(29,122,29,.35)}
 <script src="../js/core/supabase-client.js"></script>
 <script src="../js/ui/article-format.js"></script>
 <script src="../js/ai/scanner.js"></script>
-<script src="../js/core/purge.js?v=20260705v30"></script>
-<script src="../js/core/api.js?v=20260705v30"></script>
-<script src="../js/ui/ads.js?v=20260705v30"></script>
-<script src="../js/core/store.js"></script>
+<script src="../js/core/purge.js?v=20260705v31"></script>
+<script src="../js/core/api.js?v=20260705v31"></script>
+<script src="../js/ui/ads.js?v=20260705v31"></script>
+<script src="../js/core/store.js?v=20260705v31"></script>
 
 <script src="../js/ai/agents/sofia.js"></script>
 <script src="../js/ai/agents/lucas.js"></script>
 <script src="../js/ai/agents/camila.js"></script>
 <script src="../js/ai/orchestrator.js"></script>
 <script src="../js/ai/public-assistant.js"></script>
-<script src="../js/ui/dialog.js?v=20260705v30"></script>
-<script src="../js/core/social.js?v=20260705v30"></script>
-<script src="../js/ui/social-widget.js?v=20260705v30"></script>
-<script src="../js/ui/user-nav.js?v=20260705v30"></script>
+<script src="../js/ui/dialog.js?v=20260705v31"></script>
+<script src="../js/core/social.js?v=20260705v31"></script>
+<script src="../js/ui/social-widget.js?v=20260705v31"></script>
+<script src="../js/ui/user-nav.js?v=20260705v31"></script>
 <script>
 (async function(){
   const params = new URLSearchParams(location.search);
@@ -440,31 +440,24 @@ body.cat-pains{--accent:#1d7a1d;--accent-glow:rgba(29,122,29,.35)}
   }
 
   document.getElementById('paScrollNav')?.remove();
-  showSkeleton();
   initParticles();
   initCursorGlow();
 
-  let art;
-  try{
-    await PAStore.init();
-    art=PAStore.getArticle(id);
-    if(!art){
-      try{
-        art=await PAAPI.getArticle(id);
-        if(art&&art.status==='pub'){
-          const cached=JSON.parse(localStorage.getItem('pa_articles_cache_v2')||'[]');
-          if(!cached.find(a=>String(a.id)===String(id)))cached.unshift(art);
-          localStorage.setItem('pa_articles_cache_v2',JSON.stringify(cached));
-        }
-      }catch{}
-    }
-  }catch(err){
-    console.error('[noticia] init',err);
+  function withTimeout(promise,ms){return Promise.race([promise,new Promise((_,r)=>setTimeout(()=>r(new Error('timeout')),ms||8000))])}
+
+  let art=PAStore.findArticleLocal?PAStore.findArticleLocal(id):null;
+  if(art&&art.status==='pub'){
+    /* render imediato do cache */
+  }else{
+    showSkeleton();
     try{
-      const cached=JSON.parse(localStorage.getItem('pa_articles_cache_v2')||'[]');
-      art=cached.find(a=>String(a.id)===String(id));
-    }catch{}
-    if(!art){showLoadError('Falha na conexão. Verifique sua internet e tente de novo.');return;}
+      await withTimeout(PAStore.init(),8000);
+      art=PAStore.getArticle(id);
+    }catch(err){console.warn('[noticia] store',err)}
+    if(!art){
+      try{art=await withTimeout(PAAPI.getArticle(id),6000)}catch(e){console.warn('[noticia] api',e)}
+    }
+    if(!art&&PAStore.findArticleLocal)art=PAStore.findArticleLocal(id);
   }
 
   if(!art||art.status!=='pub'){

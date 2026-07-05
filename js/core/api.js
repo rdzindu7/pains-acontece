@@ -207,11 +207,21 @@ const PAAPI = (function () {
 
   let cloudOk = null;
 
+  function withTimeout(promise, ms) {
+    return Promise.race([
+      promise,
+      new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), ms || 6000))
+    ]);
+  }
+
   async function isCloudReady() {
     if (!supabaseConfigured()) return false;
     if (cloudOk !== null) return cloudOk;
     try {
-      const { error } = await sb().from('articles').select('id', { count: 'exact', head: true });
+      const { error } = await withTimeout(
+        sb().from('articles').select('id', { count: 'exact', head: true }),
+        5000
+      );
       cloudOk = !error;
     } catch {
       cloudOk = false;

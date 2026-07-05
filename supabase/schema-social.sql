@@ -108,6 +108,13 @@ CREATE POLICY "profiles_own_insert" ON profiles
 CREATE POLICY "profiles_own_update" ON profiles
   FOR UPDATE TO authenticated USING (auth.uid() = id) WITH CHECK (auth.uid() = id);
 
+-- Proprietário pode atualizar selo verificado de qualquer perfil
+DROP POLICY IF EXISTS "profiles_admin_update" ON profiles;
+CREATE POLICY "profiles_admin_update" ON profiles
+  FOR UPDATE TO authenticated USING (
+    (auth.jwt() ->> 'email') = 'admin@painsacontece.com.br'
+  ) WITH CHECK (true);
+
 -- Comentários
 CREATE POLICY "comments_public_read" ON article_comments
   FOR SELECT TO anon, authenticated USING (true);

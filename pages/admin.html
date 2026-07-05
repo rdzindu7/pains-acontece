@@ -1536,6 +1536,16 @@ body.pa-owner .owner-only.btn-pub{display:flex!important}
         </div>
         <button class="tb-btn outline" onclick="renderVerifiedRequests()"><i class="fas fa-sync"></i> Atualizar</button>
       </div>
+      <div style="margin-top:20px;padding:20px;background:rgba(29,155,240,.06);border:1px solid rgba(29,155,240,.2);border-radius:10px">
+        <h3 style="font-family:'Bebas Neue',sans-serif;letter-spacing:1.5px;color:#1d9bf0;margin-bottom:8px;font-size:1.05rem"><i class="fas fa-id-card"></i> Conceder selo manualmente</h3>
+        <p style="font-size:.78rem;color:rgba(255,255,255,.5);margin-bottom:14px">Informe o <strong>ID (UUID)</strong> do usuário ou o <strong>e-mail</strong> da conta Google. O selo vale por 1 ano.</p>
+        <div style="display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+          <input id="verifiedManualId" type="text" placeholder="UUID ou e-mail do usuário" style="flex:1;min-width:220px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12);border-radius:6px;padding:10px 14px;color:#fff;font-size:.82rem"/>
+          <button class="btn-pub green" onclick="grantVerifiedManual()"><i class="fas fa-check-circle"></i> Conceder</button>
+          <button class="btn-pub red-btn" onclick="revokeVerifiedManual()"><i class="fas fa-ban"></i> Remover selo</button>
+        </div>
+        <p id="verifiedManualMsg" style="font-size:.75rem;margin-top:10px;display:none"></p>
+      </div>
       <div id="verifiedRequestsList" style="margin-top:20px"></div>
     </div>
 
@@ -2048,7 +2058,7 @@ body.pa-owner .owner-only.btn-pub{display:flex!important}
 <script src="../js/ai/agents/rafaela.js"></script>
 <script src="../js/ai/divulgacao-assistant.js"></script>
 <script src="../js/ui/dialog.js?v=20260705v25"></script>
-<script src="../js/core/social.js?v=20260705v25"></script>
+<script src="../js/core/social.js?v=20260705v31"></script>
 <script>
 /* ════ AUTH GUARD ════ */
 let isOwnerUser = false;
@@ -3947,6 +3957,50 @@ async function rejectVerifiedReq(id) {
     showToast('Solicitação recusada.', 'info');
     renderVerifiedRequests();
   } catch (e) { showToast(e.message, 'error'); }
+}
+
+function setVerifiedManualMsg(text, ok) {
+  const el = document.getElementById('verifiedManualMsg');
+  if (!el) return;
+  el.style.display = text ? 'block' : 'none';
+  el.style.color = ok ? '#2ecc2e' : '#e74c3c';
+  el.textContent = text || '';
+}
+
+async function grantVerifiedManual() {
+  const input = document.getElementById('verifiedManualId');
+  const id = (input?.value || '').trim();
+  if (!id) { setVerifiedManualMsg('Informe o ID ou e-mail do usuário.', false); return; }
+  if (!await PADialog.confirm({ title: 'Conceder selo', message: 'Conceder selo verificado para:\n' + id + '\n\nVálido por 1 ano.', confirmText: 'Conceder', variant: 'success' })) return;
+  try {
+    await PASocial.init();
+    const prof = await PASocial.grantVerifiedByIdentifier(id, { years: 1 });
+    setVerifiedManualMsg('Selo concedido a ' + (prof.display_name || prof.email || id) + '.', true);
+    showToast('Selo verificado concedido!', 'success');
+    if (input) input.value = '';
+    renderVerifiedRequests();
+  } catch (e) {
+    setVerifiedManualMsg(e.message, false);
+    showToast(e.message, 'error');
+  }
+}
+
+async function revokeVerifiedManual() {
+  const input = document.getElementById('verifiedManualId');
+  const id = (input?.value || '').trim();
+  if (!id) { setVerifiedManualMsg('Informe o ID ou e-mail do usuário.', false); return; }
+  if (!await PADialog.confirm({ title: 'Remover selo', message: 'Remover selo verificado de:\n' + id + '?', confirmText: 'Remover', variant: 'danger' })) return;
+  try {
+    await PASocial.init();
+    const prof = await PASocial.revokeVerifiedByIdentifier(id);
+    setVerifiedManualMsg('Selo removido de ' + (prof.display_name || prof.email || id) + '.', true);
+    showToast('Selo removido.', 'info');
+    if (input) input.value = '';
+    renderVerifiedRequests();
+  } catch (e) {
+    setVerifiedManualMsg(e.message, false);
+    showToast(e.message, 'error');
+  }
 }
 
 (async function initAdmin() {

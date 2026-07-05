@@ -31,7 +31,14 @@ const PAUserNav = (function () {
   async function render(el) {
     if (!el) return;
     injectStyles();
-    await PASocial.init();
+    try {
+      await Promise.race([
+        PASocial.init(),
+        new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), 5000))
+      ]);
+    } catch (e) {
+      console.warn('[PAUserNav] init', e);
+    }
 
     const user = PASocial.getUser();
     const prof = PASocial.getProfile();
