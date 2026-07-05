@@ -12,6 +12,6 @@
  * 5. Cole as chaves abaixo e faça commit no GitHub
  */
 const PAConfig = {
-  supabaseUrl: '',
+  supabaseUrl: 'https://blcomwofpyorypqjdhfb.supabase.co',
   supabaseAnonKey: ''
 };
