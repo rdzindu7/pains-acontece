@@ -847,6 +847,7 @@ body.pa-owner .owner-only.btn-pub{display:flex!important}
 .ia-team-av.sofia{background:linear-gradient(135deg,#5dade2,#2980b9)}
 .ia-team-av.lucas{background:linear-gradient(135deg,#1d7a1d,#2ecc2e)}
 .ia-team-av.camila{background:linear-gradient(135deg,#c9a227,#8b6914)}
+.ia-team-av.tiago{background:linear-gradient(135deg,#3498db,#2980b9)}
 .ia-team-info{min-width:0}
 .ia-team-name{font-size:.72rem;font-weight:800;letter-spacing:.5px}
 .ia-team-role{font-size:.58rem;color:var(--dim)}
@@ -1217,7 +1218,7 @@ body.pa-owner .owner-only.btn-pub{display:flex!important}
         <div class="ia-hero-text">
           <div class="ia-hero-badge"><i class="fas fa-users"></i> Equipe IA Editorial</div>
           <h2>IA de Notícias</h2>
-          <p>Sofia roteia → Lucas busca nas fontes (últimos <strong>2 dias</strong>) → Camila organiza com data de divulgação. Cada notícia passa pela sua aprovação.</p>
+          <p>Sofia roteia → Lucas busca nas fontes (últimos <strong>2 dias</strong>) → Camila organiza com data de divulgação. <strong>Tiago</strong> atende transporte e ônibus no assistente público. Cada notícia passa pela sua aprovação.</p>
         </div>
         <div class="ia-hero-actions">
           <button class="tb-btn ghost" onclick="resetSearch()" id="btnResetScan" title="Limpar cache e buscar tudo de novo">
@@ -1253,6 +1254,15 @@ body.pa-owner .owner-only.btn-pub{display:flex!important}
             <div class="ia-team-name">Camila Rocha</div>
             <div class="ia-team-role">Editora-Chefe</div>
             <div class="ia-team-status" id="iaStatusCamila">Aguardando</div>
+          </div>
+        </div>
+        <i class="fas fa-chevron-right ia-team-arrow"></i>
+        <div class="ia-team-member" data-agent="tiago" id="iaTeamTiago">
+          <div class="ia-team-av tiago"><i class="fas fa-bus"></i></div>
+          <div class="ia-team-info">
+            <div class="ia-team-name">Tiago Ribeiro</div>
+            <div class="ia-team-role">Especialista em Transporte</div>
+            <div class="ia-team-status" id="iaStatusTiago">Pronto</div>
           </div>
         </div>
       </div>
@@ -2266,11 +2276,12 @@ function setScanUI(active, text) {
   if (txt && text) txt.textContent = text;
 }
 
-const IA_TEAM = { sofia: 'Sofia Mendes', lucas: 'Lucas Ferreira', camila: 'Camila Rocha' };
+const IA_TEAM = { sofia: 'Sofia Mendes', lucas: 'Lucas Ferreira', camila: 'Camila Rocha', tiago: 'Tiago Ribeiro' };
+const IA_TEAM_KEYS = Object.keys(IA_TEAM);
 
 function setIATeamAgent(agentId, status, state) {
-  const id = (agentId || '').toLowerCase().replace(/\s.*/, '');
-  const key = ['sofia', 'lucas', 'camila'].find(k => id.includes(k) || (agentId && agentId.id === k));
+  const id = (typeof agentId === 'string' ? agentId : agentId?.name || agentId?.id || '').toLowerCase().replace(/\s.*/, '');
+  const key = IA_TEAM_KEYS.find(k => id.includes(k) || (agentId && agentId.id === k));
   if (!key) return;
   const statusEl = document.getElementById('iaStatus' + key.charAt(0).toUpperCase() + key.slice(1));
   const memberEl = document.getElementById('iaTeam' + key.charAt(0).toUpperCase() + key.slice(1));
@@ -2287,7 +2298,7 @@ function initIATeamListeners() {
   window.addEventListener('pa-ia-agent', e => {
     const { agent, status } = e.detail || {};
     const name = agent?.name || agent?.id || '';
-    const key = ['sofia', 'lucas', 'camila'].find(k => name.toLowerCase().includes(k));
+    const key = IA_TEAM_KEYS.find(k => name.toLowerCase().includes(k));
     if (key) setIATeamAgent(key, status, 'active');
   });
   window.addEventListener('pa-deep-verify', e => {
@@ -2301,6 +2312,7 @@ function resetIATeamIdle() {
   setIATeamAgent('sofia', 'Pronta', 'done');
   setIATeamAgent('lucas', 'Pronto', 'done');
   setIATeamAgent('camila', 'Aguardando', 'done');
+  setIATeamAgent('tiago', 'Pronto', 'done');
   document.querySelectorAll('.ia-team-member').forEach(el => el.classList.remove('active'));
 }
 
