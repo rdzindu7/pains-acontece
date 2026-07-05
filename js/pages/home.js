@@ -13,6 +13,7 @@
     empregos:    { type: 'scroll', target: '#empregos' },
     servicos:    { type: 'scroll', target: '#servicos', highlight: true },
     restaurantes:{ type: 'scroll', target: '#restaurantes', highlight: true },
+    onibus:      { type: 'scroll', target: '#onibus', highlight: true },
     telefones:   { type: 'scroll', target: '#telefones', highlight: true },
     clima:       { type: 'scroll', target: '#clima-section', highlight: true },
     contato:     { type: 'scroll', target: '#contato', highlight: true },

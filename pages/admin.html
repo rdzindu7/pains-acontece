@@ -1002,6 +1002,11 @@ body.pa-owner .owner-only.btn-pub{display:flex!important}
         <span class="sb-tab-label">Empregos</span>
         <span class="sb-tab-glow" aria-hidden="true"></span>
       </div>
+      <div class="sb-item sb-tab sb-tab--bus" onclick="showPanel('onibus_adm',this)">
+        <span class="sb-tab-ic"><i class="fas fa-bus"></i></span>
+        <span class="sb-tab-label">Ônibus</span>
+        <span class="sb-tab-glow" aria-hidden="true"></span>
+      </div>
       <div class="sb-item sb-tab sb-tab--rest" onclick="showPanel('restaurantes_adm',this)">
         <span class="sb-tab-ic"><i class="fas fa-utensils"></i></span>
         <span class="sb-tab-label">Restaurantes</span>
@@ -1603,6 +1608,21 @@ body.pa-owner .owner-only.btn-pub{display:flex!important}
       </div>
     </div>
 
+    <!-- ══ ÔNIBUS ADMIN ══ -->
+    <div class="panel" id="panel-onibus_adm">
+      <div class="pa-page-wrap">
+        <div class="pa-page-hd">
+          <div class="pa-page-hd-text">
+            <div class="pa-page-badge" style="background:rgba(52,152,219,.15);color:#5dade2"><i class="fas fa-bus"></i> IA de Transporte</div>
+            <h2>Linhas de Ônibus</h2>
+            <p>Rotas exibidas na busca rigorosa do Tiago — Pains e região.</p>
+          </div>
+          <button class="tb-btn primary" onclick="showAddBus()"><i class="fas fa-plus"></i> Nova Linha</button>
+        </div>
+        <div class="ad-mgmt-grid" id="busAdminList"></div>
+      </div>
+    </div>
+
     <!-- ══ RESTAURANTES ADMIN ══ -->
     <div class="panel" id="panel-restaurantes_adm">
       <div class="pa-page-wrap">
@@ -1875,6 +1895,41 @@ body.pa-owner .owner-only.btn-pub{display:flex!important}
   </div>
 </div>
 
+<!-- MODAL ÔNIBUS -->
+<div class="modal-backdrop" id="busModal">
+  <div class="modal" style="max-width:560px;max-height:90vh;overflow-y:auto">
+    <h3><i class="fas fa-bus" style="color:#5dade2"></i> <span id="busModalTitle">Linha de Ônibus</span></h3>
+    <div class="modal-form">
+      <div class="inp-field"><label>Empresa / Viação</label><input type="text" id="busCompany" placeholder="Viação São Geraldo"/></div>
+      <div class="inp-field"><label>Origem</label>
+        <select id="busOrigin" style="width:100%;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:4px;padding:9px 14px;color:#fff">
+          <option value="pains">Pains MG</option><option value="formiga">Formiga MG</option><option value="piumhi">Piumhi MG</option>
+          <option value="bambui">Bambuí MG</option><option value="dores_do_indaia">Dores do Indaiá</option><option value="belo_horizonte">Belo Horizonte</option>
+          <option value="divinopolis">Divinópolis</option><option value="cristais">Cristais</option><option value="sao_sebastiao_do_oeste">São Sebastião do Oeste</option>
+        </select>
+      </div>
+      <div class="inp-field"><label>Destino</label>
+        <select id="busDest" style="width:100%;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:4px;padding:9px 14px;color:#fff">
+          <option value="">Selecione…</option><option value="pains">Pains MG</option><option value="formiga">Formiga MG</option><option value="piumhi">Piumhi MG</option>
+          <option value="bambui">Bambuí MG</option><option value="dores_do_indaia">Dores do Indaiá</option><option value="belo_horizonte">Belo Horizonte</option>
+          <option value="divinopolis">Divinópolis</option><option value="cristais">Cristais</option><option value="sao_sebastiao_do_oeste">São Sebastião do Oeste</option>
+        </select>
+      </div>
+      <div class="inp-field"><label>Telefone</label><input type="text" id="busPhone" placeholder="(37) 3331-4200"/></div>
+      <div class="inp-field"><label>Duração (min)</label><input type="number" id="busDuration" placeholder="50"/></div>
+      <div class="inp-field"><label>Preço referência</label><input type="text" id="busPrice" placeholder="R$ 18,00"/></div>
+      <div class="inp-field"><label>Ponto de embarque</label><input type="text" id="busStopO" placeholder="Praça central — Pains"/></div>
+      <div class="inp-field"><label>Ponto de desembarque</label><input type="text" id="busStopD" placeholder="Rodoviária"/></div>
+      <div class="inp-field"><label>Horários (uma linha por grupo: seg,ter,qua: 06:00, 12:00)</label><textarea id="busTimes" style="min-height:90px" placeholder="seg,ter,qua,qui,sex: 05:40, 11:30, 17:45&#10;sab: 07:00, 15:00"></textarea></div>
+      <div class="inp-field"><label>Observações</label><textarea id="busNotes" style="min-height:60px"></textarea></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-pub outline" onclick="closeModal('busModal')">Cancelar</button>
+      <button class="btn-pub green" onclick="saveBus()"><i class="fas fa-save"></i> Salvar</button>
+    </div>
+  </div>
+</div>
+
 <!-- MODAL RESTAURANTE -->
 <div class="modal-backdrop" id="restModal">
   <div class="modal" style="max-width:560px;max-height:90vh;overflow-y:auto">
@@ -1981,7 +2036,9 @@ body.pa-owner .owner-only.btn-pub{display:flex!important}
 <script src="../js/ai/orchestrator.js"></script>
 <script src="../js/ai/engine.js"></script>
 <script src="../js/core/purge.js?v=20260705v21"></script>
-<script src="../js/core/api.js?v=20260705v23"></script>
+<script src="../js/ai/agents/tiago.js?v=20260705v26"></script>
+<script src="../js/ai/bus-assistant.js?v=20260705v26"></script>
+<script src="../js/core/api.js?v=20260705v26"></script>
 <script src="../js/ui/directory.js?v=20260705v23"></script>
 <script src="../js/ui/ads.js?v=20260705v21"></script>
 <script src="../js/ui/corner-notify.js"></script>
@@ -2050,7 +2107,7 @@ const PANEL_LABELS = {
   ia: 'IA de Notícias', divulgacao: 'IA de Divulgação', categorias: 'Categorias',
   midia: 'Biblioteca de Mídia', agenda: 'Agenda de Eventos',
   empregos_adm: 'Vagas de Emprego', publicidades: 'Publicidades',
-  perfil: 'Meu Perfil', verificado_adm: 'Selo Verificado', config: 'Configurações'
+  perfil: 'Meu Perfil', verificado_adm: 'Selo Verificado', onibus_adm: 'Ônibus', config: 'Configurações'
 };
 
 function showPanel(id, el) {
@@ -2083,6 +2140,7 @@ function showPanel(id, el) {
   if (id === 'agenda') renderEvents();
   if (id === 'empregos_adm') renderJobs();
   if (id === 'publicidades') renderAdsAdmin();
+  if (id === 'onibus_adm') renderBusesAdmin();
   if (id === 'restaurantes_adm') renderRestaurantsAdmin();
   if (id === 'servicos_adm') renderServicesAdmin();
   document.querySelector('.main').scrollTop = 0;
@@ -3377,6 +3435,120 @@ async function deleteAdItem(id) {
 }
 
 /* ════ RESTAURANTES ════ */
+let editingBusId = null;
+
+async function renderBusesAdmin() {
+  const list = document.getElementById('busAdminList');
+  if (!list) return;
+  try {
+    const items = await PAAPI.getBusesAdmin();
+    const cities = typeof PABusIA !== 'undefined' ? PABusIA.CITIES : {};
+    if (!items.length) {
+      list.innerHTML = emptyState('fa-bus', 'Nenhuma linha', 'Cadastre rotas de ônibus para a IA Tiago.', 'Nova Linha', 'showAddBus()');
+      return;
+    }
+    list.innerHTML = items.map(b => {
+      const o = cities[b.origin]?.label || b.origin;
+      const d = cities[b.destination]?.label || b.destination;
+      return `
+      <div class="ad-mgmt-card ${b.active !== false ? 'active' : 'inactive'}">
+        <div class="ad-mgmt-slot"><i class="fas fa-bus"></i> ${escHtml(o)} → ${escHtml(d)}</div>
+        <div class="ad-mgmt-title">${escHtml(b.company)}</div>
+        <div class="ad-mgmt-meta">${escHtml(b.phone || '')} · ${b.active !== false ? '<span style="color:var(--g3)">Ativa</span>' : 'Inativa'}</div>
+        <div class="ad-mgmt-actions">
+          <button class="btn-pub outline" style="padding:6px 12px;font-size:.62rem" onclick="toggleBusActive(${b.id}, ${b.active === false})">${b.active === false ? 'Ativar' : 'Desativar'}</button>
+          <button class="btn-pub outline" style="padding:6px 12px;font-size:.62rem" onclick="editBus(${b.id})"><i class="fas fa-edit"></i></button>
+          <button class="btn-pub red-btn" style="padding:6px 12px;font-size:.62rem" onclick="deleteBusItem(${b.id})"><i class="fas fa-trash"></i></button>
+        </div>
+      </div>`;
+    }).join('');
+  } catch {
+    list.innerHTML = emptyState('fa-bus', 'Erro', 'Recarregue a página.', null, null);
+  }
+}
+
+function showAddBus() {
+  editingBusId = null;
+  document.getElementById('busModalTitle').textContent = 'Nova Linha de Ônibus';
+  ['busCompany','busPhone','busPrice','busStopO','busStopD','busNotes','busTimes'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  document.getElementById('busOrigin').value = 'pains';
+  document.getElementById('busDest').value = '';
+  document.getElementById('busDuration').value = '45';
+  document.getElementById('busModal').classList.add('open');
+}
+
+async function editBus(id) {
+  const items = await PAAPI.getBusesAdmin();
+  const b = items.find(x => String(x.id) === String(id));
+  if (!b) return;
+  editingBusId = id;
+  document.getElementById('busModalTitle').textContent = 'Editar Linha';
+  document.getElementById('busCompany').value = b.company || '';
+  document.getElementById('busOrigin').value = b.origin || 'pains';
+  document.getElementById('busDest').value = b.destination || '';
+  document.getElementById('busPhone').value = b.phone || '';
+  document.getElementById('busDuration').value = b.duration_min || '';
+  document.getElementById('busPrice').value = b.price_ref || '';
+  document.getElementById('busStopO').value = b.stop_origin || '';
+  document.getElementById('busStopD').value = b.stop_destination || '';
+  document.getElementById('busNotes').value = b.notes || '';
+  const times = (b.schedules || []).map(s => `${(s.days || []).join(',')}: ${(s.times || []).join(',')}`).join('\n');
+  document.getElementById('busTimes').value = times;
+  document.getElementById('busModal').classList.add('open');
+}
+
+function parseBusSchedules(text) {
+  const lines = (text || '').split('\n').map(l => l.trim()).filter(Boolean);
+  const dayMap = { seg: 'seg', ter: 'ter', qua: 'qua', qui: 'qui', sex: 'sex', sab: 'sab', dom: 'dom' };
+  return lines.map(line => {
+    const [daysPart, timesPart] = line.split(':');
+    const days = (daysPart || '').split(/[,;\s]+/).map(d => dayMap[d.trim().slice(0, 3)] || d.trim()).filter(Boolean);
+    const times = (timesPart || '').split(/[,;]+/).map(t => t.trim()).filter(Boolean);
+    return { days, times };
+  }).filter(s => s.times.length);
+}
+
+async function saveBus() {
+  const data = {
+    company: document.getElementById('busCompany').value.trim(),
+    origin: document.getElementById('busOrigin').value,
+    destination: document.getElementById('busDest').value,
+    phone: document.getElementById('busPhone').value.trim(),
+    duration_min: Number(document.getElementById('busDuration').value) || 0,
+    price_ref: document.getElementById('busPrice').value.trim(),
+    stop_origin: document.getElementById('busStopO').value.trim(),
+    stop_destination: document.getElementById('busStopD').value.trim(),
+    notes: document.getElementById('busNotes').value.trim(),
+    schedules: parseBusSchedules(document.getElementById('busTimes').value),
+    active: true
+  };
+  if (!data.company || !data.destination) { showToast('Informe empresa e destino.', 'error'); return; }
+  try {
+    if (editingBusId) await PAAPI.updateBus(editingBusId, data);
+    else await PAAPI.addBus(data);
+    if (typeof PABusIA !== 'undefined') PABusIA.invalidateCache();
+    closeModal('busModal');
+    showToast('Linha salva!', 'success');
+    renderBusesAdmin();
+  } catch { showToast('Erro ao salvar.', 'error'); }
+}
+
+async function toggleBusActive(id, active) {
+  try {
+    await PAAPI.updateBus(id, { active });
+    renderBusesAdmin();
+  } catch { showToast('Erro ao atualizar.', 'error'); }
+}
+
+async function deleteBusItem(id) {
+  if (!await PADialog.confirm({ title: 'Excluir linha', message: 'Remover esta linha de ônibus da IA?', confirmText: 'Excluir', variant: 'danger' })) return;
+  try {
+    await PAAPI.deleteBus(id);
+    showToast('Linha removida.', 'info');
+    renderBusesAdmin();
+  } catch { showToast('Erro ao excluir.', 'error'); }
+}
+
 let editingRestId = null;
 
 async function renderRestaurantsAdmin() {

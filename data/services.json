@@ -55,7 +55,7 @@
     "description": "Linhas intermunicipais, horários e mobilidade na região.",
     "icon": "fa-bus",
     "image": "https://images.unsplash.com/photo-1544625617-1a516b3f3c42?w=640&q=80",
-    "link": "#telefones",
+    "link": "#onibus",
     "phone": "",
     "active": true
   },

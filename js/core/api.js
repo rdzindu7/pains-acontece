@@ -710,6 +710,77 @@ const PAAPI = (function () {
       return { ok: true };
     },
 
+    async getBuses() {
+      const state = getState();
+      const base = await fetchJson('buses.json').catch(() => []);
+      let list = mergeById(base, state.buses);
+      const deleted = state.deletedBuses || [];
+      if (deleted.length) list = list.filter(b => !deleted.includes(String(b.id)));
+      return list.filter(b => b.active !== false);
+    },
+
+    async getBusesAdmin() {
+      const state = getState();
+      const base = await fetchJson('buses.json').catch(() => []);
+      let list = mergeById(base, state.buses);
+      const deleted = state.deletedBuses || [];
+      if (deleted.length) list = list.filter(b => !deleted.includes(String(b.id)));
+      return list;
+    },
+
+    async addBus(data) {
+      const state = getState();
+      if (!state.buses) state.buses = [];
+      const item = {
+        id: Date.now(),
+        active: data.active !== false,
+        company: data.company || '',
+        phone: data.phone || '',
+        origin: data.origin || 'pains',
+        destination: data.destination || '',
+        duration_min: Number(data.duration_min) || 0,
+        price_ref: data.price_ref || '',
+        stop_origin: data.stop_origin || '',
+        stop_destination: data.stop_destination || '',
+        notes: data.notes || '',
+        schedules: Array.isArray(data.schedules) ? data.schedules : []
+      };
+      state.buses.unshift(item);
+      saveAdminState(state);
+      return item;
+    },
+
+    async updateBus(id, data) {
+      const state = getState();
+      if (!state.buses) state.buses = [];
+      const idx = state.buses.findIndex(b => String(b.id) === String(id));
+      if (idx >= 0) {
+        state.buses[idx] = { ...state.buses[idx], ...data };
+        saveAdminState(state);
+        return state.buses[idx];
+      }
+      const base = await fetchJson('buses.json').catch(() => []);
+      const b = base.find(x => String(x.id) === String(id));
+      if (b) {
+        state.buses.push({ ...b, ...data });
+        saveAdminState(state);
+        return state.buses[state.buses.length - 1];
+      }
+      throw new Error('Linha não encontrada');
+    },
+
+    async deleteBus(id) {
+      const state = getState();
+      state.buses = (state.buses || []).filter(b => String(b.id) !== String(id));
+      const base = await fetchJson('buses.json').catch(() => []);
+      if (base.some(b => String(b.id) === String(id))) {
+        state.deletedBuses = state.deletedBuses || [];
+        if (!state.deletedBuses.includes(String(id))) state.deletedBuses.push(String(id));
+      }
+      saveAdminState(state);
+      return { ok: true };
+    },
+
     exportForGitHub() {
       const state = getState();
       return fetchJson('articles.json').then(base => {
@@ -1009,6 +1080,11 @@ const PAAPI = (function () {
     addRestaurant: async (d) => (await getBackend()).addRestaurant?.(d) ?? Promise.reject(new Error('Não disponível')),
     updateRestaurant: async (id, d) => (await getBackend()).updateRestaurant?.(id, d) ?? Promise.reject(new Error('Não disponível')),
     deleteRestaurant: async (id) => (await getBackend()).deleteRestaurant?.(id) ?? Promise.reject(new Error('Não disponível')),
+    getBuses: async () => (await getBackend()).getBuses?.() ?? [],
+    getBusesAdmin: async () => (await getBackend()).getBusesAdmin?.() ?? [],
+    addBus: async (d) => (await getBackend()).addBus?.(d) ?? Promise.reject(new Error('Não disponível')),
+    updateBus: async (id, d) => (await getBackend()).updateBus?.(id, d) ?? Promise.reject(new Error('Não disponível')),
+    deleteBus: async (id) => (await getBackend()).deleteBus?.(id) ?? Promise.reject(new Error('Não disponível')),
     resolveRole,
     isOwner,
     getAdminAccounts,

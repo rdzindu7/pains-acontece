@@ -210,6 +210,15 @@ const PAPublicIA = (function () {
       return typeof PASofia !== 'undefined' ? PASofia.weather() : { agent: PASofia?.PROFILE, reply: 'Veja a previsão na aba Clima do menu.' };
     }
 
+    if (typeof PABusIA !== 'undefined' && PABusIA.isBusIntent(msg)) {
+      setActiveAgent('tiago');
+      const res = await PABusIA.search(msg);
+      return {
+        agent: PATiago?.PROFILE || { id: 'tiago', name: 'Tiago Ribeiro', role: 'Transporte', icon: 'fa-bus', color: '#3498db' },
+        reply: PABusIA.formatReply(res)
+      };
+    }
+
     if (/selo|verificad|badge|conta verificada|credibilidade/.test(low)) {
       setActiveAgent('sofia');
       const plan = PAConfig?.verifiedPlan || {};
@@ -375,6 +384,7 @@ const PAPublicIA = (function () {
     if (cmd === 'clima') { sendDirect('como está o clima em Pains?'); return; }
     if (cmd === 'duvida') { sendDirect('Tenho uma dúvida sobre uma publicação'); return; }
     if (cmd === 'verificado') { sendDirect('Quero saber sobre o selo verificado e seus benefícios'); return; }
+    if (cmd === 'onibus') { sendDirect('ônibus de Pains para Formiga'); return; }
     const input = document.getElementById('papiaInput');
     if (input?.value.trim()) send();
   }
@@ -405,6 +415,7 @@ const PAPublicIA = (function () {
     return `
       <button type="button" class="papia-act" onclick="PAPublicIA.quick('ultimas')"><i class="fas fa-newspaper"></i> Últimas</button>
       ${onArticle ? '<button type="button" class="papia-act" onclick="PAPublicIA.quick(\'explicar\')">Explicar matéria</button>' : ''}
+      <button type="button" class="papia-act" onclick="PAPublicIA.quick('onibus')"><i class="fas fa-bus"></i> Ônibus</button>
       <button type="button" class="papia-act" onclick="PAPublicIA.quick('verificado')"><i class="fas fa-check-circle"></i> Selo</button>
       <button type="button" class="papia-act" onclick="PAPublicIA.quick('pains')">Pains</button>
       <button type="button" class="papia-act" onclick="PAPublicIA.quick('clima')">Clima</button>

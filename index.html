@@ -1289,6 +1289,7 @@ body.cat-filter-mode .category-view { display: block; }
     <div class="nav-item"><a href="#agenda" data-nav="agenda" data-i18n="nav.agenda">Agenda</a></div>
     <div class="nav-item"><a href="#empregos" data-nav="empregos" data-i18n="nav.empregos">Empregos</a></div>
     <div class="nav-item"><a href="#restaurantes" data-nav="restaurantes" data-i18n="nav.restaurantes">Restaurantes & Lanchonetes</a></div>
+    <div class="nav-item"><a href="#onibus" data-nav="onibus" data-i18n="nav.onibus">Ônibus</a></div>
     <div class="nav-item"><a href="#telefones" data-nav="telefones" data-i18n="nav.telefones">Telefones</a></div>
     <div class="nav-item"><a href="#clima" data-nav="clima" data-i18n="nav.clima">Clima</a></div>
     <div class="nav-item"><a href="#publicidades" data-nav="publicidades" data-i18n="nav.anuncie">Anuncie</a></div>
@@ -1465,6 +1466,16 @@ body.cat-filter-mode .category-view { display: block; }
   </div>
   <p class="reveal" style="font-size:.78rem;color:var(--dim);margin:-8px 0 16px;max-width:560px">Onde comer em Pains — parceiros com foto, descrição, cardápio e telefone. Anuncie seu estabelecimento.</p>
   <div id="restaurantsDynamic"></div>
+</section>
+
+<section class="section wrap" style="padding-top:0;" id="onibus">
+  <div class="sec-head reveal">
+    <div class="line-v" style="background:linear-gradient(180deg,#3498db,#1a5276)"></div>
+    <h2>Ônibus — Pains e Região</h2>
+    <div class="rule"></div>
+  </div>
+  <p class="reveal" style="font-size:.78rem;color:var(--dim);margin:-8px 0 16px;max-width:600px">IA <strong>Tiago Ribeiro</strong> com busca rigorosa: só linhas do Alto São Francisco e Sudoeste de MG. Informe origem e destino.</p>
+  <div id="busIaMount"></div>
 </section>
 
 <section class="section wrap" style="padding-top:0;" id="telefones">
@@ -1723,9 +1734,12 @@ document.querySelectorAll('.ncard, .ncard-xl, .srv-card').forEach(card => {
 <script src="js/ai/orchestrator.js"></script>
 <script src="js/ai/engine.js"></script>
 <script src="js/core/purge.js?v=20260705v21"></script>
-<script src="js/core/api.js?v=20260705v23"></script>
+<script src="js/core/api.js?v=20260705v26"></script>
 <script src="js/ui/ads.js?v=20260705v23"></script>
-<script src="js/ui/directory.js?v=20260705v23"></script>
+<script src="js/ui/directory.js?v=20260705v26"></script>
+<script src="js/ai/agents/tiago.js?v=20260705v26"></script>
+<script src="js/ai/bus-assistant.js?v=20260705v26"></script>
+<script src="js/ui/bus-widget.js?v=20260705v26"></script>
 <script src="js/ui/corner-notify.js"></script>
 <script src="js/ui/i18n.js"></script>
 <script src="js/ai/agents/rafaela.js"></script>
@@ -1736,11 +1750,18 @@ document.querySelectorAll('.ncard, .ncard-xl, .srv-card').forEach(card => {
 <script src="js/pages/weather.js"></script>
 <script src="js/ai/bom-dia.js"></script>
 <script src="js/ui/scroll-nav.js"></script>
+<script src="js/ai/agents/tiago.js?v=20260705v26"></script>
+<script src="js/ai/bus-assistant.js?v=20260705v26"></script>
 <script src="js/ai/public-assistant.js"></script>
 <script src="js/ui/dialog.js?v=20260705v25"></script>
 <script src="js/core/social.js?v=20260705v25"></script>
 <script src="js/ui/user-nav.js?v=20260705v25"></script>
 <script src="js/pages/home.js"></script>
-<script>document.addEventListener('DOMContentLoaded',()=>PAUserNav.init('#paUserNav'));</script>
+<script>
+document.addEventListener('DOMContentLoaded',()=>{
+  PAUserNav.init('#paUserNav');
+  PABusWidget.mount(document.getElementById('busIaMount'));
+});
+</script>
 </body>
 </html>
