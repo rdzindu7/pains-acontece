@@ -530,7 +530,7 @@ const PAAPI = (function () {
       }
       const art = await this.addArticle({
         title: p.title, lead: p.lead, content: p.content, cat: p.cat, status: 'pub',
-        img: p.img, author: p.author || 'IA Pains Acontece', verified: p.verified, confidence: p.confidence,
+        img: p.img, video: p.video || '', author: p.author || 'IA Pains Acontece', verified: p.verified, confidence: p.confidence,
         world: p.world || p.cat === 'Mundo', source_url: p.source_url,
         pubISO: p.pubISO, date: p.date, timeAgo: p.timeAgo, source: p.source
       });
@@ -1109,7 +1109,7 @@ const PAAPI = (function () {
 
       const art = await this.addArticle({
         title: p.title, lead: p.lead, content: p.content, cat: p.cat, status: 'pub',
-        img: p.img, author: p.author || 'IA Pains Acontece', verified: p.verified, confidence: p.confidence,
+        img: p.img, video: p.video || '', author: p.author || 'IA Pains Acontece', verified: p.verified, confidence: p.confidence,
         world: p.world || p.cat === 'Mundo', source_url: p.source_url,
         pubISO: p.pub_iso || p.pubISO, date: p.date, timeAgo: p.time_ago || p.timeAgo, source: p.source
       });

@@ -102,32 +102,40 @@
     return `<span class="quick-btn" onclick="event.preventDefault();event.stopPropagation();location.href='pages/noticia.html?id=${id}&mode=quick'"><i class="fas fa-bolt"></i> Rápida</span>`;
   }
 
+  function imgTag(a) {
+    const fb = (typeof PAPainsMedia !== 'undefined') ? PAPainsMedia.pick(a.cat) : '';
+    const src = a.img || fb;
+    const onerr = fb ? ` onerror="this.onerror=null;this.src='${fb.replace(/'/g, '%27')}'"` : '';
+    return `<img src="${esc(src)}" alt="" loading="lazy"${onerr}/>`;
+  }
+
   function card(a, size) {
     const href = 'pages/noticia.html?id=' + a.id;
+    const views = Number(a.views || 0).toLocaleString('pt-BR');
     if (size === 'xl') {
       return `<a href="${href}" class="ncard-xl reveal">
-        <img src="${esc(a.img)}" alt="" loading="lazy"/>
+        ${imgTag(a)}
         ${quickBtn(a.id)}
         <div class="xl-grad"></div>
         <div class="xl-body">
           <div class="xl-cat">${esc(a.cat)}${a.verified ? ' <i class="fas fa-check-circle" style="font-size:.55rem;color:#2ecc2e" title="Verificado"></i>' : ''}</div>
           <h3 class="xl-title">${esc(a.title)}</h3>
-          <div class="xl-meta"><span><i class="fas fa-calendar-alt"></i> ${esc(pubLabel(a))}</span><span><i class="fas fa-eye"></i> ${Number(a.views||0).toLocaleString('pt-BR')}</span></div>
+          <div class="xl-meta"><span><i class="fas fa-calendar-alt"></i> ${esc(pubLabel(a))}</span><span><i class="fas fa-eye"></i> <span data-pa-views="${a.id}">${views}</span></span></div>
         </div>
       </a>`;
     }
     return `<a href="${href}" class="ncard reveal">
-      <div class="thumb"><img src="${esc(a.img)}" alt="" loading="lazy"/><div class="thumb-overlay"></div>${quickBtn(a.id)}<span class="cat-pill">${esc(a.cat)}</span></div>
+      <div class="thumb">${imgTag(a)}<div class="thumb-overlay"></div>${quickBtn(a.id)}<span class="cat-pill">${esc(a.cat)}</span></div>
       <div class="card-body">
         <h3 class="card-title">${esc(a.title)}</h3>
-        <div class="card-foot"><span><i class="fas fa-calendar-alt"></i> ${esc(pubLabel(a))}</span><span class="views"><i class="fas fa-eye"></i> ${Number(a.views||0).toLocaleString('pt-BR')}</span></div>
+        <div class="card-foot"><span><i class="fas fa-calendar-alt"></i> ${esc(pubLabel(a))}</span><span class="views"><i class="fas fa-eye"></i> <span data-pa-views="${a.id}">${views}</span></span></div>
       </div>
     </a>`;
   }
 
   function listRow(a) {
     return `<a href="pages/noticia.html?id=${a.id}" class="nlist-item reveal">
-      <div class="t"><img src="${esc(a.img)}" alt="" loading="lazy"/></div>
+      <div class="t">${imgTag(a)}</div>
       <div class="inf">
         <div class="tag">${esc(a.cat)}${a.verified ? ' ✓' : ''}</div>
         <div class="ttl">${esc(a.title)}</div>
@@ -488,7 +496,8 @@
   window.applyNav = applyNav;
 
   function applyArticles(raw, gated) {
-    const pool = gated?.length ? gated : raw;
+    let pool = gated?.length ? gated : raw;
+    if (typeof PAViewsTracker !== 'undefined') pool = PAViewsTracker.mergeArticles(pool);
     allPub = filterForDisplay(pool);
     if (currentNav === 'home') renderHome();
     else applyNav(currentNav);

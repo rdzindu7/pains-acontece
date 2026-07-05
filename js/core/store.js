@@ -60,6 +60,7 @@ const PAStore = (function () {
       if (local.length) articles = local;
     }
     localStorage.setItem(LS_KEY, JSON.stringify(articles));
+    if (typeof PAViewsTracker !== 'undefined') articles = PAViewsTracker.mergeArticles(articles);
     return articles;
   }
 
@@ -125,9 +126,14 @@ const PAStore = (function () {
     try {
       const res = await PAAPI.incrementViews(id);
       const art = getArticle(id);
-      if (art && res) art.views = res.views;
+      const views = res?.views ?? ((art?.views || 0) + 1);
+      if (art) art.views = views;
+      if (typeof PAViewsTracker !== 'undefined') PAViewsTracker.setCount(id, views);
       localStorage.setItem(LS_KEY, JSON.stringify(articles));
-    } catch {}
+      return { views };
+    } catch {
+      return { views: typeof PAViewsTracker !== 'undefined' ? PAViewsTracker.getCount(id) : 0 };
+    }
   }
 
   function syncLocalCache() {

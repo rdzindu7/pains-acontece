@@ -151,19 +151,48 @@ const PAScanner = (function () {
   const SCAN_QUICK_TIMEOUT = 55000;
 
   function pickImage(cat) {
-    const imgs = {
-      'Polícia': 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=800&q=80',
-      'Política': 'https://images.unsplash.com/photo-1529107386315-e1a2ed48a620?w=800&q=80',
-      'Saúde': 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=800&q=80',
-      'Agenda': 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&q=80',
-      'Empregos': 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=800&q=80',
-      'Pains': 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&q=80',
-      'Região': 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=800&q=80',
-      'Brasil': 'https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?w=800&q=80',
-      'Brasil / Mundo': 'https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?w=800&q=80',
-      'Mundo': 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&q=80'
-    };
-    return imgs[cat] || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&q=80';
+    if (typeof PAPainsMedia !== 'undefined') return PAPainsMedia.pick(cat);
+    return 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Igreja_Nossa_Senhora_do_Ros%C3%A1rio_-_Pains_MG.jpg/800px-Igreja_Nossa_Senhora_do_Ros%C3%A1rio_-_Pains_MG.jpg';
+  }
+
+  function extractVideoFromHtml(html) {
+    if (!html) return '';
+    const h = decodeEntities(html);
+    const og = h.match(/property=["']og:video(?::secure_url|:url)?["'][^>]*content=["']([^"']+)["']/i)
+      || h.match(/content=["']([^"']+)["'][^>]*property=["']og:video/i);
+    if (og && /^https?:\/\//i.test(og[1])) return og[1].trim();
+    const yt = h.match(/(?:youtube\.com\/embed\/|youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{6,})/i);
+    if (yt) return `https://www.youtube.com/embed/${yt[1]}`;
+    const vid = h.match(/<video[^>]+src=["']([^"']+)["']/i);
+    if (vid && /^https?:\/\//i.test(vid[1])) return vid[1].trim();
+    return '';
+  }
+
+  function youtubeThumb(embedUrl) {
+    const m = (embedUrl || '').match(/embed\/([a-zA-Z0-9_-]+)/);
+    return m ? `https://img.youtube.com/vi/${m[1]}/hqdefault.jpg` : '';
+  }
+
+  async function resolveItemMedia(item, cat, skipFetch) {
+    let img = await resolveItemImage(item, cat, skipFetch);
+    let video = item.video || extractVideoFromHtml(item.summary) || '';
+    if (!video && !skipFetch) {
+      const articleUrl = extractArticleUrl(item.summary, item.link);
+      if (articleUrl && !/news\.google\.com\/rss/i.test(articleUrl)) {
+        const html = await fetchHtml(articleUrl);
+        if (html) {
+          if (!video) video = extractVideoFromHtml(html);
+          if (!img || /unsplash\.com/i.test(img)) {
+            const meta = extractPageMeta(html);
+            const pageImg = meta.images[0] || extractImagesFromHtml(html);
+            if (pageImg) img = pageImg;
+          }
+        }
+      }
+    }
+    if (!img && video) img = youtubeThumb(video) || pickImage(cat);
+    if (!img) img = pickImage(cat);
+    return { img, video: video || '' };
   }
 
   function decodeEntities(s) {
@@ -459,7 +488,8 @@ const PAScanner = (function () {
       checkedAt: new Date().toISOString(),
       quick: true
     };
-    const img = normalizeImageUrl(item.image) || extractImagesFromHtml(item.summary) || pickImage(cat);
+    const media = { img: normalizeImageUrl(item.image) || extractImagesFromHtml(item.summary) || pickImage(cat), video: extractVideoFromHtml(item.summary) || '' };
+    const img = media.img;
     const summaryRaw = item.summary || '';
     const blocks = typeof PAArticleFormat !== 'undefined' ? PAArticleFormat.textToBlocks(summaryRaw) : [];
     const paraTexts = blocks.filter(b => b.type === 'p').map(b => b.text);
@@ -475,6 +505,7 @@ const PAScanner = (function () {
       quickLead,
       content: buildDeepContent(item, pageMeta, sources, confidence, audit, img),
       img,
+      video: media.video,
       sources,
       source_url: articleUrl || item.link,
       deepVerified: true,
@@ -548,7 +579,8 @@ const PAScanner = (function () {
       checkedAt: new Date().toISOString()
     };
 
-    const img = await resolveItemImage(item, cat, pageFetched || skipPageFetch);
+    const media = await resolveItemMedia(item, cat, pageFetched || skipPageFetch);
+    const img = media.img;
     const lead = pageMeta.excerpt
       ? (pageMeta.excerpt.length > 280 ? pageMeta.excerpt.slice(0, 277) + '…' : pageMeta.excerpt)
       : makeLead(item.title, item.summary);
@@ -562,6 +594,7 @@ const PAScanner = (function () {
       quickLead,
       content: buildDeepContent(item, pageMeta, sources, confidence, audit, img),
       img,
+      video: media.video,
       sources,
       source_url: articleUrl || item.link,
       deepVerified: true,
@@ -677,7 +710,7 @@ const PAScanner = (function () {
         lead: deep.lead,
         quickLead: deep.quickLead,
         content: deep.content,
-        cat, img: deep.img, author: 'IA Pains Acontece',
+        cat, img: deep.img, video: deep.video || '', author: 'IA Pains Acontece',
         date: formatDateBR(item.pubDate),
         pubISO: item.pubDate.toISOString(),
         timeAgo: formatDate(item.pubDate),
@@ -732,7 +765,7 @@ const PAScanner = (function () {
         lead: deep.lead,
         quickLead: deep.quickLead,
         content: deep.content,
-        cat, img: deep.img, author: 'IA Pains Acontece',
+        cat, img: deep.img, video: deep.video || '', author: 'IA Pains Acontece',
         date: formatDateBR(item.pubDate),
         pubISO: item.pubDate.toISOString(),
         timeAgo: formatDate(item.pubDate),

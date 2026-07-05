@@ -20,7 +20,7 @@ a{text-decoration:none;color:inherit}
 }
 .pa-auth-bg-img{
   position:fixed;inset:-10%;
-  background:url('https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=1600&q=60') center/cover;
+  background:url('https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Igreja_Nossa_Senhora_do_Ros%C3%A1rio_-_Pains_MG.jpg/1280px-Igreja_Nossa_Senhora_do_Ros%C3%A1rio_-_Pains_MG.jpg') center/cover;
   opacity:.05;animation:paAuthZoom 22s ease-in-out infinite alternate;
 }
 @keyframes paAuthZoom{from{transform:scale(1.04)}to{transform:scale(1.12) translate(-1%,-1%)}}

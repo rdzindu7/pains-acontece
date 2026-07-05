@@ -6,7 +6,7 @@
 <link rel="icon" type="image/jpeg" href="../assets/images/favicon.jpg"/>
 <link rel="apple-touch-icon" href="../assets/images/favicon.jpg"/>
 <title>Notícia – Pains Acontece</title>
-<meta name="pa-build" content="2026.07.05-v19"/>
+<meta name="pa-build" content="2026.07.05-v20"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,700;0,900;1,700&display=swap" rel="stylesheet"/>
@@ -339,11 +339,13 @@ body.cat-pains{--accent:#1d7a1d;--accent-glow:rgba(29,122,29,.35)}
 <script src="../js/core/supabase-client.js"></script>
 <script src="../js/ui/article-format.js"></script>
 <script src="../js/ai/scanner.js"></script>
-<script src="../js/core/purge.js?v=20260705v19"></script>
-<script src="../js/core/auto-reload.js?v=20260705v19"></script>
-<script src="../js/core/api.js?v=20260705v39"></script>
+<script src="../js/core/purge.js?v=20260705v20"></script>
+<script src="../js/core/auto-reload.js?v=20260705v20"></script>
+<script src="../js/core/pains-media.js?v=20260705v40"></script>
+<script src="../js/core/views-tracker.js?v=20260705v40"></script>
+<script src="../js/core/api.js?v=20260705v40"></script>
 <script src="../js/ui/ads.js?v=20260705v36"></script>
-<script src="../js/core/store.js?v=20260705v39"></script>
+<script src="../js/core/store.js?v=20260705v40"></script>
 
 <script src="../js/ai/agents/sofia.js"></script>
 <script src="../js/ai/agents/lucas.js"></script>
@@ -485,7 +487,8 @@ body.cat-pains{--accent:#1d7a1d;--accent-glow:rgba(29,122,29,.35)}
 
   document.title=art.title+' – Pains Acontece';
   window.PACurrentArticle=art;
-  PAStore.incrementViews(id).catch(()=>{});
+  if(typeof PAViewsTracker!=='undefined'){PAViewsTracker.trackView(id).then(r=>{if(r?.views)document.querySelectorAll('[data-pa-views]').forEach(el=>{el.textContent=Number(r.views).toLocaleString('pt-BR')})}).catch(()=>{})}
+  else PAStore.incrementViews(id).catch(()=>{});
 
   let relatedPool=[];
   try{
@@ -592,11 +595,16 @@ body.cat-pains{--accent:#1d7a1d;--accent-glow:rgba(29,122,29,.35)}
     const toc=extractTOC(bodyHtml);
     const author=art.author||'Redação Pains Acontece';
     const sponsored=art.sponsored?'<span class="sponsored-badge reveal"><i class="fas fa-star"></i> Conteúdo Patrocinado</span>':'';
+    const painsFb=(typeof PAPainsMedia!=='undefined')?PAPainsMedia.pick(art.cat):'';
+    const heroImg=art.img||painsFb;
+    const isYt=art.video&&/youtube\.com|youtu\.be/i.test(art.video);
     const heroMedia=art.video
-      ?`<video src="${esc(art.video)}" controls playsinline poster="${esc(art.img||'')}"></video>`
-      :art.img
-        ?`<img src="${esc(art.img)}" alt="" loading="eager"/>`
-        :`<div class="hero-no-img" aria-hidden="true"></div>`;
+      ?(isYt
+        ?`<iframe src="${esc(art.video.includes('embed')?art.video:art.video.replace('watch?v=','embed/'))}" title="Vídeo" allowfullscreen loading="lazy" style="width:100%;height:100%;border:0"></iframe>`
+        :`<video src="${esc(art.video)}" controls playsinline poster="${esc(heroImg)}"></video>`)
+      :heroImg
+        ?`<img src="${esc(heroImg)}" alt="" loading="eager" onerror="this.onerror=null;this.src='${esc(painsFb||'../assets/images/pains-acontece-logo.png')}'"/>`
+        :`<img src="../assets/images/pains-acontece-logo.png" alt="Pains Acontece" loading="eager"/>`;
 
     const tocHtml=toc.length?`<div class="aside-card reveal"><h5><i class="fas fa-list-ul"></i> Nesta matéria</h5>
       <ul class="aside-toc">${toc.map(t=>`<li><a href="#${esc(t.id)}">${esc(t.text)}</a></li>`).join('')}</ul></div>`:'';
@@ -625,7 +633,7 @@ body.cat-pains{--accent:#1d7a1d;--accent-glow:rgba(29,122,29,.35)}
       <h1 class="art-title">${esc(art.title)}</h1>
       <div class="meta-chips">
         <span class="meta-chip"><i class="fas fa-clock"></i> ${readingTime(art.content)}</span>
-        <span class="meta-chip"><i class="fas fa-eye"></i> ${Number(art.views||0).toLocaleString('pt-BR')} leituras</span>
+        <span class="meta-chip"><i class="fas fa-eye"></i> <span data-pa-views="${esc(String(art.id))}">${Number(art.views||0).toLocaleString('pt-BR')}</span> leituras</span>
         ${art.verified?'<span class="meta-chip verified"><i class="fas fa-check-circle"></i> Verificada pela IA</span>':''}
       </div>
     </header>

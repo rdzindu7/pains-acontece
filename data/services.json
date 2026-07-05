@@ -24,7 +24,7 @@
     "title": "Saúde Pública",
     "description": "Consultas, vacinas, UBS e atendimento da rede municipal de saúde.",
     "icon": "fa-hospital",
-    "image": "https://images.unsplash.com/photo-1519494026892-80bbd2d6fd0d?w=640&q=80",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Igreja_Nossa_Senhora_do_Ros%C3%A1rio_-_Pains_MG.jpg/480px-Igreja_Nossa_Senhora_do_Ros%C3%A1rio_-_Pains_MG.jpg",
     "link": "tel:+553733841350",
     "phone": "(37) 3384-1350",
     "active": true
@@ -34,7 +34,7 @@
     "title": "Educação",
     "description": "Secretaria de Educação, matrículas e informações escolares.",
     "icon": "fa-graduation-cap",
-    "image": "https://images.unsplash.com/photo-1523050854058-8df90110c9f1?w=640&q=80",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/Pedreiras_de_Pains_-_MG.JPG/480px-Pedreiras_de_Pains_-_MG.JPG",
     "link": "tel:+553733841230",
     "phone": "(37) 3384-1230",
     "active": true
@@ -44,7 +44,7 @@
     "title": "Segurança",
     "description": "PM, Bombeiros, Defesa Civil e números de emergência.",
     "icon": "fa-shield-alt",
-    "image": "https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=640&q=80",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/Pedreiras_de_Pains_-_MG.JPG/640px-Pedreiras_de_Pains_-_MG.JPG",
     "link": "tel:190",
     "phone": "190 / 193 / 199",
     "active": true
@@ -54,7 +54,7 @@
     "title": "Transporte",
     "description": "Linhas intermunicipais, horários e mobilidade na região.",
     "icon": "fa-bus",
-    "image": "https://images.unsplash.com/photo-1544625617-1a516b3f3c42?w=640&q=80",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Igreja_Nossa_Senhora_do_Ros%C3%A1rio_-_Pains_MG.jpg/480px-Igreja_Nossa_Senhora_do_Ros%C3%A1rio_-_Pains_MG.jpg",
     "link": "#onibus",
     "phone": "",
     "active": true
@@ -64,7 +64,7 @@
     "title": "CEMIG / Água",
     "description": "Ocorrências de energia, contas CEMIG e COPASA.",
     "icon": "fa-bolt",
-    "image": "https://images.unsplash.com/photo-1473341303090-613dcca5f925?w=640&q=80",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/Pedreiras_de_Pains_-_MG.JPG/480px-Pedreiras_de_Pains_-_MG.JPG",
     "link": "tel:116",
     "phone": "116 / 115",
     "active": true
@@ -74,7 +74,7 @@
     "title": "Documentos",
     "description": "Cartório, RG, CPF, certidões e segunda via de documentos.",
     "icon": "fa-file-alt",
-    "image": "https://images.unsplash.com/photo-1450101499163-c8848c66ca85?w=640&q=80",
+    "image": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Igreja_Nossa_Senhora_do_Ros%C3%A1rio_-_Pains_MG.jpg/480px-Igreja_Nossa_Senhora_do_Ros%C3%A1rio_-_Pains_MG.jpg",
     "link": "#telefones",
     "phone": "",
     "active": true
