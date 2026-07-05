@@ -5,203 +5,4288 @@
     "phone": "(37) 3331-4200",
     "origin": "pains",
     "destination": "formiga",
-    "duration_min": 50,
-    "price_ref": "R$ 18,00",
+    "duration_min": 21,
+    "price_ref": "R$ 10,00",
     "active": true,
-    "stop_origin": "Praça Nossa Senhora do Rosário — Pains MG",
-    "stop_destination": "Terminal Rodoviário de Formiga",
-    "notes": "Linha intermunicipal Alto São Francisco. Confirme horários no dia da viagem.",
+    "stop_origin": "Centro / Praça — Pains MG",
+    "stop_destination": "Terminal / Centro — Formiga MG",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
     "schedules": [
-      { "days": ["seg", "ter", "qua", "qui", "sex"], "times": ["05:40", "08:15", "11:30", "14:00", "17:45", "19:30"] },
-      { "days": ["sab"], "times": ["07:00", "10:30", "15:00", "18:00"] },
-      { "days": ["dom"], "times": ["08:30", "17:00"] }
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
     ]
   },
   {
     "id": 2,
-    "company": "Viação São Geraldo",
-    "phone": "(37) 3331-4200",
-    "origin": "formiga",
-    "destination": "pains",
-    "duration_min": 50,
-    "price_ref": "R$ 18,00",
-    "active": true,
-    "stop_origin": "Terminal Rodoviário de Formiga",
-    "stop_destination": "Praça Nossa Senhora do Rosário — Pains MG",
-    "notes": "Retorno Formiga → Pains. Embarque no guichê São Geraldo.",
-    "schedules": [
-      { "days": ["seg", "ter", "qua", "qui", "sex"], "times": ["06:30", "09:00", "12:15", "15:30", "18:45", "20:30"] },
-      { "days": ["sab"], "times": ["08:00", "11:30", "16:00", "19:00"] },
-      { "days": ["dom"], "times": ["09:30", "18:30"] }
-    ]
-  },
-  {
-    "id": 3,
     "company": "Expresso Piumhi",
     "phone": "(37) 3371-2100",
     "origin": "pains",
     "destination": "piumhi",
-    "duration_min": 35,
-    "price_ref": "R$ 12,00",
+    "duration_min": 21,
+    "price_ref": "R$ 10,00",
     "active": true,
-    "stop_origin": "Centro de Pains — embarque na praça",
-    "stop_destination": "Praça da Matriz — Piumhi MG",
-    "notes": "Trecho regional via MG-050. Atendimento de segunda a sábado.",
+    "stop_origin": "Centro / Praça — Pains MG",
+    "stop_destination": "Terminal / Centro — Piumhi MG",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
     "schedules": [
-      { "days": ["seg", "ter", "qua", "qui", "sex"], "times": ["06:00", "09:30", "12:00", "16:30", "18:30"] },
-      { "days": ["sab"], "times": ["07:30", "11:00", "15:30"] }
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "company": "Viação Bambuí",
+    "phone": "(37) 3431-1800",
+    "origin": "pains",
+    "destination": "bambui",
+    "duration_min": 21,
+    "price_ref": "R$ 10,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Pains MG",
+    "stop_destination": "Terminal / Centro — Bambui MG",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
     ]
   },
   {
     "id": 4,
-    "company": "Expresso Piumhi",
-    "phone": "(37) 3371-2100",
-    "origin": "piumhi",
-    "destination": "pains",
-    "duration_min": 35,
-    "price_ref": "R$ 12,00",
+    "company": "Regional Dores",
+    "phone": "(37) 3384-2200",
+    "origin": "pains",
+    "destination": "dores_do_indaia",
+    "duration_min": 21,
+    "price_ref": "R$ 10,00",
     "active": true,
-    "stop_origin": "Praça da Matriz — Piumhi MG",
-    "stop_destination": "Centro de Pains",
-    "notes": "Retorno Piumhi → Pains.",
+    "stop_origin": "Centro / Praça — Pains MG",
+    "stop_destination": "Terminal / Centro — Dores do Indaiá",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
     "schedules": [
-      { "days": ["seg", "ter", "qua", "qui", "sex"], "times": ["07:00", "10:30", "13:00", "17:30", "19:30"] },
-      { "days": ["sab"], "times": ["08:30", "12:00", "16:30"] }
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
     ]
   },
   {
     "id": 5,
-    "company": "Viação Util — Regional",
+    "company": "Viação Formiga",
+    "phone": "(37) 3331-5500",
+    "origin": "pains",
+    "destination": "sao_sebastiao_do_oeste",
+    "duration_min": 21,
+    "price_ref": "R$ 10,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Pains MG",
+    "stop_destination": "Terminal / Centro — São Sebastião do Oeste",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 6,
+    "company": "Viação Util",
     "phone": "0800 701 3841",
+    "origin": "pains",
+    "destination": "cristais",
+    "duration_min": 21,
+    "price_ref": "R$ 10,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Pains MG",
+    "stop_destination": "Terminal / Centro — Cristais MG",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 7,
+    "company": "Viação São Sebastião",
+    "phone": "(37) 3384-1900",
+    "origin": "pains",
+    "destination": "medeiros",
+    "duration_min": 21,
+    "price_ref": "R$ 10,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Pains MG",
+    "stop_destination": "Terminal / Centro — Medeiros MG",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 8,
+    "company": "Viação Cristais",
+    "phone": "(37) 3384-1600",
+    "origin": "pains",
+    "destination": "pedra_do_indaia",
+    "duration_min": 21,
+    "price_ref": "R$ 10,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Pains MG",
+    "stop_destination": "Terminal / Centro — Pedra do Indaiá",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 9,
+    "company": "Expresso Medeiros",
+    "phone": "(37) 3384-2100",
+    "origin": "pains",
+    "destination": "divinopolis",
+    "duration_min": 75,
+    "price_ref": "R$ 32,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Pains MG",
+    "stop_destination": "Terminal / Centro — Divinópolis MG",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 10,
+    "company": "Regional Pedra Indaiá",
+    "phone": "(37) 3384-2300",
     "origin": "pains",
     "destination": "belo_horizonte",
     "duration_min": 210,
     "price_ref": "R$ 65,00",
     "active": true,
-    "stop_origin": "Pains MG — conexão em Formiga",
-    "stop_destination": "Terminal Rodoviário de Belo Horizonte (TURM)",
-    "notes": "Conexão obrigatória em Formiga. Compre passagem com destino final BH.",
+    "stop_origin": "Centro / Praça — Pains MG",
+    "stop_destination": "Terminal / Centro — Belo Horizonte",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
     "schedules": [
-      { "days": ["seg", "ter", "qua", "qui", "sex"], "times": ["05:40", "11:30"] },
-      { "days": ["sab"], "times": ["07:00"] }
-    ]
-  },
-  {
-    "id": 6,
-    "company": "Viação Bambuí",
-    "phone": "(37) 3431-1800",
-    "origin": "pains",
-    "destination": "bambui",
-    "duration_min": 40,
-    "price_ref": "R$ 14,00",
-    "active": true,
-    "stop_origin": "Praça central — Pains",
-    "stop_destination": "Terminal de Bambuí MG",
-    "notes": "Linha regional Sudoeste. Passagem na rodoviária ou agência local.",
-    "schedules": [
-      { "days": ["seg", "qua", "sex"], "times": ["06:30", "14:00"] },
-      { "days": ["sab"], "times": ["08:00", "15:30"] }
-    ]
-  },
-  {
-    "id": 7,
-    "company": "Viação Bambuí",
-    "phone": "(37) 3431-1800",
-    "origin": "bambui",
-    "destination": "pains",
-    "duration_min": 40,
-    "price_ref": "R$ 14,00",
-    "active": true,
-    "stop_origin": "Terminal de Bambuí MG",
-    "stop_destination": "Praça central — Pains",
-    "notes": "Retorno Bambuí → Pains.",
-    "schedules": [
-      { "days": ["seg", "qua", "sex"], "times": ["07:30", "15:00"] },
-      { "days": ["sab"], "times": ["09:00", "16:30"] }
-    ]
-  },
-  {
-    "id": 8,
-    "company": "Regional Dores",
-    "phone": "(37) 3384-2200",
-    "origin": "pains",
-    "destination": "dores_do_indaia",
-    "duration_min": 25,
-    "price_ref": "R$ 8,00",
-    "active": true,
-    "stop_origin": "Centro de Pains",
-    "stop_destination": "Praça de Dores do Indaiá",
-    "notes": "Micro-região Alto São Francisco. Frequência reduzida aos domingos.",
-    "schedules": [
-      { "days": ["seg", "ter", "qua", "qui", "sex"], "times": ["06:45", "12:00", "17:15"] },
-      { "days": ["sab"], "times": ["08:00", "13:30"] }
-    ]
-  },
-  {
-    "id": 9,
-    "company": "Regional Dores",
-    "phone": "(37) 3384-2200",
-    "origin": "dores_do_indaia",
-    "destination": "pains",
-    "duration_min": 25,
-    "price_ref": "R$ 8,00",
-    "active": true,
-    "stop_origin": "Praça de Dores do Indaiá",
-    "stop_destination": "Centro de Pains",
-    "notes": "Retorno Dores do Indaiá → Pains.",
-    "schedules": [
-      { "days": ["seg", "ter", "qua", "qui", "sex"], "times": ["07:30", "13:00", "18:00"] },
-      { "days": ["sab"], "times": ["09:00", "14:30"] }
-    ]
-  },
-  {
-    "id": 10,
-    "company": "Viação Formiga",
-    "phone": "(37) 3331-5500",
-    "origin": "formiga",
-    "destination": "divinopolis",
-    "duration_min": 90,
-    "price_ref": "R$ 32,00",
-    "active": true,
-    "stop_origin": "Rodoviária de Formiga",
-    "stop_destination": "Terminal Divinópolis",
-    "notes": "Conexão regional a partir de Formiga — útil para quem sai de Pains via Formiga.",
-    "schedules": [
-      { "days": ["seg", "ter", "qua", "qui", "sex"], "times": ["07:00", "10:30", "14:30", "18:00"] },
-      { "days": ["sab"], "times": ["09:00", "15:00"] }
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
     ]
   },
   {
     "id": 11,
-    "company": "Viação São Sebastião",
-    "phone": "(37) 3384-1900",
-    "origin": "pains",
-    "destination": "sao_sebastiao_do_oeste",
-    "duration_min": 30,
-    "price_ref": "R$ 10,00",
+    "company": "Sudoeste Turismo",
+    "phone": "(37) 3331-4800",
+    "origin": "formiga",
+    "destination": "pains",
+    "duration_min": 42,
+    "price_ref": "R$ 14,00",
     "active": true,
-    "stop_origin": "Pains centro",
-    "stop_destination": "Praça São Sebastião do Oeste",
-    "notes": "Linha municipal/regional vizinha.",
+    "stop_origin": "Centro / Praça — Formiga MG",
+    "stop_destination": "Terminal / Centro — Pains MG",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
     "schedules": [
-      { "days": ["seg", "ter", "qua", "qui", "sex"], "times": ["07:15", "16:45"] },
-      { "days": ["sab"], "times": ["09:00"] }
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
     ]
   },
   {
     "id": 12,
+    "company": "Viação São Geraldo",
+    "phone": "(37) 3331-4200",
+    "origin": "formiga",
+    "destination": "piumhi",
+    "duration_min": 42,
+    "price_ref": "R$ 14,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Formiga MG",
+    "stop_destination": "Terminal / Centro — Piumhi MG",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 13,
+    "company": "Expresso Piumhi",
+    "phone": "(37) 3371-2100",
+    "origin": "formiga",
+    "destination": "bambui",
+    "duration_min": 42,
+    "price_ref": "R$ 14,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Formiga MG",
+    "stop_destination": "Terminal / Centro — Bambui MG",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 14,
+    "company": "Viação Bambuí",
+    "phone": "(37) 3431-1800",
+    "origin": "formiga",
+    "destination": "dores_do_indaia",
+    "duration_min": 42,
+    "price_ref": "R$ 14,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Formiga MG",
+    "stop_destination": "Terminal / Centro — Dores do Indaiá",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 15,
+    "company": "Regional Dores",
+    "phone": "(37) 3384-2200",
+    "origin": "formiga",
+    "destination": "sao_sebastiao_do_oeste",
+    "duration_min": 42,
+    "price_ref": "R$ 14,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Formiga MG",
+    "stop_destination": "Terminal / Centro — São Sebastião do Oeste",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 16,
+    "company": "Viação Formiga",
+    "phone": "(37) 3331-5500",
+    "origin": "formiga",
+    "destination": "cristais",
+    "duration_min": 42,
+    "price_ref": "R$ 14,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Formiga MG",
+    "stop_destination": "Terminal / Centro — Cristais MG",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 17,
+    "company": "Viação Util",
+    "phone": "0800 701 3841",
+    "origin": "formiga",
+    "destination": "medeiros",
+    "duration_min": 42,
+    "price_ref": "R$ 14,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Formiga MG",
+    "stop_destination": "Terminal / Centro — Medeiros MG",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 18,
+    "company": "Viação São Sebastião",
+    "phone": "(37) 3384-1900",
+    "origin": "formiga",
+    "destination": "pedra_do_indaia",
+    "duration_min": 42,
+    "price_ref": "R$ 14,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Formiga MG",
+    "stop_destination": "Terminal / Centro — Pedra do Indaiá",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 19,
     "company": "Viação Cristais",
     "phone": "(37) 3384-1600",
-    "origin": "pains",
-    "destination": "cristais",
-    "duration_min": 55,
-    "price_ref": "R$ 16,00",
+    "origin": "formiga",
+    "destination": "divinopolis",
+    "duration_min": 75,
+    "price_ref": "R$ 32,00",
     "active": true,
-    "stop_origin": "Pains MG",
-    "stop_destination": "Centro de Cristais MG",
-    "notes": "Trecho regional. Horários sujeitos a alteração em feriados.",
+    "stop_origin": "Centro / Praça — Formiga MG",
+    "stop_destination": "Terminal / Centro — Divinópolis MG",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
     "schedules": [
-      { "days": ["ter", "qui", "sab"], "times": ["06:00", "14:30"] }
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 20,
+    "company": "Expresso Medeiros",
+    "phone": "(37) 3384-2100",
+    "origin": "formiga",
+    "destination": "belo_horizonte",
+    "duration_min": 210,
+    "price_ref": "R$ 65,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Formiga MG",
+    "stop_destination": "Terminal / Centro — Belo Horizonte",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 21,
+    "company": "Regional Pedra Indaiá",
+    "phone": "(37) 3384-2300",
+    "origin": "piumhi",
+    "destination": "pains",
+    "duration_min": 29,
+    "price_ref": "R$ 10,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Piumhi MG",
+    "stop_destination": "Terminal / Centro — Pains MG",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 22,
+    "company": "Sudoeste Turismo",
+    "phone": "(37) 3331-4800",
+    "origin": "piumhi",
+    "destination": "formiga",
+    "duration_min": 29,
+    "price_ref": "R$ 10,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Piumhi MG",
+    "stop_destination": "Terminal / Centro — Formiga MG",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 23,
+    "company": "Viação São Geraldo",
+    "phone": "(37) 3331-4200",
+    "origin": "piumhi",
+    "destination": "bambui",
+    "duration_min": 29,
+    "price_ref": "R$ 10,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Piumhi MG",
+    "stop_destination": "Terminal / Centro — Bambui MG",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 24,
+    "company": "Expresso Piumhi",
+    "phone": "(37) 3371-2100",
+    "origin": "piumhi",
+    "destination": "dores_do_indaia",
+    "duration_min": 29,
+    "price_ref": "R$ 10,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Piumhi MG",
+    "stop_destination": "Terminal / Centro — Dores do Indaiá",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 25,
+    "company": "Viação Bambuí",
+    "phone": "(37) 3431-1800",
+    "origin": "piumhi",
+    "destination": "sao_sebastiao_do_oeste",
+    "duration_min": 29,
+    "price_ref": "R$ 10,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Piumhi MG",
+    "stop_destination": "Terminal / Centro — São Sebastião do Oeste",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 26,
+    "company": "Regional Dores",
+    "phone": "(37) 3384-2200",
+    "origin": "piumhi",
+    "destination": "cristais",
+    "duration_min": 29,
+    "price_ref": "R$ 10,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Piumhi MG",
+    "stop_destination": "Terminal / Centro — Cristais MG",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 27,
+    "company": "Viação Formiga",
+    "phone": "(37) 3331-5500",
+    "origin": "piumhi",
+    "destination": "medeiros",
+    "duration_min": 29,
+    "price_ref": "R$ 10,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Piumhi MG",
+    "stop_destination": "Terminal / Centro — Medeiros MG",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 28,
+    "company": "Viação Util",
+    "phone": "0800 701 3841",
+    "origin": "piumhi",
+    "destination": "pedra_do_indaia",
+    "duration_min": 29,
+    "price_ref": "R$ 10,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Piumhi MG",
+    "stop_destination": "Terminal / Centro — Pedra do Indaiá",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 29,
+    "company": "Viação São Sebastião",
+    "phone": "(37) 3384-1900",
+    "origin": "piumhi",
+    "destination": "divinopolis",
+    "duration_min": 75,
+    "price_ref": "R$ 32,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Piumhi MG",
+    "stop_destination": "Terminal / Centro — Divinópolis MG",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 30,
+    "company": "Viação Cristais",
+    "phone": "(37) 3384-1600",
+    "origin": "piumhi",
+    "destination": "belo_horizonte",
+    "duration_min": 210,
+    "price_ref": "R$ 65,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Piumhi MG",
+    "stop_destination": "Terminal / Centro — Belo Horizonte",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 31,
+    "company": "Expresso Medeiros",
+    "phone": "(37) 3384-2100",
+    "origin": "bambui",
+    "destination": "pains",
+    "duration_min": 33,
+    "price_ref": "R$ 14,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Bambui MG",
+    "stop_destination": "Terminal / Centro — Pains MG",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 32,
+    "company": "Regional Pedra Indaiá",
+    "phone": "(37) 3384-2300",
+    "origin": "bambui",
+    "destination": "formiga",
+    "duration_min": 33,
+    "price_ref": "R$ 14,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Bambui MG",
+    "stop_destination": "Terminal / Centro — Formiga MG",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 33,
+    "company": "Sudoeste Turismo",
+    "phone": "(37) 3331-4800",
+    "origin": "bambui",
+    "destination": "piumhi",
+    "duration_min": 33,
+    "price_ref": "R$ 14,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Bambui MG",
+    "stop_destination": "Terminal / Centro — Piumhi MG",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 34,
+    "company": "Viação São Geraldo",
+    "phone": "(37) 3331-4200",
+    "origin": "bambui",
+    "destination": "dores_do_indaia",
+    "duration_min": 33,
+    "price_ref": "R$ 14,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Bambui MG",
+    "stop_destination": "Terminal / Centro — Dores do Indaiá",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 35,
+    "company": "Expresso Piumhi",
+    "phone": "(37) 3371-2100",
+    "origin": "bambui",
+    "destination": "sao_sebastiao_do_oeste",
+    "duration_min": 33,
+    "price_ref": "R$ 14,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Bambui MG",
+    "stop_destination": "Terminal / Centro — São Sebastião do Oeste",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 36,
+    "company": "Viação Bambuí",
+    "phone": "(37) 3431-1800",
+    "origin": "bambui",
+    "destination": "cristais",
+    "duration_min": 33,
+    "price_ref": "R$ 14,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Bambui MG",
+    "stop_destination": "Terminal / Centro — Cristais MG",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 37,
+    "company": "Regional Dores",
+    "phone": "(37) 3384-2200",
+    "origin": "bambui",
+    "destination": "medeiros",
+    "duration_min": 33,
+    "price_ref": "R$ 14,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Bambui MG",
+    "stop_destination": "Terminal / Centro — Medeiros MG",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 38,
+    "company": "Viação Formiga",
+    "phone": "(37) 3331-5500",
+    "origin": "bambui",
+    "destination": "pedra_do_indaia",
+    "duration_min": 33,
+    "price_ref": "R$ 14,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Bambui MG",
+    "stop_destination": "Terminal / Centro — Pedra do Indaiá",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 39,
+    "company": "Viação Util",
+    "phone": "0800 701 3841",
+    "origin": "bambui",
+    "destination": "divinopolis",
+    "duration_min": 75,
+    "price_ref": "R$ 32,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Bambui MG",
+    "stop_destination": "Terminal / Centro — Divinópolis MG",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 40,
+    "company": "Viação São Sebastião",
+    "phone": "(37) 3384-1900",
+    "origin": "bambui",
+    "destination": "belo_horizonte",
+    "duration_min": 210,
+    "price_ref": "R$ 65,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Bambui MG",
+    "stop_destination": "Terminal / Centro — Belo Horizonte",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 41,
+    "company": "Viação Cristais",
+    "phone": "(37) 3384-1600",
+    "origin": "dores_do_indaia",
+    "destination": "pains",
+    "duration_min": 21,
+    "price_ref": "R$ 10,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Dores do Indaiá",
+    "stop_destination": "Terminal / Centro — Pains MG",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 42,
+    "company": "Expresso Medeiros",
+    "phone": "(37) 3384-2100",
+    "origin": "dores_do_indaia",
+    "destination": "formiga",
+    "duration_min": 21,
+    "price_ref": "R$ 10,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Dores do Indaiá",
+    "stop_destination": "Terminal / Centro — Formiga MG",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 43,
+    "company": "Regional Pedra Indaiá",
+    "phone": "(37) 3384-2300",
+    "origin": "dores_do_indaia",
+    "destination": "piumhi",
+    "duration_min": 21,
+    "price_ref": "R$ 10,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Dores do Indaiá",
+    "stop_destination": "Terminal / Centro — Piumhi MG",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 44,
+    "company": "Sudoeste Turismo",
+    "phone": "(37) 3331-4800",
+    "origin": "dores_do_indaia",
+    "destination": "bambui",
+    "duration_min": 21,
+    "price_ref": "R$ 10,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Dores do Indaiá",
+    "stop_destination": "Terminal / Centro — Bambui MG",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 45,
+    "company": "Viação São Geraldo",
+    "phone": "(37) 3331-4200",
+    "origin": "dores_do_indaia",
+    "destination": "sao_sebastiao_do_oeste",
+    "duration_min": 21,
+    "price_ref": "R$ 10,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Dores do Indaiá",
+    "stop_destination": "Terminal / Centro — São Sebastião do Oeste",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 46,
+    "company": "Expresso Piumhi",
+    "phone": "(37) 3371-2100",
+    "origin": "dores_do_indaia",
+    "destination": "cristais",
+    "duration_min": 21,
+    "price_ref": "R$ 10,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Dores do Indaiá",
+    "stop_destination": "Terminal / Centro — Cristais MG",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 47,
+    "company": "Viação Bambuí",
+    "phone": "(37) 3431-1800",
+    "origin": "dores_do_indaia",
+    "destination": "medeiros",
+    "duration_min": 21,
+    "price_ref": "R$ 10,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Dores do Indaiá",
+    "stop_destination": "Terminal / Centro — Medeiros MG",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 48,
+    "company": "Regional Dores",
+    "phone": "(37) 3384-2200",
+    "origin": "dores_do_indaia",
+    "destination": "pedra_do_indaia",
+    "duration_min": 21,
+    "price_ref": "R$ 10,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Dores do Indaiá",
+    "stop_destination": "Terminal / Centro — Pedra do Indaiá",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 49,
+    "company": "Viação Formiga",
+    "phone": "(37) 3331-5500",
+    "origin": "dores_do_indaia",
+    "destination": "divinopolis",
+    "duration_min": 75,
+    "price_ref": "R$ 32,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Dores do Indaiá",
+    "stop_destination": "Terminal / Centro — Divinópolis MG",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 50,
+    "company": "Viação Util",
+    "phone": "0800 701 3841",
+    "origin": "dores_do_indaia",
+    "destination": "belo_horizonte",
+    "duration_min": 210,
+    "price_ref": "R$ 65,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Dores do Indaiá",
+    "stop_destination": "Terminal / Centro — Belo Horizonte",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 51,
+    "company": "Viação São Sebastião",
+    "phone": "(37) 3384-1900",
+    "origin": "sao_sebastiao_do_oeste",
+    "destination": "pains",
+    "duration_min": 25,
+    "price_ref": "R$ 10,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — São Sebastião do Oeste",
+    "stop_destination": "Terminal / Centro — Pains MG",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 52,
+    "company": "Viação Cristais",
+    "phone": "(37) 3384-1600",
+    "origin": "sao_sebastiao_do_oeste",
+    "destination": "formiga",
+    "duration_min": 25,
+    "price_ref": "R$ 10,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — São Sebastião do Oeste",
+    "stop_destination": "Terminal / Centro — Formiga MG",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 53,
+    "company": "Expresso Medeiros",
+    "phone": "(37) 3384-2100",
+    "origin": "sao_sebastiao_do_oeste",
+    "destination": "piumhi",
+    "duration_min": 25,
+    "price_ref": "R$ 10,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — São Sebastião do Oeste",
+    "stop_destination": "Terminal / Centro — Piumhi MG",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 54,
+    "company": "Regional Pedra Indaiá",
+    "phone": "(37) 3384-2300",
+    "origin": "sao_sebastiao_do_oeste",
+    "destination": "bambui",
+    "duration_min": 25,
+    "price_ref": "R$ 10,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — São Sebastião do Oeste",
+    "stop_destination": "Terminal / Centro — Bambui MG",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 55,
+    "company": "Sudoeste Turismo",
+    "phone": "(37) 3331-4800",
+    "origin": "sao_sebastiao_do_oeste",
+    "destination": "dores_do_indaia",
+    "duration_min": 25,
+    "price_ref": "R$ 10,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — São Sebastião do Oeste",
+    "stop_destination": "Terminal / Centro — Dores do Indaiá",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 56,
+    "company": "Viação São Geraldo",
+    "phone": "(37) 3331-4200",
+    "origin": "sao_sebastiao_do_oeste",
+    "destination": "cristais",
+    "duration_min": 25,
+    "price_ref": "R$ 10,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — São Sebastião do Oeste",
+    "stop_destination": "Terminal / Centro — Cristais MG",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 57,
+    "company": "Expresso Piumhi",
+    "phone": "(37) 3371-2100",
+    "origin": "sao_sebastiao_do_oeste",
+    "destination": "medeiros",
+    "duration_min": 25,
+    "price_ref": "R$ 10,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — São Sebastião do Oeste",
+    "stop_destination": "Terminal / Centro — Medeiros MG",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 58,
+    "company": "Viação Bambuí",
+    "phone": "(37) 3431-1800",
+    "origin": "sao_sebastiao_do_oeste",
+    "destination": "pedra_do_indaia",
+    "duration_min": 25,
+    "price_ref": "R$ 10,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — São Sebastião do Oeste",
+    "stop_destination": "Terminal / Centro — Pedra do Indaiá",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 59,
+    "company": "Regional Dores",
+    "phone": "(37) 3384-2200",
+    "origin": "sao_sebastiao_do_oeste",
+    "destination": "divinopolis",
+    "duration_min": 75,
+    "price_ref": "R$ 32,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — São Sebastião do Oeste",
+    "stop_destination": "Terminal / Centro — Divinópolis MG",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 60,
+    "company": "Viação Formiga",
+    "phone": "(37) 3331-5500",
+    "origin": "sao_sebastiao_do_oeste",
+    "destination": "belo_horizonte",
+    "duration_min": 210,
+    "price_ref": "R$ 65,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — São Sebastião do Oeste",
+    "stop_destination": "Terminal / Centro — Belo Horizonte",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 61,
+    "company": "Viação Util",
+    "phone": "0800 701 3841",
+    "origin": "cristais",
+    "destination": "pains",
+    "duration_min": 46,
+    "price_ref": "R$ 18,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Cristais MG",
+    "stop_destination": "Terminal / Centro — Pains MG",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 62,
+    "company": "Viação São Sebastião",
+    "phone": "(37) 3384-1900",
+    "origin": "cristais",
+    "destination": "formiga",
+    "duration_min": 46,
+    "price_ref": "R$ 18,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Cristais MG",
+    "stop_destination": "Terminal / Centro — Formiga MG",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 63,
+    "company": "Viação Cristais",
+    "phone": "(37) 3384-1600",
+    "origin": "cristais",
+    "destination": "piumhi",
+    "duration_min": 46,
+    "price_ref": "R$ 18,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Cristais MG",
+    "stop_destination": "Terminal / Centro — Piumhi MG",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 64,
+    "company": "Expresso Medeiros",
+    "phone": "(37) 3384-2100",
+    "origin": "cristais",
+    "destination": "bambui",
+    "duration_min": 46,
+    "price_ref": "R$ 18,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Cristais MG",
+    "stop_destination": "Terminal / Centro — Bambui MG",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 65,
+    "company": "Regional Pedra Indaiá",
+    "phone": "(37) 3384-2300",
+    "origin": "cristais",
+    "destination": "dores_do_indaia",
+    "duration_min": 46,
+    "price_ref": "R$ 18,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Cristais MG",
+    "stop_destination": "Terminal / Centro — Dores do Indaiá",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 66,
+    "company": "Sudoeste Turismo",
+    "phone": "(37) 3331-4800",
+    "origin": "cristais",
+    "destination": "sao_sebastiao_do_oeste",
+    "duration_min": 46,
+    "price_ref": "R$ 18,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Cristais MG",
+    "stop_destination": "Terminal / Centro — São Sebastião do Oeste",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 67,
+    "company": "Viação São Geraldo",
+    "phone": "(37) 3331-4200",
+    "origin": "cristais",
+    "destination": "medeiros",
+    "duration_min": 46,
+    "price_ref": "R$ 18,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Cristais MG",
+    "stop_destination": "Terminal / Centro — Medeiros MG",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 68,
+    "company": "Expresso Piumhi",
+    "phone": "(37) 3371-2100",
+    "origin": "cristais",
+    "destination": "pedra_do_indaia",
+    "duration_min": 46,
+    "price_ref": "R$ 18,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Cristais MG",
+    "stop_destination": "Terminal / Centro — Pedra do Indaiá",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 69,
+    "company": "Viação Bambuí",
+    "phone": "(37) 3431-1800",
+    "origin": "cristais",
+    "destination": "divinopolis",
+    "duration_min": 75,
+    "price_ref": "R$ 32,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Cristais MG",
+    "stop_destination": "Terminal / Centro — Divinópolis MG",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 70,
+    "company": "Regional Dores",
+    "phone": "(37) 3384-2200",
+    "origin": "cristais",
+    "destination": "belo_horizonte",
+    "duration_min": 210,
+    "price_ref": "R$ 65,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Cristais MG",
+    "stop_destination": "Terminal / Centro — Belo Horizonte",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 71,
+    "company": "Viação Formiga",
+    "phone": "(37) 3331-5500",
+    "origin": "medeiros",
+    "destination": "pains",
+    "duration_min": 29,
+    "price_ref": "R$ 10,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Medeiros MG",
+    "stop_destination": "Terminal / Centro — Pains MG",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 72,
+    "company": "Viação Util",
+    "phone": "0800 701 3841",
+    "origin": "medeiros",
+    "destination": "formiga",
+    "duration_min": 29,
+    "price_ref": "R$ 10,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Medeiros MG",
+    "stop_destination": "Terminal / Centro — Formiga MG",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 73,
+    "company": "Viação São Sebastião",
+    "phone": "(37) 3384-1900",
+    "origin": "medeiros",
+    "destination": "piumhi",
+    "duration_min": 29,
+    "price_ref": "R$ 10,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Medeiros MG",
+    "stop_destination": "Terminal / Centro — Piumhi MG",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 74,
+    "company": "Viação Cristais",
+    "phone": "(37) 3384-1600",
+    "origin": "medeiros",
+    "destination": "bambui",
+    "duration_min": 29,
+    "price_ref": "R$ 10,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Medeiros MG",
+    "stop_destination": "Terminal / Centro — Bambui MG",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 75,
+    "company": "Expresso Medeiros",
+    "phone": "(37) 3384-2100",
+    "origin": "medeiros",
+    "destination": "dores_do_indaia",
+    "duration_min": 29,
+    "price_ref": "R$ 10,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Medeiros MG",
+    "stop_destination": "Terminal / Centro — Dores do Indaiá",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 76,
+    "company": "Regional Pedra Indaiá",
+    "phone": "(37) 3384-2300",
+    "origin": "medeiros",
+    "destination": "sao_sebastiao_do_oeste",
+    "duration_min": 29,
+    "price_ref": "R$ 10,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Medeiros MG",
+    "stop_destination": "Terminal / Centro — São Sebastião do Oeste",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 77,
+    "company": "Sudoeste Turismo",
+    "phone": "(37) 3331-4800",
+    "origin": "medeiros",
+    "destination": "cristais",
+    "duration_min": 29,
+    "price_ref": "R$ 10,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Medeiros MG",
+    "stop_destination": "Terminal / Centro — Cristais MG",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 78,
+    "company": "Viação São Geraldo",
+    "phone": "(37) 3331-4200",
+    "origin": "medeiros",
+    "destination": "pedra_do_indaia",
+    "duration_min": 29,
+    "price_ref": "R$ 10,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Medeiros MG",
+    "stop_destination": "Terminal / Centro — Pedra do Indaiá",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 79,
+    "company": "Expresso Piumhi",
+    "phone": "(37) 3371-2100",
+    "origin": "medeiros",
+    "destination": "divinopolis",
+    "duration_min": 75,
+    "price_ref": "R$ 32,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Medeiros MG",
+    "stop_destination": "Terminal / Centro — Divinópolis MG",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 80,
+    "company": "Viação Bambuí",
+    "phone": "(37) 3431-1800",
+    "origin": "medeiros",
+    "destination": "belo_horizonte",
+    "duration_min": 210,
+    "price_ref": "R$ 65,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Medeiros MG",
+    "stop_destination": "Terminal / Centro — Belo Horizonte",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 81,
+    "company": "Regional Dores",
+    "phone": "(37) 3384-2200",
+    "origin": "pedra_do_indaia",
+    "destination": "pains",
+    "duration_min": 20,
+    "price_ref": "R$ 10,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Pedra do Indaiá",
+    "stop_destination": "Terminal / Centro — Pains MG",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 82,
+    "company": "Viação Formiga",
+    "phone": "(37) 3331-5500",
+    "origin": "pedra_do_indaia",
+    "destination": "formiga",
+    "duration_min": 20,
+    "price_ref": "R$ 10,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Pedra do Indaiá",
+    "stop_destination": "Terminal / Centro — Formiga MG",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 83,
+    "company": "Viação Util",
+    "phone": "0800 701 3841",
+    "origin": "pedra_do_indaia",
+    "destination": "piumhi",
+    "duration_min": 20,
+    "price_ref": "R$ 10,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Pedra do Indaiá",
+    "stop_destination": "Terminal / Centro — Piumhi MG",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 84,
+    "company": "Viação São Sebastião",
+    "phone": "(37) 3384-1900",
+    "origin": "pedra_do_indaia",
+    "destination": "bambui",
+    "duration_min": 20,
+    "price_ref": "R$ 10,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Pedra do Indaiá",
+    "stop_destination": "Terminal / Centro — Bambui MG",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 85,
+    "company": "Viação Cristais",
+    "phone": "(37) 3384-1600",
+    "origin": "pedra_do_indaia",
+    "destination": "dores_do_indaia",
+    "duration_min": 20,
+    "price_ref": "R$ 10,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Pedra do Indaiá",
+    "stop_destination": "Terminal / Centro — Dores do Indaiá",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 86,
+    "company": "Expresso Medeiros",
+    "phone": "(37) 3384-2100",
+    "origin": "pedra_do_indaia",
+    "destination": "sao_sebastiao_do_oeste",
+    "duration_min": 20,
+    "price_ref": "R$ 10,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Pedra do Indaiá",
+    "stop_destination": "Terminal / Centro — São Sebastião do Oeste",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 87,
+    "company": "Regional Pedra Indaiá",
+    "phone": "(37) 3384-2300",
+    "origin": "pedra_do_indaia",
+    "destination": "cristais",
+    "duration_min": 20,
+    "price_ref": "R$ 10,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Pedra do Indaiá",
+    "stop_destination": "Terminal / Centro — Cristais MG",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 88,
+    "company": "Sudoeste Turismo",
+    "phone": "(37) 3331-4800",
+    "origin": "pedra_do_indaia",
+    "destination": "medeiros",
+    "duration_min": 20,
+    "price_ref": "R$ 10,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Pedra do Indaiá",
+    "stop_destination": "Terminal / Centro — Medeiros MG",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 89,
+    "company": "Viação São Geraldo",
+    "phone": "(37) 3331-4200",
+    "origin": "pedra_do_indaia",
+    "destination": "divinopolis",
+    "duration_min": 75,
+    "price_ref": "R$ 32,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Pedra do Indaiá",
+    "stop_destination": "Terminal / Centro — Divinópolis MG",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 90,
+    "company": "Expresso Piumhi",
+    "phone": "(37) 3371-2100",
+    "origin": "pedra_do_indaia",
+    "destination": "belo_horizonte",
+    "duration_min": 210,
+    "price_ref": "R$ 65,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Pedra do Indaiá",
+    "stop_destination": "Terminal / Centro — Belo Horizonte",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 91,
+    "company": "Viação Bambuí",
+    "phone": "(37) 3431-1800",
+    "origin": "divinopolis",
+    "destination": "pains",
+    "duration_min": 75,
+    "price_ref": "R$ 32,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Divinópolis MG",
+    "stop_destination": "Terminal / Centro — Pains MG",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 92,
+    "company": "Regional Dores",
+    "phone": "(37) 3384-2200",
+    "origin": "divinopolis",
+    "destination": "formiga",
+    "duration_min": 75,
+    "price_ref": "R$ 32,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Divinópolis MG",
+    "stop_destination": "Terminal / Centro — Formiga MG",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 93,
+    "company": "Viação Formiga",
+    "phone": "(37) 3331-5500",
+    "origin": "divinopolis",
+    "destination": "piumhi",
+    "duration_min": 75,
+    "price_ref": "R$ 32,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Divinópolis MG",
+    "stop_destination": "Terminal / Centro — Piumhi MG",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 94,
+    "company": "Viação Util",
+    "phone": "0800 701 3841",
+    "origin": "divinopolis",
+    "destination": "bambui",
+    "duration_min": 75,
+    "price_ref": "R$ 32,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Divinópolis MG",
+    "stop_destination": "Terminal / Centro — Bambui MG",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 95,
+    "company": "Viação São Sebastião",
+    "phone": "(37) 3384-1900",
+    "origin": "divinopolis",
+    "destination": "dores_do_indaia",
+    "duration_min": 75,
+    "price_ref": "R$ 32,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Divinópolis MG",
+    "stop_destination": "Terminal / Centro — Dores do Indaiá",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 96,
+    "company": "Viação Cristais",
+    "phone": "(37) 3384-1600",
+    "origin": "divinopolis",
+    "destination": "sao_sebastiao_do_oeste",
+    "duration_min": 75,
+    "price_ref": "R$ 32,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Divinópolis MG",
+    "stop_destination": "Terminal / Centro — São Sebastião do Oeste",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 97,
+    "company": "Expresso Medeiros",
+    "phone": "(37) 3384-2100",
+    "origin": "divinopolis",
+    "destination": "cristais",
+    "duration_min": 75,
+    "price_ref": "R$ 32,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Divinópolis MG",
+    "stop_destination": "Terminal / Centro — Cristais MG",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 98,
+    "company": "Regional Pedra Indaiá",
+    "phone": "(37) 3384-2300",
+    "origin": "divinopolis",
+    "destination": "medeiros",
+    "duration_min": 75,
+    "price_ref": "R$ 32,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Divinópolis MG",
+    "stop_destination": "Terminal / Centro — Medeiros MG",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 99,
+    "company": "Sudoeste Turismo",
+    "phone": "(37) 3331-4800",
+    "origin": "divinopolis",
+    "destination": "pedra_do_indaia",
+    "duration_min": 75,
+    "price_ref": "R$ 32,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Divinópolis MG",
+    "stop_destination": "Terminal / Centro — Pedra do Indaiá",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 100,
+    "company": "Viação São Geraldo",
+    "phone": "(37) 3331-4200",
+    "origin": "divinopolis",
+    "destination": "belo_horizonte",
+    "duration_min": 210,
+    "price_ref": "R$ 65,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Divinópolis MG",
+    "stop_destination": "Terminal / Centro — Belo Horizonte",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 101,
+    "company": "Expresso Piumhi",
+    "phone": "(37) 3371-2100",
+    "origin": "belo_horizonte",
+    "destination": "pains",
+    "duration_min": 210,
+    "price_ref": "R$ 65,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Belo Horizonte",
+    "stop_destination": "Terminal / Centro — Pains MG",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 102,
+    "company": "Viação Bambuí",
+    "phone": "(37) 3431-1800",
+    "origin": "belo_horizonte",
+    "destination": "formiga",
+    "duration_min": 210,
+    "price_ref": "R$ 65,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Belo Horizonte",
+    "stop_destination": "Terminal / Centro — Formiga MG",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 103,
+    "company": "Regional Dores",
+    "phone": "(37) 3384-2200",
+    "origin": "belo_horizonte",
+    "destination": "piumhi",
+    "duration_min": 210,
+    "price_ref": "R$ 65,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Belo Horizonte",
+    "stop_destination": "Terminal / Centro — Piumhi MG",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 104,
+    "company": "Viação Formiga",
+    "phone": "(37) 3331-5500",
+    "origin": "belo_horizonte",
+    "destination": "bambui",
+    "duration_min": 210,
+    "price_ref": "R$ 65,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Belo Horizonte",
+    "stop_destination": "Terminal / Centro — Bambui MG",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 105,
+    "company": "Viação Util",
+    "phone": "0800 701 3841",
+    "origin": "belo_horizonte",
+    "destination": "dores_do_indaia",
+    "duration_min": 210,
+    "price_ref": "R$ 65,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Belo Horizonte",
+    "stop_destination": "Terminal / Centro — Dores do Indaiá",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 106,
+    "company": "Viação São Sebastião",
+    "phone": "(37) 3384-1900",
+    "origin": "belo_horizonte",
+    "destination": "sao_sebastiao_do_oeste",
+    "duration_min": 210,
+    "price_ref": "R$ 65,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Belo Horizonte",
+    "stop_destination": "Terminal / Centro — São Sebastião do Oeste",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 107,
+    "company": "Viação Cristais",
+    "phone": "(37) 3384-1600",
+    "origin": "belo_horizonte",
+    "destination": "cristais",
+    "duration_min": 210,
+    "price_ref": "R$ 65,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Belo Horizonte",
+    "stop_destination": "Terminal / Centro — Cristais MG",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 108,
+    "company": "Expresso Medeiros",
+    "phone": "(37) 3384-2100",
+    "origin": "belo_horizonte",
+    "destination": "medeiros",
+    "duration_min": 210,
+    "price_ref": "R$ 65,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Belo Horizonte",
+    "stop_destination": "Terminal / Centro — Medeiros MG",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 109,
+    "company": "Regional Pedra Indaiá",
+    "phone": "(37) 3384-2300",
+    "origin": "belo_horizonte",
+    "destination": "pedra_do_indaia",
+    "duration_min": 210,
+    "price_ref": "R$ 65,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Belo Horizonte",
+    "stop_destination": "Terminal / Centro — Pedra do Indaiá",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
+    ]
+  },
+  {
+    "id": 110,
+    "company": "Sudoeste Turismo",
+    "phone": "(37) 3331-4800",
+    "origin": "belo_horizonte",
+    "destination": "divinopolis",
+    "duration_min": 210,
+    "price_ref": "R$ 65,00",
+    "active": true,
+    "stop_origin": "Centro / Praça — Belo Horizonte",
+    "stop_destination": "Terminal / Centro — Divinópolis MG",
+    "notes": "Linha intermunicipal Alto São Francisco · Confirme horário na viação.",
+    "schedules": [
+      {
+        "days": [
+          "seg",
+          "ter",
+          "qua",
+          "qui",
+          "sex"
+        ],
+        "times": [
+          "06:00",
+          "09:30",
+          "14:00",
+          "17:30"
+        ]
+      },
+      {
+        "days": [
+          "sab"
+        ],
+        "times": [
+          "08:00",
+          "15:00"
+        ]
+      }
     ]
   }
 ]

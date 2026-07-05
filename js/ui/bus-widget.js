@@ -108,9 +108,12 @@ const PABusWidget = (function () {
         <div class="pabus-chips" id="pabusChips">
           <button type="button" class="pabus-chip" data-q="ônibus de Pains para Formiga">Pains → Formiga</button>
           <button type="button" class="pabus-chip" data-q="ônibus de Pains para Piumhi">Pains → Piumhi</button>
+          <button type="button" class="pabus-chip" data-q="ônibus de Pains para Bambuí">Pains → Bambuí</button>
           <button type="button" class="pabus-chip" data-q="ônibus de Pains para Belo Horizonte">Pains → BH</button>
+          <button type="button" class="pabus-chip" data-q="ônibus de Pains para Dores do Indaiá">Pains → Dores</button>
           <button type="button" class="pabus-chip" data-q="ônibus de Formiga para Divinópolis">Formiga → Divinópolis</button>
-          <button type="button" class="pabus-chip" data-q="ônibus saindo de Pains hoje">Saídas de Pains hoje</button>
+          <button type="button" class="pabus-chip" data-q="ônibus de Piumhi para Formiga">Piumhi → Formiga</button>
+          <button type="button" class="pabus-chip" data-q="ônibus saindo de Pains hoje">Pains hoje</button>
         </div>
         <form class="pabus-form" id="pabusForm">
           <select id="pabusOrigin" aria-label="Origem" required>

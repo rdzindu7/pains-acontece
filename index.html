@@ -1256,7 +1256,7 @@ body.cat-filter-mode .category-view { display: block; }
   <div class="header-inner">
     <a href="index.html" class="logo"><img src="assets/images/pains-acontece-logo.png" alt="Pains Acontece"/></a>
     <div class="search-wrap">
-      <input type="text" id="siteSearch" placeholder="Buscar notícias, serviços, restaurantes…" data-i18n="search.placeholder" aria-label="Buscar"/>
+      <input type="text" id="siteSearch" placeholder="Buscar notícias em Pains e região…" data-i18n="search.placeholder" aria-label="Buscar"/>
       <button aria-label="Pesquisar"><i class="fas fa-search"></i></button>
     </div>
     <div class="header-right">
@@ -1289,6 +1289,7 @@ body.cat-filter-mode .category-view { display: block; }
     <div class="nav-item"><a href="#agenda" data-nav="agenda" data-i18n="nav.agenda">Agenda</a></div>
     <div class="nav-item"><a href="#empregos" data-nav="empregos" data-i18n="nav.empregos">Empregos</a></div>
     <div class="nav-item"><a href="#restaurantes" data-nav="restaurantes" data-i18n="nav.restaurantes">Restaurantes & Lanchonetes</a></div>
+    <div class="nav-item"><a href="#busca-noticias" data-nav="buscanoticias" data-i18n="nav.buscanoticias">Busca IA</a></div>
     <div class="nav-item"><a href="#onibus" data-nav="onibus" data-i18n="nav.onibus">Ônibus</a></div>
     <div class="nav-item"><a href="#telefones" data-nav="telefones" data-i18n="nav.telefones">Telefones</a></div>
     <div class="nav-item"><a href="#clima" data-nav="clima" data-i18n="nav.clima">Clima</a></div>
@@ -1466,6 +1467,15 @@ body.cat-filter-mode .category-view { display: block; }
   </div>
   <p class="reveal" style="font-size:.78rem;color:var(--dim);margin:-8px 0 16px;max-width:560px">Onde comer em Pains — parceiros com foto, descrição, cardápio e telefone. Anuncie seu estabelecimento.</p>
   <div id="restaurantsDynamic"></div>
+</section>
+
+<section class="section wrap home-only" style="padding-top:0;" id="busca-noticias">
+  <div class="sec-head reveal">
+    <div class="line-v" style="background:linear-gradient(180deg,#2ecc2e,#0d4d0d)"></div>
+    <h2>Busca IA — Pains e Região</h2>
+    <div class="rule"></div>
+  </div>
+  <div id="newsIaMount"></div>
 </section>
 
 <section class="section wrap" style="padding-top:0;" id="onibus">
@@ -1727,7 +1737,7 @@ document.querySelectorAll('.ncard, .ncard-xl, .srv-card').forEach(card => {
 <script src="js/core/supabase-client.js"></script>
 <script src="js/ui/article-format.js"></script>
 <script src="js/core/article-scope.js"></script>
-<script src="js/ai/scanner.js"></script>
+<script src="js/ai/scanner.js?v=20260705v27"></script>
 <script src="js/ai/agents/sofia.js"></script>
 <script src="js/ai/agents/lucas.js"></script>
 <script src="js/ai/agents/camila.js"></script>
@@ -1738,8 +1748,10 @@ document.querySelectorAll('.ncard, .ncard-xl, .srv-card').forEach(card => {
 <script src="js/ui/ads.js?v=20260705v23"></script>
 <script src="js/ui/directory.js?v=20260705v26"></script>
 <script src="js/ai/agents/tiago.js?v=20260705v26"></script>
-<script src="js/ai/bus-assistant.js?v=20260705v26"></script>
-<script src="js/ui/bus-widget.js?v=20260705v26"></script>
+<script src="js/ai/bus-assistant.js?v=20260705v27"></script>
+<script src="js/ai/news-search.js?v=20260705v27"></script>
+<script src="js/ui/bus-widget.js?v=20260705v27"></script>
+<script src="js/ui/news-search-widget.js?v=20260705v27"></script>
 <script src="js/ui/corner-notify.js"></script>
 <script src="js/ui/i18n.js"></script>
 <script src="js/ai/agents/rafaela.js"></script>
@@ -1751,7 +1763,8 @@ document.querySelectorAll('.ncard, .ncard-xl, .srv-card').forEach(card => {
 <script src="js/ai/bom-dia.js"></script>
 <script src="js/ui/scroll-nav.js"></script>
 <script src="js/ai/agents/tiago.js?v=20260705v26"></script>
-<script src="js/ai/bus-assistant.js?v=20260705v26"></script>
+<script src="js/ai/news-search.js?v=20260705v27"></script>
+<script src="js/ai/bus-assistant.js?v=20260705v27"></script>
 <script src="js/ai/public-assistant.js"></script>
 <script src="js/ui/dialog.js?v=20260705v25"></script>
 <script src="js/core/social.js?v=20260705v25"></script>
@@ -1761,6 +1774,7 @@ document.querySelectorAll('.ncard, .ncard-xl, .srv-card').forEach(card => {
 document.addEventListener('DOMContentLoaded',()=>{
   PAUserNav.init('#paUserNav');
   PABusWidget.mount(document.getElementById('busIaMount'));
+  PANewsWidget.mount(document.getElementById('newsIaMount'));
 });
 </script>
 </body>

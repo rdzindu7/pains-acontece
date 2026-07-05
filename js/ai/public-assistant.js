@@ -210,6 +210,12 @@ const PAPublicIA = (function () {
       return typeof PASofia !== 'undefined' ? PASofia.weather() : { agent: PASofia?.PROFILE, reply: 'Veja a previsão na aba Clima do menu.' };
     }
 
+    if (typeof PANewsIA !== 'undefined' && PANewsIA.isNewsSearchIntent(msg)) {
+      setActiveAgent('lucas');
+      const res = await PANewsIA.search(msg);
+      return { agent: PALucas?.PROFILE, reply: PANewsIA.formatReply(res) };
+    }
+
     if (typeof PABusIA !== 'undefined' && PABusIA.isBusIntent(msg)) {
       setActiveAgent('tiago');
       const res = await PABusIA.search(msg);
@@ -384,6 +390,7 @@ const PAPublicIA = (function () {
     if (cmd === 'clima') { sendDirect('como está o clima em Pains?'); return; }
     if (cmd === 'duvida') { sendDirect('Tenho uma dúvida sobre uma publicação'); return; }
     if (cmd === 'verificado') { sendDirect('Quero saber sobre o selo verificado e seus benefícios'); return; }
+    if (cmd === 'noticias') { sendDirect('buscar notícias sobre Pains e região'); return; }
     if (cmd === 'onibus') { sendDirect('ônibus de Pains para Formiga'); return; }
     const input = document.getElementById('papiaInput');
     if (input?.value.trim()) send();
@@ -415,6 +422,7 @@ const PAPublicIA = (function () {
     return `
       <button type="button" class="papia-act" onclick="PAPublicIA.quick('ultimas')"><i class="fas fa-newspaper"></i> Últimas</button>
       ${onArticle ? '<button type="button" class="papia-act" onclick="PAPublicIA.quick(\'explicar\')">Explicar matéria</button>' : ''}
+      <button type="button" class="papia-act" onclick="PAPublicIA.quick('noticias')"><i class="fas fa-newspaper"></i> Notícias</button>
       <button type="button" class="papia-act" onclick="PAPublicIA.quick('onibus')"><i class="fas fa-bus"></i> Ônibus</button>
       <button type="button" class="papia-act" onclick="PAPublicIA.quick('verificado')"><i class="fas fa-check-circle"></i> Selo</button>
       <button type="button" class="papia-act" onclick="PAPublicIA.quick('pains')">Pains</button>

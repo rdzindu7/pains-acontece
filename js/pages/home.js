@@ -14,6 +14,7 @@
     servicos:    { type: 'scroll', target: '#servicos', highlight: true },
     restaurantes:{ type: 'scroll', target: '#restaurantes', highlight: true },
     onibus:      { type: 'scroll', target: '#onibus', highlight: true },
+    buscanoticias: { type: 'scroll', target: '#busca-noticias', highlight: true },
     telefones:   { type: 'scroll', target: '#telefones', highlight: true },
     clima:       { type: 'scroll', target: '#clima-section', highlight: true },
     contato:     { type: 'scroll', target: '#contato', highlight: true },
@@ -644,18 +645,29 @@
 
     const search = document.getElementById('siteSearch');
     if (search) {
-      search.addEventListener('keydown', function (e) {
+      search.addEventListener('keydown', async function (e) {
         if (e.key !== 'Enter') return;
-        const q = this.value.toLowerCase().trim();
+        const q = this.value.trim();
         if (!q) return;
+        const ql = q.toLowerCase();
         const matches = allPub.filter(a =>
-          a.title.toLowerCase().includes(q) || a.cat.toLowerCase().includes(q) || (a.lead || '').toLowerCase().includes(q)
+          a.title.toLowerCase().includes(ql) || a.cat.toLowerCase().includes(ql) || (a.lead || '').toLowerCase().includes(ql)
         );
         if (matches.length === 1) {
           location.href = 'pages/noticia.html?id=' + matches[0].id;
-        } else if (matches.length > 1) {
+          return;
+        }
+        if (typeof PANewsIA !== 'undefined' && typeof PANewsWidget !== 'undefined') {
+          applyNav('buscanoticias');
+          const inp = document.getElementById('panewsInput');
+          if (inp) inp.value = q;
+          await PANewsWidget.runSearch(q);
+          if (matches.length > 1) showToast(`${matches.length} no portal + busca IA regional`, 'success');
+          return;
+        }
+        if (matches.length > 1) {
           applyNav('ultimas');
-          showToast(`${matches.length} resultados para "${this.value}"`, 'success');
+          showToast(`${matches.length} resultados para "${q}"`, 'success');
         } else {
           showToast(isOwnerView() ? 'Nenhuma notícia encontrada. Tente "buscar" na IA.' : 'Nenhuma notícia encontrada.', 'error');
         }
