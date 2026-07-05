@@ -7,7 +7,7 @@
 <link rel="apple-touch-icon" href="../assets/images/favicon.jpg"/>
 <title>Painel – Pains Acontece</title>
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
-<meta name="pa-build" content="2026.07.05-v5"/>
+<meta name="pa-build" content="2026.07.05-v7"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
@@ -561,6 +561,23 @@ body{background:var(--k2);font-family:var(--fb);color:var(--w);display:flex}
   color:var(--y2);font-size:.58rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;
   padding:3px 10px;border-radius:20px;margin-left:8px;
 }
+.ads-table-wrap{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.ads-row-featured td{background:rgba(29,122,29,.08)}
+.ads-row-featured .pos{color:var(--g3)}
+@media(max-width:700px){
+  .ads-table thead{display:none}
+  .ads-table,.ads-table tbody,.ads-table tr,.ads-table td{display:block;width:100%}
+  .ads-table tr{
+    margin-bottom:12px;padding:14px 16px;border:1px solid var(--border);border-radius:8px;
+    background:rgba(255,255,255,.02);
+  }
+  .ads-table td{border:none;padding:4px 0}
+  .ads-table td.pos{font-size:.95rem;margin-bottom:4px}
+  .ads-table td.desc{font-size:.75rem;margin-bottom:8px}
+  .ads-table td.price{font-size:1.4rem;margin-top:8px;padding-top:8px;border-top:1px solid var(--border)}
+  .ads-table td:nth-child(3){font-size:.68rem;color:var(--muted)}
+  .ads-table td.price::before{content:'Valor: ';font-size:.65rem;color:var(--dim);font-family:var(--fb)}
+}
 .owner-only{display:none!important}
 body.pa-owner .owner-only.sb-item{display:flex!important}
 body.pa-owner .owner-only.btn-pub{display:flex!important}
@@ -788,7 +805,7 @@ body.pa-owner .owner-only.btn-pub{display:flex!important}
         </div>
         <div class="stat-card" style="--accent:#3498db">
           <div class="ic"><i class="fas fa-clock"></i></div>
-          <div class="val" id="iaInterval">20</div>
+          <div class="val" id="iaInterval">5</div>
           <div class="lbl">Minutos entre Buscas</div>
         </div>
         <div class="stat-card" style="--accent:var(--y)">
@@ -805,7 +822,7 @@ body.pa-owner .owner-only.btn-pub{display:flex!important}
         <div id="pendingList">
           <div style="padding:40px;text-align:center;color:var(--dim);font-size:.82rem">
             <i class="fas fa-robot" style="font-size:2rem;margin-bottom:12px;display:block;opacity:.3"></i>
-            Nenhuma notícia pendente. A IA busca automaticamente a cada 20 minutos.
+            Nenhuma notícia pendente. A IA busca automaticamente a cada 5 minutos.
           </div>
         </div>
       </div>
@@ -1117,16 +1134,16 @@ body.pa-owner .owner-only.btn-pub{display:flex!important}
       <div class="ads-hero">
         <div>
           <h3><i class="fas fa-ad" style="color:var(--y);margin-right:8px"></i> Anuncie no Pains Acontece</h3>
-          <p>Alcance moradores de Pains e região com visibilidade no portal mais acessado do Sudoeste Mineiro. Valores atualizados para 2026.</p>
+          <p><strong>Portal novo. Visão grande.</strong> Estamos construindo o canal de referência de Pains — e os primeiros parceiros entram com preços de lançamento e destaque permanente como apoiadores fundadores.</p>
         </div>
-        <button class="tb-btn primary" onclick="showToast('Entre em contato pelo WhatsApp do portal!','info')"><i class="fab fa-whatsapp"></i> Solicitar Orçamento</button>
+        <button class="tb-btn primary" onclick="showToast('Entre em contato pelo WhatsApp do portal!','info')"><i class="fab fa-whatsapp"></i> Quero ser parceiro</button>
       </div>
       <div class="box">
         <div class="box-head">
           <h3>Tabela de Preços</h3>
-          <span class="ads-badge">Valores mensais</span>
+          <span class="ads-badge">Lançamento 2026</span>
         </div>
-        <div style="overflow-x:auto">
+        <div class="ads-table-wrap">
           <table class="ads-table">
             <thead>
               <tr><th>Posição</th><th>Descrição</th><th>Alcance</th><th>Valor</th></tr>
@@ -1134,53 +1151,53 @@ body.pa-owner .owner-only.btn-pub{display:flex!important}
             <tbody>
               <tr>
                 <td class="pos">Banner Principal</td>
-                <td class="desc">Destaque no topo da home — primeira dobra, visível em desktop e mobile</td>
-                <td>~15.000 views/mês</td>
-                <td class="price">R$ 800</td>
+                <td class="desc">Destaque no topo da home — primeira dobra, desktop e mobile</td>
+                <td>~3.000 views/mês*</td>
+                <td class="price">R$ 149</td>
               </tr>
               <tr>
                 <td class="pos">Sidebar Lateral</td>
                 <td class="desc">Bloco fixo na coluna direita em todas as páginas de notícias</td>
-                <td>~8.000 views/mês</td>
-                <td class="price">R$ 350</td>
+                <td>~1.800 views/mês*</td>
+                <td class="price">R$ 79</td>
               </tr>
               <tr>
                 <td class="pos">Destaque Editorial</td>
                 <td class="desc">Matéria patrocinada com selo "Conteúdo Patrocinado" na seção principal</td>
-                <td>~12.000 views/mês</td>
-                <td class="price">R$ 1.200</td>
+                <td>~2.500 leituras/mês*</td>
+                <td class="price">R$ 249</td>
               </tr>
               <tr>
                 <td class="pos">Ticker / Faixa</td>
                 <td class="desc">Faixa animada abaixo do menu com texto e link do anunciante</td>
-                <td>~20.000 impressões/mês</td>
-                <td class="price">R$ 450</td>
+                <td>~5.000 impressões/mês*</td>
+                <td class="price">R$ 99</td>
               </tr>
               <tr>
                 <td class="pos">Newsletter</td>
-                <td class="desc">Inclusão no boletim semanal enviado por e-mail e WhatsApp</td>
-                <td>~2.500 envios/mês</td>
-                <td class="price">R$ 200</td>
+                <td class="desc">Inclusão no boletim semanal por e-mail e WhatsApp</td>
+                <td>~800 envios/mês*</td>
+                <td class="price">R$ 59</td>
               </tr>
               <tr>
                 <td class="pos">Redes Sociais</td>
                 <td class="desc">Post patrocinado no Instagram, Facebook e WhatsApp do portal</td>
-                <td>~5.000 alcance/post</td>
-                <td class="price">R$ 150</td>
+                <td>~1.200 alcance/post*</td>
+                <td class="price">R$ 39</td>
               </tr>
-              <tr>
-                <td class="pos">Pacote Completo</td>
-                <td class="desc">Banner + Sidebar + Destaque + Redes — máxima visibilidade com 20% de desconto</td>
-                <td>Combo premium</td>
-                <td class="price">R$ 2.100</td>
+              <tr class="ads-row-featured">
+                <td class="pos">Pacote Fundador</td>
+                <td class="desc">Banner + Sidebar + Destaque + Redes — visibilidade máxima com 30% off para os primeiros 10 parceiros</td>
+                <td>Combo completo</td>
+                <td class="price">R$ 399</td>
               </tr>
             </tbody>
           </table>
         </div>
       </div>
       <div style="margin-top:16px;padding:16px 20px;background:rgba(29,122,29,.08);border:1px solid rgba(29,122,29,.2);border-radius:6px;font-size:.78rem;color:var(--dim);line-height:1.6">
-        <i class="fas fa-info-circle" style="color:var(--g3);margin-right:6px"></i>
-        Valores sujeitos a negociação para contratos trimestrais ou anuais. Materiais gráficos podem ser produzidos pela redação mediante taxa adicional.
+        <i class="fas fa-rocket" style="color:var(--g3);margin-right:6px"></i>
+        <strong style="color:var(--w)">Preços de lançamento</strong> — vagas limitadas. *Projeções com base no crescimento orgânico do portal. Parceiros fundadores mantêm condições especiais. Arte pode ser produzida pela redação.
       </div>
     </div>
 
@@ -1375,6 +1392,7 @@ body.pa-owner .owner-only.btn-pub{display:flex!important}
 <script src="../js/ai/orchestrator.js"></script>
 <script src="../js/ai/engine.js"></script>
 <script src="../js/core/api.js?v=20260705v3"></script>
+<script src="../js/ui/corner-notify.js"></script>
 <script src="../js/core/store.js"></script>
 <script src="../js/ai/assistant.js"></script>
 <script src="../js/ai/agents/rafaela.js"></script>
@@ -1648,6 +1666,12 @@ function rejectFromModal() {
   modalPendingId = null;
 }
 
+function escHtml(s) {
+  const d = document.createElement('div');
+  d.textContent = s || '';
+  return d.innerHTML;
+}
+
 async function pollPending() {
   try {
     const items = await PAAPI.getPending();
@@ -1655,8 +1679,21 @@ async function pollPending() {
     for (const item of items) {
       if (!knownPendingIds.has(item.id)) {
         knownPendingIds.add(item.id);
-        showApproveModal(item);
-        showToast('IA encontrou uma notícia — aguardando sua aprovação!', 'info', 6000);
+        if (typeof PACornerNotify !== 'undefined') {
+          PACornerNotify.show({
+            title: 'Nova notícia encontrada',
+            body: `<strong>${escHtml(item.title)}</strong><br><span style="font-size:.68rem;opacity:.75">${escHtml(item.cat)} · ${item.confidence || 0}% confiança</span>`,
+            icon: 'fa-newspaper',
+            actions: [
+              { id: 'pub', label: 'Sim, publicar', kind: 'yes', onClick: () => approvePending(item.id) },
+              { id: 'rej', label: 'Não publicar', kind: 'no', onClick: () => rejectPending(item.id) },
+              { id: 'panel', label: 'Ver painel', kind: 'no', onClick: () => { showPanel('ia', document.getElementById('sbIA')); renderPending(); } }
+            ]
+          });
+        } else {
+          showApproveModal(item);
+          showToast('IA encontrou uma notícia — aguardando sua aprovação!', 'info', 6000);
+        }
         break;
       }
     }
@@ -1664,6 +1701,34 @@ async function pollPending() {
     const panel = document.getElementById('panel-ia');
     if (panel && panel.classList.contains('active')) renderPending();
   } catch {}
+}
+
+let iaAutoScanTimer = null;
+
+function promptAdminAutoScan() {
+  if (!isOwnerUser || iaScanning) return;
+  if (typeof PACornerNotify === 'undefined') {
+    runScanNow();
+    return;
+  }
+  if (!PACornerNotify.getAutoPref()) return;
+  PACornerNotify.show({
+    title: 'Busca automática',
+    body: 'A IA pode verificar novas notícias nas fontes. Deseja buscar agora?',
+    icon: 'fa-satellite-dish',
+    actions: [
+      { id: 'yes', label: 'Sim, buscar', kind: 'yes', onClick: () => runScanNow() },
+      { id: 'no', label: 'Agora não', kind: 'no' },
+      { id: 'off', label: 'Não perguntar', kind: 'no', onClick: () => PACornerNotify.setAutoPref(false) }
+    ]
+  });
+}
+
+function startAdminAutoScan() {
+  if (!isOwnerUser) return;
+  clearInterval(iaAutoScanTimer);
+  iaAutoScanTimer = setInterval(promptAdminAutoScan, 5 * 60 * 1000);
+  setTimeout(promptAdminAutoScan, 15000);
 }
 
 /* ════ PUBLICAÇÕES DATA ════ */
@@ -2569,6 +2634,7 @@ if (artStatusEl) {
   if (isOwnerUser) {
     iaPollTimer = setInterval(pollPending, 30000);
     pollPending();
+    startAdminAutoScan();
   }
   syncCategorySelect();
   renderCategories();

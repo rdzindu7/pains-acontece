@@ -4,7 +4,7 @@ const PAAutoPublisher = (function () {
   const MAX_PUBLISH = 25;
   const MAX_PUBLISH_EMPTY = 18;
   const LS_LAST = 'pa_autopub_last';
-  const INTERVAL = 12 * 60 * 1000;
+  const INTERVAL = 5 * 60 * 1000;
 
   async function run(force) {
     let existing = [];

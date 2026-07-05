@@ -394,26 +394,114 @@
     else applyNav(currentNav);
   }
 
-  async function runBackgroundSearch() {
-    if (!isOwnerView()) return;
-    setLoading(true, 'IA buscando novas notícias…');
+  const AUTO_SCAN_MS = 5 * 60 * 1000;
+  let autoScanTimer = null;
+  let autoScanRunning = false;
+
+  async function executeBackgroundSearch(silent) {
+    if (!isOwnerView() || autoScanRunning || typeof PAAutoPublisher === 'undefined') return null;
+    autoScanRunning = true;
+    let notify = null;
+    if (!silent && typeof PACornerNotify !== 'undefined') {
+      notify = PACornerNotify.show({
+        title: 'IA buscando notícias',
+        body: 'Varredura em andamento — sem interromper sua navegação.',
+        icon: 'fa-spinner fa-spin',
+        scanning: true,
+        closable: false,
+        actions: []
+      });
+    }
     try {
-      if (typeof PAAutoPublisher !== 'undefined') {
-        const onProgress = e => {
-          const d = e.detail;
-          if (d) setLoading(true, `Verificando ${d.current}/${d.total}…`);
-        };
-        window.addEventListener('pa-deep-verify', onProgress);
-        const result = await PAAutoPublisher.run();
-        window.removeEventListener('pa-deep-verify', onProgress);
-        if (result.published > 0) {
-          await PAStore.init();
-          applyArticles(PAStore.getArticles('pub'));
-          showToast(`${result.published} notícia(s) verificada(s) publicada(s) pela IA`, 'success');
+      const onProgress = e => {
+        const d = e.detail;
+        if (d && notify) {
+          notify.update({ body: `Verificando fontes <strong>${d.current}/${d.total}</strong>…` });
         }
+      };
+      window.addEventListener('pa-deep-verify', onProgress);
+      const result = await PAAutoPublisher.run(true);
+      window.removeEventListener('pa-deep-verify', onProgress);
+      notify?.dismiss();
+      if (result?.published > 0) {
+        await PAStore.init();
+        applyArticles(PAStore.getArticles('pub'));
+        if (typeof PACornerNotify !== 'undefined') {
+          PACornerNotify.show({
+            title: 'Novas notícias publicadas',
+            body: `<strong>${result.published}</strong> matéria(s) verificada(s) e adicionada(s) ao portal.`,
+            icon: 'fa-check-circle',
+            duration: 8000,
+            actions: [{ id: 'ok', label: 'Ok', kind: 'yes' }]
+          });
+        } else {
+          showToast(`${result.published} notícia(s) publicada(s) pela IA`, 'success');
+        }
+      } else if (!silent && typeof PACornerNotify !== 'undefined') {
+        PACornerNotify.show({
+          title: 'Busca concluída',
+          body: 'Nenhuma matéria nova no momento. Próxima verificação em <strong>5 min</strong>.',
+          icon: 'fa-info-circle',
+          duration: 6000,
+          actions: [{ id: 'ok', label: 'Ok', kind: 'yes' }]
+        });
       }
-    } catch {}
-    setLoading(false, '');
+      return result;
+    } catch {
+      notify?.dismiss();
+      return null;
+    } finally {
+      autoScanRunning = false;
+    }
+  }
+
+  function promptAutoSearch() {
+    if (!isOwnerView() || autoScanRunning) return;
+    const pref = typeof PACornerNotify !== 'undefined' ? PACornerNotify.getAutoPref() : true;
+    if (!pref) return;
+
+    if (typeof PACornerNotify === 'undefined') {
+      executeBackgroundSearch(true);
+      return;
+    }
+
+    PACornerNotify.show({
+      title: 'Busca automática',
+      body: 'A IA pode verificar novas notícias de Pains e região. Deseja buscar agora?',
+      icon: 'fa-satellite-dish',
+      actions: [
+        {
+          id: 'yes',
+          label: 'Sim, buscar',
+          kind: 'yes',
+          onClick: () => executeBackgroundSearch(false)
+        },
+        {
+          id: 'no',
+          label: 'Agora não',
+          kind: 'no',
+          onClick: () => {}
+        },
+        {
+          id: 'off',
+          label: 'Não perguntar',
+          kind: 'no',
+          onClick: () => PACornerNotify.setAutoPref(false)
+        }
+      ]
+    });
+  }
+
+  function startAutoScanLoop() {
+    if (!isOwnerView()) return;
+    clearInterval(autoScanTimer);
+    autoScanTimer = setInterval(promptAutoSearch, AUTO_SCAN_MS);
+    setTimeout(promptAutoSearch, 12000);
+  }
+
+  function runBackgroundSearch() {
+    if (!isOwnerView()) return;
+    executeBackgroundSearch(false);
   }
 
   async function init() {
@@ -465,7 +553,7 @@
       }).catch(() => {});
     }
 
-    runBackgroundSearch();
+    startAutoScanLoop();
   }
 
   window.enviarPauta = async function (e) {
