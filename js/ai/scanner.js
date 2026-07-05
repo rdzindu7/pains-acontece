@@ -1,14 +1,23 @@
 const PAScanner = (function () {
   const RSS_FEEDS = [
-    { url: 'https://news.google.com/rss/search?q=Pains+Minas+Gerais&hl=pt-BR&gl=BR&ceid=BR:pt-419', region: 'Pains' },
-    { url: 'https://news.google.com/rss/search?q=Pains+MG+prefeitura&hl=pt-BR&gl=BR&ceid=BR:pt-419', region: 'Pains' },
-    { url: 'https://news.google.com/rss/search?q=Formiga+MG+regi%C3%A3o&hl=pt-BR&gl=BR&ceid=BR:pt-419', region: 'Região' },
-    { url: 'https://news.google.com/rss/search?q=Alto+S%C3%A3o+Francisco+Mineiro&hl=pt-BR&gl=BR&ceid=BR:pt-419', region: 'Região' },
-    { url: 'https://news.google.com/rss/search?q=Piumhi+OR+Dores+do+Indai%C3%A1+MG&hl=pt-BR&gl=BR&ceid=BR:pt-419', region: 'Região' },
-    { url: 'https://news.google.com/rss/search?q=Minas+Gerais+interior&hl=pt-BR&gl=BR&ceid=BR:pt-419', region: 'Brasil / Mundo' }
+    { url: 'https://news.google.com/rss/search?q=Pains+MG&hl=pt-BR&gl=BR&ceid=BR:pt-419', region: 'Pains', priority: 3 },
+    { url: 'https://news.google.com/rss/search?q=Pains+Minas+Gerais+prefeitura&hl=pt-BR&gl=BR&ceid=BR:pt-419', region: 'Pains', priority: 3 },
+    { url: 'https://news.google.com/rss/search?q=Pains+MG+not%C3%ADcias&hl=pt-BR&gl=BR&ceid=BR:pt-419', region: 'Pains', priority: 3 },
+    { url: 'https://news.google.com/rss/search?q=Formiga+MG&hl=pt-BR&gl=BR&ceid=BR:pt-419', region: 'Região', priority: 2 },
+    { url: 'https://news.google.com/rss/search?q=Piumhi+MG&hl=pt-BR&gl=BR&ceid=BR:pt-419', region: 'Região', priority: 2 },
+    { url: 'https://news.google.com/rss/search?q=Alto+S%C3%A3o+Francisco+Mineiro&hl=pt-BR&gl=BR&ceid=BR:pt-419', region: 'Região', priority: 2 },
+    { url: 'https://news.google.com/rss/search?q=Dores+do+Indai%C3%A1+MG&hl=pt-BR&gl=BR&ceid=BR:pt-419', region: 'Região', priority: 2 },
+    { url: 'https://news.google.com/rss/search?q=Minas+Gerais&hl=pt-BR&gl=BR&ceid=BR:pt-419', region: 'Brasil / Mundo', priority: 1 },
+    { url: 'https://news.google.com/rss/search?q=Brasil+not%C3%ADcias&hl=pt-BR&gl=BR&ceid=BR:pt-419', region: 'Brasil / Mundo', priority: 1 },
+    { url: 'https://news.google.com/rss/search?q=site:g1.globo.com+Brasil&hl=pt-BR&gl=BR&ceid=BR:pt-419', region: 'Brasil / Mundo', priority: 1 },
+    { url: 'https://news.google.com/rss/search?q=mundo+internacional&hl=pt-BR&gl=BR&ceid=BR:pt-419', region: 'Brasil / Mundo', priority: 1, world: true },
+    { url: 'https://news.google.com/rss/search?q=world+news&hl=en-US&gl=US&ceid=US:en', region: 'Brasil / Mundo', priority: 1, world: true },
+    { url: 'https://feeds.bbci.co.uk/portuguese/rss.xml', region: 'Brasil / Mundo', priority: 1, world: true },
+    { url: 'https://news.google.com/rss/search?q=economia+Brasil&hl=pt-BR&gl=BR&ceid=BR:pt-419', region: 'Brasil / Mundo', priority: 1 },
+    { url: 'https://news.google.com/rss/search?q=pol%C3%ADtica+Brasil&hl=pt-BR&gl=BR&ceid=BR:pt-419', region: 'Brasil / Mundo', priority: 1 }
   ];
 
-  const TRUSTED = ['gov.br', 'g1.globo.com', 'uol.com.br', 'r7.com', 'otempo.com.br', 'em.com.br', 'prefeitura', 'camara', 'pains.mg.gov.br'];
+  const TRUSTED = ['gov.br', 'g1.globo.com', 'uol.com.br', 'r7.com', 'otempo.com.br', 'em.com.br', 'prefeitura', 'camara', 'pains.mg.gov.br', 'bbc.com', 'bbc.co.uk', 'cnn.com', 'reuters.com', 'agenciabrasil', 'folha.uol', 'estadao'];
 
   const CAT_KEYWORDS = {
     'Polícia': ['policia', 'pm', 'prisao', 'assalto', 'roubo', 'crime', 'delegacia'],
@@ -27,13 +36,16 @@ const PAScanner = (function () {
     return (s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
   }
 
-  function detectCategory(title, summary) {
+  function detectCategory(title, summary, feedRegion, isWorld) {
+    if (isWorld || feedRegion === 'Brasil / Mundo') return 'Brasil / Mundo';
+    if (feedRegion && feedRegion !== 'Últimas Notícias') return feedRegion;
     const text = norm(title + ' ' + summary);
     let best = 'Últimas Notícias', score = 0;
     for (const [cat, keys] of Object.entries(CAT_KEYWORDS)) {
       const s = keys.filter(k => text.includes(k)).length;
       if (s > score) { score = s; best = cat; }
     }
+    if (text.includes('pains')) return 'Pains';
     return best;
   }
 
@@ -73,48 +85,76 @@ const PAScanner = (function () {
       'Agenda': 'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=800&q=80',
       'Empregos': 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=800&q=80',
       'Pains': 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&q=80',
-      'Região': 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=800&q=80'
+      'Região': 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=800&q=80',
+      'Brasil / Mundo': 'https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?w=800&q=80'
     };
     return imgs[cat] || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&q=80';
   }
 
+  function stripHtml(raw) {
+    if (!raw) return '';
+    return raw
+      .replace(/<!\[CDATA\[/g, '').replace(/\]\]>/g, '')
+      .replace(/<[^>]+>/g, ' ')
+      .replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&')
+      .replace(/&nbsp;/g, ' ').replace(/&quot;/g, '"')
+      .replace(/\s+/g, ' ').trim();
+  }
+
   function buildContent(title, summary, source, link) {
-    const clean = (summary || '').replace(/<[^>]+>/g, '').trim();
+    const clean = stripHtml(summary);
     let html = clean ? `<p>${clean}</p>` : '';
     html += `<p><strong>${title}</strong> — informação levantada pela redação do Pains Acontece com base em fontes públicas da região.</p>`;
     if (link) html += `<p>Fonte: <em>${source}</em>. <a href="${link}" target="_blank" rel="noopener">Leia na fonte original</a>.</p>`;
     return html;
   }
 
+  async function fetchXml(url) {
+    const attempts = [
+      url,
+      'https://api.codetabs.com/v1/proxy?quest=' + encodeURIComponent(url),
+      'https://corsproxy.io/?' + encodeURIComponent(url),
+      'https://api.allorigins.win/raw?url=' + encodeURIComponent(url)
+    ];
+    for (const u of attempts) {
+      try {
+        const res = await fetch(u, { signal: AbortSignal.timeout(18000) });
+        const text = await res.text();
+        if (text && text.includes('<item') && !text.includes('<html')) return text;
+      } catch {}
+    }
+    return null;
+  }
+
+  function parseRssXml(xml, cfg) {
+    const doc = new DOMParser().parseFromString(xml, 'text/xml');
+    return [...doc.querySelectorAll('item')].map(item => {
+      const link = item.querySelector('link')?.textContent?.trim() || '';
+      const title = (item.querySelector('title')?.textContent || '').replace(/ - .+$/, '').trim();
+      const summary = item.querySelector('description')?.textContent || '';
+      const pub = item.querySelector('pubDate')?.textContent;
+      return { title, summary, link, pubDate: pub ? new Date(pub) : new Date(), region: cfg.region, source: extractSource(link) };
+    }).filter(i => i.title && i.link);
+  }
+
   async function fetchFeed(cfg) {
     try {
-      const proxy = 'https://api.allorigins.win/raw?url=' + encodeURIComponent(cfg.url);
-      const res = await fetch(proxy, { signal: AbortSignal.timeout(15000) });
-      const xml = await res.text();
-      const doc = new DOMParser().parseFromString(xml, 'text/xml');
-      return [...doc.querySelectorAll('item')].map(item => {
-        const link = item.querySelector('link')?.textContent?.trim() || '';
-        const title = (item.querySelector('title')?.textContent || '').replace(/ - .+$/, '').trim();
-        const summary = item.querySelector('description')?.textContent || '';
-        const pub = item.querySelector('pubDate')?.textContent;
-        return { title, summary, link, pubDate: pub ? new Date(pub) : new Date(), region: cfg.region, source: extractSource(link) };
-      }).filter(i => i.title && i.link);
+      const xml = await fetchXml(cfg.url);
+      if (!xml) return [];
+      return parseRssXml(xml, cfg);
     } catch { return []; }
   }
 
-  async function scanNews(seenUrls = []) {
-    const results = await Promise.all(RSS_FEEDS.map(fetchFeed));
-    const all = results.flat();
-    const seen = new Set(seenUrls);
+  function processItems(all, seen, limit) {
     const items = [];
-
-    for (const item of all) {
+    const sorted = [...all].sort((a, b) => (b.feedPriority || 0) - (a.feedPriority || 0) || b.pubDate - a.pubDate);
+    for (const item of sorted) {
       if (seen.has(item.link)) continue;
       const confidence = calcConfidence(item, all);
-      const cat = detectCategory(item.title, item.summary);
+      const cat = detectCategory(item.title, item.summary, item.region, item.world);
       items.push({
         title: item.title,
-        lead: (item.summary || '').replace(/<[^>]+>/g, '').slice(0, 200),
+        lead: stripHtml(item.summary).slice(0, 220),
         content: buildContent(item.title, item.summary, item.source, item.link),
         cat, img: pickImage(cat), author: 'IA Pains Acontece',
         date: item.pubDate.toLocaleDateString('pt-BR'),
@@ -123,9 +163,32 @@ const PAScanner = (function () {
         verified: confidence >= 65, confidence, status: 'pending'
       });
       seen.add(item.link);
+      if (limit && items.length >= limit) break;
     }
     items.sort((a, b) => b.confidence - a.confidence);
+    return items;
+  }
+
+  async function fetchAllFeeds() {
+    const results = await Promise.all(RSS_FEEDS.map(async cfg => {
+      const items = await fetchFeed(cfg);
+      return items.map(i => ({ ...i, feedPriority: cfg.priority || 0, world: !!cfg.world }));
+    }));
+    return results.flat();
+  }
+
+  async function scanNews(seenUrls = []) {
+    const all = await fetchAllFeeds();
+    const seen = new Set(seenUrls);
+    const items = processItems(all, seen, null);
     return { items, seenUrls: [...seen] };
+  }
+
+  async function scanNewsFull(seenUrls = []) {
+    const all = await fetchAllFeeds();
+    const seen = new Set(seenUrls);
+    const items = processItems(all, seen, null);
+    return { items, seenUrls: [...seen], total: all.length };
   }
 
   async function verifyText(text) {
@@ -148,5 +211,5 @@ const PAScanner = (function () {
     };
   }
 
-  return { scanNews, verifyText, detectCategory, pickImage, formatDate };
+  return { scanNews, scanNewsFull, verifyText, detectCategory, pickImage, formatDate, RSS_FEEDS };
 })();

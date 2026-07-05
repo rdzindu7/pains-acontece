@@ -205,10 +205,12 @@ body::before {
   border-bottom: 1px solid rgba(29,122,29,.2);
   position: relative;
   display: flex; flex-wrap: wrap; align-items: center;
+  justify-content: center;
 }
 .nav-inner {
   max-width: var(--container-max); margin: 0 auto;
-  display: flex; align-items: center; flex: 1 1 auto;
+  display: flex; align-items: center; justify-content: center;
+  flex: 1 1 auto; gap: 2px;
   padding: 0 var(--pad-x);
   overflow-x: auto; scrollbar-width: none;
   -webkit-overflow-scrolling: touch;
@@ -219,13 +221,15 @@ body::before {
   display: flex; align-items: center;
 }
 .nav-item a {
-  display: block; padding: 10px 13px;
-  font-size: .68rem; font-weight: 700;
-  letter-spacing: 1.2px; text-transform: uppercase;
+  display: flex; align-items: center; justify-content: center;
+  padding: 11px 12px; min-height: 40px;
+  font-size: .67rem; font-weight: 700;
+  letter-spacing: 1.1px; text-transform: uppercase;
   color: rgba(255,255,255,.65);
   white-space: nowrap;
-  transition: color .2s;
+  transition: color .25s var(--ease), background .25s;
 }
+.nav-item a:hover { background: rgba(0,0,0,.12); }
 .nav-item a::after {
   content: '';
   position: absolute; bottom: 0; left: 13px; right: 13px;
@@ -468,6 +472,87 @@ body.cat-filter-mode .category-view { display: block; }
 .reveal-delay-3 { transition-delay: .3s; }
 .reveal-delay-4 { transition-delay: .4s; }
 .reveal-delay-5 { transition-delay: .5s; }
+
+/* ── ANIMAÇÕES UTILITÁRIAS ── */
+@keyframes animFadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+@keyframes animFloat { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+@keyframes sectionPulse { 0%, 100% { box-shadow: 0 0 0 0 rgba(29,122,29,0); } 50% { box-shadow: 0 0 0 4px rgba(29,122,29,.25); } }
+.anim-fade { animation: animFadeIn .6s var(--ease) both; }
+.anim-float { animation: animFloat 3s ease-in-out infinite; }
+.section-highlight { animation: sectionPulse 1.2s ease 2; border-radius: 4px; }
+
+/* ── TOAST ── */
+.pa-toast-wrap {
+  position: fixed; top: calc(78px + env(safe-area-inset-top)); right: 20px;
+  z-index: 10001; display: flex; flex-direction: column; gap: 8px;
+  pointer-events: none; max-width: min(360px, calc(100vw - 40px));
+}
+.pa-toast {
+  padding: 14px 18px; border-radius: 4px;
+  background: rgba(13,77,13,.95); border: 1px solid rgba(46,204,46,.35);
+  color: #fff; font-size: .82rem; line-height: 1.45;
+  box-shadow: 0 12px 40px rgba(0,0,0,.5);
+  transform: translateX(120%); opacity: 0;
+  transition: transform .4s var(--ease), opacity .4s;
+  pointer-events: all; display: flex; align-items: flex-start; gap: 10px;
+}
+.pa-toast.show { transform: none; opacity: 1; }
+.pa-toast.error { background: rgba(120,30,30,.95); border-color: rgba(200,60,60,.4); }
+.pa-toast i { color: var(--y); margin-top: 2px; flex-shrink: 0; }
+
+/* ── CLIMA SEÇÃO COMPLETA ── */
+.clima-section { background: linear-gradient(180deg, rgba(13,77,13,.08), transparent); }
+.clima-full-wrap {
+  background: rgba(255,255,255,.03); border: 1px solid rgba(255,255,255,.06);
+  border-radius: 4px; padding: clamp(20px, 4vw, 32px);
+}
+.clima-full-grid .clima-temp-big { font-size: clamp(3rem, 8vw, 4.5rem); }
+
+/* ── TELEFONES ── */
+.phone-search {
+  max-width: 400px; margin-bottom: 20px; position: relative;
+}
+.phone-search input {
+  width: 100%; background: rgba(255,255,255,.05);
+  border: 1px solid rgba(255,255,255,.08); border-radius: 40px;
+  padding: 11px 44px 11px 18px; color: #fff; font-size: .82rem;
+  font-family: var(--ff-body); outline: none;
+  transition: border-color .3s, box-shadow .3s;
+}
+.phone-search input:focus { border-color: var(--g); box-shadow: 0 0 0 3px rgba(29,122,29,.2); }
+.phone-search i { position: absolute; right: 16px; top: 50%; transform: translateY(-50%); color: var(--dim); }
+.ph-item a.ph-num { transition: color .2s, transform .2s; }
+.ph-item:hover a.ph-num { color: var(--y); transform: scale(1.02); }
+.ph-item.hidden { display: none; }
+
+/* ── BREAKING LINKS ── */
+.breaking-items .breaking-item {
+  font-size: .78rem; font-weight: 500; color: rgba(255,255,255,.75);
+  display: flex; align-items: center; gap: 10px;
+  white-space: nowrap; padding: 11px 16px 11px 0;
+  cursor: pointer; transition: color .2s; text-decoration: none;
+  border-right: 1px solid rgba(255,255,255,.06); margin-right: 16px;
+}
+.breaking-items .breaking-item:hover { color: var(--y); }
+.breaking-items .breaking-item::before {
+  content: ''; width: 6px; height: 6px; border-radius: 50%;
+  background: var(--g3); flex-shrink: 0;
+}
+
+/* ── PAUTA ── */
+.pauta-section .pauta-icon-wrap { animation: animFloat 4s ease-in-out infinite; }
+.pauta-form .btn-pauta.loading { opacity: .7; pointer-events: none; }
+.pauta-form .btn-pauta.success { background: linear-gradient(135deg, #1a6b1a, #0d4d0d); }
+
+/* ── LOADING OVERLAY ── */
+.pa-loading-bar {
+  position: fixed; top: 0; left: 0; right: 0; height: 3px; z-index: 10002;
+  background: linear-gradient(90deg, var(--g), var(--y), var(--g));
+  background-size: 200% 100%; animation: loadingBar 1.2s linear infinite;
+  opacity: 0; transition: opacity .3s; pointer-events: none;
+}
+.pa-loading-bar.active { opacity: 1; }
+@keyframes loadingBar { from { background-position: 200% 0; } to { background-position: -200% 0; } }
 
 /* ═══════════════════════════════════════════
    BREAKING STRIP
@@ -786,8 +871,10 @@ body.cat-filter-mode .category-view { display: block; }
 .ph-item {
   display: flex; align-items: center; justify-content: space-between;
   padding: 13px 18px; background: var(--k3);
-  transition: background .2s; cursor: pointer;
+  transition: background .2s, transform .2s var(--ease); cursor: pointer;
+  text-decoration: none; color: inherit;
 }
+.ph-item:active { transform: scale(.98); }
 .ph-item:hover { background: var(--k4); }
 .ph-name { display: flex; align-items: center; gap: 10px; font-size: .8rem; font-weight: 600; color: var(--w); }
 .ph-name i { color: var(--y); width: 14px; text-align: center; font-size: .75rem; }
@@ -1011,6 +1098,8 @@ body.cat-filter-mode .category-view { display: block; }
 </style>
 </head>
 <body>
+<div class="pa-loading-bar" id="paLoadingBar"></div>
+<div class="pa-toast-wrap" id="paToastWrap"></div>
 <div class="cursor-glow" id="cursorGlow"></div>
 <!-- TICKER -->
 <div class="ticker">
@@ -1179,30 +1268,10 @@ body.cat-filter-mode .category-view { display: block; }
     <aside class="sidebar" id="clima">
 
       <!-- CLIMA -->
-      <div class="widget reveal">
+      <div class="widget reveal" id="clima">
         <div class="wid-head"><i class="fas fa-cloud-sun"></i><h3>Clima em Pains</h3></div>
-        <div class="wid-body">
-          <div class="clima-top">
-            <div>
-              <div class="clima-city">Pains, MG</div>
-              <div class="clima-temp-big">22°C</div>
-              <div class="clima-desc">Parcialmente nublado</div>
-            </div>
-            <div class="clima-icon-big">⛅</div>
-          </div>
-          <div class="clima-grid">
-            <div class="clima-cell"><span>Sensação</span><strong>20°C</strong></div>
-            <div class="clima-cell"><span>Umidade</span><strong>68%</strong></div>
-            <div class="clima-cell"><span>Vento</span><strong>14 km/h</strong></div>
-            <div class="clima-cell"><span>Máx / Mín</span><strong>26° / 16°</strong></div>
-          </div>
-          <div class="clima-forecast">
-            <div class="fc-day"><div class="d">Sex</div><div class="ic">🌧️</div><div class="t">19°</div></div>
-            <div class="fc-day"><div class="d">Sáb</div><div class="ic">☀️</div><div class="t">25°</div></div>
-            <div class="fc-day"><div class="d">Dom</div><div class="ic">⛅</div><div class="t">23°</div></div>
-            <div class="fc-day"><div class="d">Seg</div><div class="ic">🌦️</div><div class="t">21°</div></div>
-            <div class="fc-day"><div class="d">Ter</div><div class="ic">☀️</div><div class="t">26°</div></div>
-          </div>
+        <div class="wid-body" id="climaWidgetBody">
+          <p style="color:var(--dim);font-size:.82rem"><i class="fas fa-spinner fa-spin"></i> Carregando previsão…</p>
         </div>
       </div>
 
@@ -1310,19 +1379,35 @@ body.cat-filter-mode .category-view { display: block; }
     <h2>Telefones Úteis</h2>
     <div class="rule"></div>
   </div>
-  <div class="phone-grid reveal">
-    <div class="ph-item"><div class="ph-name"><i class="fas fa-landmark"></i>Prefeitura Municipal</div><div class="ph-num">(37) 3384-1212</div></div>
-    <div class="ph-item"><div class="ph-name"><i class="fas fa-microphone-alt"></i>Câmara Municipal</div><div class="ph-num">(37) 3384-1400</div></div>
-    <div class="ph-item"><div class="ph-name"><i class="fas fa-hospital"></i>Santa Casa de Pains</div><div class="ph-num">(37) 3384-1350</div></div>
-    <div class="ph-item"><div class="ph-name"><i class="fas fa-ambulance"></i>SAMU</div><div class="ph-num">192</div></div>
-    <div class="ph-item"><div class="ph-name"><i class="fas fa-fire-extinguisher"></i>Corpo de Bombeiros</div><div class="ph-num">193</div></div>
-    <div class="ph-item"><div class="ph-name"><i class="fas fa-shield-alt"></i>Polícia Militar</div><div class="ph-num">190</div></div>
-    <div class="ph-item"><div class="ph-name"><i class="fas fa-user-secret"></i>Polícia Civil</div><div class="ph-num">197</div></div>
-    <div class="ph-item"><div class="ph-name"><i class="fas fa-bolt"></i>CEMIG – Emergências</div><div class="ph-num">116</div></div>
-    <div class="ph-item"><div class="ph-name"><i class="fas fa-tint"></i>COPASA – Água</div><div class="ph-num">115</div></div>
-    <div class="ph-item"><div class="ph-name"><i class="fas fa-graduation-cap"></i>Sec. de Educação</div><div class="ph-num">(37) 3384-1230</div></div>
-    <div class="ph-item"><div class="ph-name"><i class="fas fa-leaf"></i>Defesa Civil</div><div class="ph-num">199</div></div>
-    <div class="ph-item"><div class="ph-name"><i class="fas fa-balance-scale"></i>OAB – Jurídico</div><div class="ph-num">(37) 3384-2200</div></div>
+  <div class="phone-search reveal">
+    <input type="search" id="phoneSearch" placeholder="Buscar telefone ou serviço…" aria-label="Buscar telefone"/>
+    <i class="fas fa-search"></i>
+  </div>
+  <div class="phone-grid reveal" id="phoneGrid">
+    <a href="tel:+553733841212" class="ph-item" data-name="prefeitura municipal"><div class="ph-name"><i class="fas fa-landmark"></i>Prefeitura Municipal</div><span class="ph-num">(37) 3384-1212</span></a>
+    <a href="tel:+553733841400" class="ph-item" data-name="câmara municipal"><div class="ph-name"><i class="fas fa-microphone-alt"></i>Câmara Municipal</div><span class="ph-num">(37) 3384-1400</span></a>
+    <a href="tel:+553733841350" class="ph-item" data-name="santa casa hospital"><div class="ph-name"><i class="fas fa-hospital"></i>Santa Casa de Pains</div><span class="ph-num">(37) 3384-1350</span></a>
+    <a href="tel:192" class="ph-item" data-name="samu emergência"><div class="ph-name"><i class="fas fa-ambulance"></i>SAMU</div><span class="ph-num">192</span></a>
+    <a href="tel:193" class="ph-item" data-name="bombeiros"><div class="ph-name"><i class="fas fa-fire-extinguisher"></i>Corpo de Bombeiros</div><span class="ph-num">193</span></a>
+    <a href="tel:190" class="ph-item" data-name="polícia militar pm"><div class="ph-name"><i class="fas fa-shield-alt"></i>Polícia Militar</div><span class="ph-num">190</span></a>
+    <a href="tel:197" class="ph-item" data-name="polícia civil"><div class="ph-name"><i class="fas fa-user-secret"></i>Polícia Civil</div><span class="ph-num">197</span></a>
+    <a href="tel:116" class="ph-item" data-name="cemig energia"><div class="ph-name"><i class="fas fa-bolt"></i>CEMIG – Emergências</div><span class="ph-num">116</span></a>
+    <a href="tel:115" class="ph-item" data-name="copasa água"><div class="ph-name"><i class="fas fa-tint"></i>COPASA – Água</div><span class="ph-num">115</span></a>
+    <a href="tel:+553733841230" class="ph-item" data-name="educação secretaria"><div class="ph-name"><i class="fas fa-graduation-cap"></i>Sec. de Educação</div><span class="ph-num">(37) 3384-1230</span></a>
+    <a href="tel:199" class="ph-item" data-name="defesa civil"><div class="ph-name"><i class="fas fa-leaf"></i>Defesa Civil</div><span class="ph-num">199</span></a>
+    <a href="tel:+553733842200" class="ph-item" data-name="oab jurídico"><div class="ph-name"><i class="fas fa-balance-scale"></i>OAB – Jurídico</div><span class="ph-num">(37) 3384-2200</span></a>
+  </div>
+</section>
+
+<!-- CLIMA COMPLETO -->
+<section class="section clima-section wrap" style="padding-top:0;" id="clima-section">
+  <div class="sec-head reveal">
+    <div class="line-v" style="background:linear-gradient(180deg,#5dade2,#1a5276)"></div>
+    <h2>Previsão do Tempo</h2>
+    <div class="rule"></div>
+  </div>
+  <div class="clima-full-wrap reveal" id="climaFullBody">
+    <p style="color:var(--dim);font-size:.82rem;text-align:center"><i class="fas fa-spinner fa-spin"></i> Consultando Open-Meteo para Pains, MG…</p>
   </div>
 </section>
 <!-- REGIÃO -->
@@ -1467,6 +1552,9 @@ document.querySelectorAll('.ncard, .ncard-xl, .srv-card').forEach(card => {
 <script src="js/ai/engine.js"></script>
 <script src="js/core/api.js"></script>
 <script src="js/core/store.js"></script>
+<script src="js/ai/autopublisher.js"></script>
+<script src="js/pages/weather.js"></script>
+<script src="js/ai/public-assistant.js"></script>
 <script src="js/pages/home.js"></script>
 </body>
 </html>

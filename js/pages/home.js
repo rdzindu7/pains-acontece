@@ -8,12 +8,12 @@
     policia:     { type: 'news', title: 'Polícia', cats: ['Polícia'] },
     politica:    { type: 'news', title: 'Política', cats: ['Política'] },
     saude:       { type: 'news', title: 'Saúde', cats: ['Saúde'] },
-    agenda:      { type: 'news', title: 'Agenda', cats: ['Agenda'] },
-    empregos:    { type: 'news', title: 'Empregos', cats: ['Empregos'] },
-    restaurantes:{ type: 'news', title: 'Restaurantes & Gastronomia', cats: ['Gastronomia'] },
-    telefones:   { type: 'scroll', target: '#telefones' },
-    clima:       { type: 'scroll', target: '#clima' },
-    contato:     { type: 'scroll', target: '#contato' }
+    agenda:      { type: 'scroll', target: '#agenda' },
+    empregos:    { type: 'scroll', target: '#empregos' },
+    restaurantes:{ type: 'scroll', target: '#restaurantes' },
+    telefones:   { type: 'scroll', target: '#telefones', highlight: true },
+    clima:       { type: 'scroll', target: '#clima-section', highlight: true },
+    contato:     { type: 'scroll', target: '#contato', highlight: true }
   };
 
   let allPub = [];
@@ -25,6 +25,24 @@
     return d.innerHTML;
   }
 
+  function showToast(msg, type) {
+    const wrap = document.getElementById('paToastWrap');
+    if (!wrap) return;
+    const t = document.createElement('div');
+    t.className = 'pa-toast' + (type === 'error' ? ' error' : '');
+    t.innerHTML = `<i class="fas fa-${type === 'error' ? 'exclamation-circle' : 'check-circle'}"></i><span>${esc(msg)}</span>`;
+    wrap.appendChild(t);
+    requestAnimationFrame(() => t.classList.add('show'));
+    setTimeout(() => {
+      t.classList.remove('show');
+      setTimeout(() => t.remove(), 400);
+    }, 4500);
+  }
+
+  function setLoading(on) {
+    document.getElementById('paLoadingBar')?.classList.toggle('active', !!on);
+  }
+
   function card(a, size) {
     const href = 'pages/noticia.html?id=' + a.id;
     if (size === 'xl') {
@@ -32,7 +50,7 @@
         <img src="${esc(a.img)}" alt="" loading="lazy"/>
         <div class="xl-grad"></div>
         <div class="xl-body">
-          <div class="xl-cat">${esc(a.cat)}</div>
+          <div class="xl-cat">${esc(a.cat)}${a.verified ? ' <i class="fas fa-check-circle" style="font-size:.55rem;color:#2ecc2e" title="Verificado"></i>' : ''}</div>
           <h3 class="xl-title">${esc(a.title)}</h3>
           <div class="xl-meta"><span><i class="fas fa-clock"></i> ${esc(a.timeAgo || a.date)}</span><span><i class="fas fa-eye"></i> ${Number(a.views||0).toLocaleString('pt-BR')}</span></div>
         </div>
@@ -48,17 +66,17 @@
   }
 
   function listRow(a) {
-    return `<a href="pages/noticia.html?id=${a.id}" class="list-row reveal" style="display:flex;gap:16px;padding:16px 0;border-bottom:1px solid rgba(255,255,255,.04);align-items:flex-start;transition:background .2s">
-      <img src="${esc(a.img)}" alt="" style="width:100px;height:72px;object-fit:cover;border-radius:3px;flex-shrink:0"/>
-      <div style="flex:1;min-width:0">
-        <div style="font-size:.62rem;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--g3);margin-bottom:4px">${esc(a.cat)}</div>
-        <div style="font-size:.88rem;font-weight:600;line-height:1.4;color:var(--w)">${esc(a.title)}</div>
-        <div style="font-size:.7rem;color:var(--dim);margin-top:6px"><i class="fas fa-clock"></i> ${esc(a.timeAgo || a.date)}</div>
+    return `<a href="pages/noticia.html?id=${a.id}" class="nlist-item reveal">
+      <div class="t"><img src="${esc(a.img)}" alt="" loading="lazy"/></div>
+      <div class="inf">
+        <div class="tag">${esc(a.cat)}${a.verified ? ' ✓' : ''}</div>
+        <div class="ttl">${esc(a.title)}</div>
+        <div class="time"><i class="fas fa-clock"></i> ${esc(a.timeAgo || a.date)}</div>
       </div>
     </a>`;
   }
 
-  const emptyMsg = '<p style="color:var(--dim);font-size:.82rem;padding:20px 0">Nenhuma notícia nesta seção.</p>';
+  const emptyMsg = '<p style="color:var(--dim);font-size:.82rem;padding:20px 0">Nenhuma notícia nesta seção. A IA está buscando fatos verificados…</p>';
 
   function filterByCats(arts, cats) {
     if (!cats) return arts;
@@ -74,11 +92,11 @@
         <div class="hero-text">
           <div class="hero-eyebrow">
             <span class="dot"></span>
-            <span class="label">Pains Acontece</span>
+            <span class="label">IA Ativa</span>
           </div>
-          <h1 class="hero-title">Seu portal de notícias está <em>pronto</em></h1>
-          <p class="hero-lead">Publique a primeira matéria pelo painel administrativo e ela aparecerá aqui automaticamente.</p>
-          <a href="pages/login.html" class="btn-hero">Acessar painel <i class="fas fa-arrow-right arr"></i></a>
+          <h1 class="hero-title">Buscando notícias <em>verificadas</em> de Pains</h1>
+          <p class="hero-lead">Nossa IA editorial está varrendo fontes de Pains MG, região, Brasil e mundo. As matérias aparecem aqui automaticamente.</p>
+          <button type="button" class="btn-hero" onclick="PAPublicIA.runSearch()">Buscar agora <i class="fas fa-rss arr"></i></button>
         </div>`;
       return;
     }
@@ -96,6 +114,7 @@
           <span><i class="fas fa-user-circle"></i> ${esc(hero.author || 'Redação')}</span>
           <span><i class="fas fa-calendar"></i> ${esc(hero.date)}</span>
           <span><i class="fas fa-eye"></i> ${Number(hero.views||0).toLocaleString('pt-BR')} leituras</span>
+          ${hero.verified ? '<span><i class="fas fa-check-circle"></i> Verificado pela IA</span>' : ''}
         </div>
         <a href="pages/noticia.html?id=${hero.id}" class="btn-hero">Ler matéria completa <i class="fas fa-arrow-right arr"></i></a>
       </div>
@@ -109,18 +128,18 @@
   function renderTicker(arts) {
     const el = document.getElementById('tickerDynamic');
     if (!el) return;
-    const items = arts.slice(0, 8);
+    const items = arts.slice(0, 10);
     el.innerHTML = items.length
       ? items.map(a => `<span>${esc(a.title)}</span>`).join('')
-      : '<span>Pains Acontece — notícias em tempo real da região</span>';
+      : '<span>Pains Acontece — IA buscando notícias em tempo real</span>';
   }
 
   function renderBreaking(arts) {
     const el = document.getElementById('breakingDynamic');
     if (!el) return;
-    el.innerHTML = arts.slice(1, 5).map(a =>
+    el.innerHTML = arts.slice(1, 6).map(a =>
       `<a href="pages/noticia.html?id=${a.id}" class="breaking-item">${esc(a.title)}</a>`
-    ).join('');
+    ).join('') || '<span class="breaking-item" style="cursor:default;opacity:.5">Aguardando destaques…</span>';
   }
 
   function renderSection(id, arts, mode) {
@@ -142,8 +161,8 @@
     if (titleEl) titleEl.textContent = title;
     if (countEl) {
       countEl.textContent = arts.length
-        ? `${arts.length} notícia${arts.length > 1 ? 's' : ''} encontrada${arts.length > 1 ? 's' : ''}`
-        : 'Nenhuma notícia publicada nesta categoria ainda';
+        ? `${arts.length} notícia${arts.length > 1 ? 's' : ''} verificada${arts.length > 1 ? 's' : ''}`
+        : 'A IA está buscando matérias nesta categoria…';
     }
     if (viewEl) viewEl.setAttribute('aria-hidden', 'false');
 
@@ -152,8 +171,9 @@
     if (!arts.length) {
       featEl.innerHTML = '';
       gridEl.innerHTML = `<div style="grid-column:1/-1;padding:40px 0;text-align:center;color:var(--dim)">
-        <i class="fas fa-newspaper" style="font-size:2rem;opacity:.3;margin-bottom:12px;display:block"></i>
-        Nenhuma notícia nesta categoria.<br><span style="font-size:.78rem;margin-top:8px;display:inline-block">Publique pelo painel admin com a categoria <strong>${esc(title)}</strong>.</span>
+        <i class="fas fa-satellite-dish" style="font-size:2rem;opacity:.3;margin-bottom:12px;display:block"></i>
+        Nenhuma notícia nesta categoria ainda.<br>
+        <button type="button" onclick="PAPublicIA.runSearch()" style="margin-top:16px;padding:10px 20px;background:var(--g);border:none;color:#fff;border-radius:3px;cursor:pointer;font-size:.75rem;font-weight:700">Buscar com IA</button>
       </div>`;
       return;
     }
@@ -170,9 +190,9 @@
     if (!el) return;
     if (!jobs.length) { el.innerHTML = emptyMsg; return; }
     el.innerHTML = jobs.map(j => `
-      <div class="job-item" style="padding:12px 0;border-bottom:1px solid rgba(255,255,255,.04)">
-        <div style="font-size:.82rem;font-weight:600">${esc(j.title)}</div>
-        <div style="font-size:.68rem;color:var(--dim);margin-top:3px">${esc(j.type)} · ${esc(j.company)}</div>
+      <div class="job-item">
+        <div class="job-ttl">${esc(j.title)}</div>
+        <div class="job-co"><i class="fas fa-building"></i> ${esc(j.company)} · ${esc(j.type)}</div>
       </div>`).join('');
   }
 
@@ -181,14 +201,14 @@
     if (!el) return;
     if (!events.length) { el.innerHTML = emptyMsg; return; }
     el.innerHTML = events.map(e => `
-      <div class="ag-item" style="display:flex;gap:12px;padding:12px 0;border-bottom:1px solid rgba(255,255,255,.04)">
-        <div style="background:rgba(29,122,29,.15);border-radius:4px;padding:8px 10px;text-align:center;flex-shrink:0;min-width:52px">
-          <div style="font-family:var(--ff-display);font-size:.9rem;color:var(--y)">${esc(e.date?.split(' ')[0] || '')}</div>
-          <div style="font-size:.6rem;color:var(--dim)">${esc(e.date?.split(' ')[1] || '')}</div>
+      <div class="ag-item">
+        <div class="ag-date">
+          <div class="dd">${esc(e.date?.split(' ')[0] || '')}</div>
+          <div class="mm">${esc(e.date?.split(' ')[1] || '')}</div>
         </div>
-        <div>
-          <div style="font-size:.8rem;font-weight:600">${esc(e.title)}</div>
-          <div style="font-size:.68rem;color:var(--dim);margin-top:3px">${esc(e.time)} · ${esc(e.place)}</div>
+        <div class="ag-info">
+          <div class="ev-t">${esc(e.title)}</div>
+          <div class="ev-l"><i class="fas fa-map-marker-alt"></i> ${esc(e.place)} · ${esc(e.time)}</div>
         </div>
       </div>`).join('');
   }
@@ -209,10 +229,38 @@
       if (pf) pf.innerHTML = emptyMsg;
       if (pl) pl.innerHTML = '';
     }
-    renderSection('politicaList', byCat('Política', 4), 'list');
+    renderSection('politicaList', byCat('Política', 5), 'list');
     renderSection('saudeGrid', byCat('Saúde', 3), 'grid');
-    renderSection('brasilList', byCat('Brasil / Mundo', 4), 'list');
+    renderSection('brasilList', byCat('Brasil / Mundo', 10), 'list');
     renderSection('regiaoGrid', byCat('Região', 6), 'grid');
+    observeReveals();
+  }
+
+  function observeReveals() {
+    const obs = new IntersectionObserver(entries => {
+      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
+    }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
+    document.querySelectorAll('.reveal:not(.visible)').forEach(el => obs.observe(el));
+  }
+
+  function setupPhoneSearch() {
+    const input = document.getElementById('phoneSearch');
+    const items = document.querySelectorAll('#phoneGrid .ph-item');
+    if (!input || !items.length) return;
+    input.addEventListener('input', function () {
+      const q = this.value.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+      items.forEach(el => {
+        const name = (el.dataset.name || el.textContent || '').toLowerCase();
+        el.classList.toggle('hidden', q.length > 0 && !name.includes(q));
+      });
+    });
+  }
+
+  function highlightSection(selector) {
+    const el = document.querySelector(selector);
+    if (!el) return;
+    el.classList.add('section-highlight');
+    setTimeout(() => el.classList.remove('section-highlight'), 2400);
   }
 
   function setActiveNav(navKey) {
@@ -246,7 +294,12 @@
       if (viewEl) viewEl.setAttribute('aria-hidden', 'true');
       renderHome();
       const el = document.querySelector(cfg.target);
-      if (el) setTimeout(() => el.scrollIntoView({ behavior: 'smooth', block: 'start' }), 80);
+      if (el) {
+        setTimeout(() => {
+          el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          if (cfg.highlight) highlightSection(cfg.target);
+        }, 80);
+      }
       return;
     }
 
@@ -279,11 +332,33 @@
     }
   }
 
+  window.PAHomeRefresh = function () {
+    allPub = PAStore.getArticles('pub');
+    if (currentNav === 'home') renderHome();
+    else applyNav(currentNav);
+  };
+
   async function init() {
+    setLoading(true);
+    try {
+      if (typeof PAAutoPublisher !== 'undefined') {
+        const result = await PAAutoPublisher.run();
+        if (result.published > 0) {
+          showToast(`${result.published} notícia(s) verificada(s) publicada(s) pela IA`, 'success');
+        }
+      }
+    } catch {}
+
     await PAStore.init();
     allPub = PAStore.getArticles('pub');
     renderHome();
     setupNav();
+    setupPhoneSearch();
+    observeReveals();
+
+    if (typeof PAWeather !== 'undefined') {
+      PAWeather.renderAll().catch(() => {});
+    }
 
     try {
       const [jobs, events] = await Promise.all([PAAPI.getJobs(), PAAPI.getEvents()]);
@@ -296,32 +371,51 @@
 
     const search = document.getElementById('siteSearch');
     if (search) {
-      search.addEventListener('input', function () {
-        const q = this.value.toLowerCase();
+      search.addEventListener('keydown', function (e) {
+        if (e.key !== 'Enter') return;
+        const q = this.value.toLowerCase().trim();
         if (!q) return;
-        const match = allPub.find(a => a.title.toLowerCase().includes(q) || a.cat.toLowerCase().includes(q));
-        if (match) location.href = 'pages/noticia.html?id=' + match.id;
+        const matches = allPub.filter(a =>
+          a.title.toLowerCase().includes(q) || a.cat.toLowerCase().includes(q) || (a.lead || '').toLowerCase().includes(q)
+        );
+        if (matches.length === 1) {
+          location.href = 'pages/noticia.html?id=' + matches[0].id;
+        } else if (matches.length > 1) {
+          applyNav('ultimas');
+          showToast(`${matches.length} resultados para "${this.value}"`, 'success');
+        } else {
+          showToast('Nenhuma notícia encontrada. Tente "buscar" na IA.', 'error');
+        }
       });
     }
+
+    setLoading(false);
   }
 
   window.enviarPauta = async function (e) {
     e.preventDefault();
     const form = e.target;
+    const btn = form.querySelector('.btn-pauta');
     const data = {
       nome: form.querySelector('[aria-label="Nome"]')?.value,
       whatsapp: form.querySelector('[aria-label="WhatsApp"]')?.value,
       assunto: form.querySelector('[aria-label="Assunto"]')?.value,
       descricao: form.querySelector('[aria-label="Descrição"]')?.value
     };
+    btn?.classList.add('loading');
+    btn.disabled = true;
     try {
-      await PAAPI.sendPauta(data);
-      alert('Pauta enviada com sucesso! Nossa redação entrará em contato.');
+      const res = await PAAPI.sendPauta(data);
+      showToast(res.message || 'Pauta enviada! Nossa redação entrará em contato.');
       form.reset();
+      btn?.classList.add('success');
+      setTimeout(() => btn?.classList.remove('success'), 2000);
     } catch {
-      alert('Pauta registrada! Entraremos em contato em breve.');
+      showToast('Pauta registrada localmente. Entraremos em contato em breve.');
       form.reset();
     }
+    btn?.classList.remove('loading');
+    btn.disabled = false;
   };
 
   init();

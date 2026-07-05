@@ -151,6 +151,15 @@ const PAAPI = (function () {
     return local;
   }
 
+  function normalizePauta(data) {
+    return {
+      name: data.nome || data.name || '',
+      email: data.email || '',
+      phone: data.whatsapp || data.phone || '',
+      message: [data.assunto, data.descricao].filter(Boolean).join('\n\n') || data.message || ''
+    };
+  }
+
   function staticAdminLogin(user, pass) {
     if (user === ADMIN_USER && pass === ADMIN_PASS) {
       sessionStorage.setItem('pa_auth_mode', 'local');
@@ -296,7 +305,8 @@ const PAAPI = (function () {
     sendPauta(data) {
       const state = getState();
       state.pautas = state.pautas || [];
-      state.pautas.unshift({ ...data, date: new Date().toISOString() });
+      const p = normalizePauta(data);
+      state.pautas.unshift({ ...p, ...data, date: new Date().toISOString() });
       saveAdminState(state);
       return Promise.resolve({ ok: true, message: 'Pauta recebida!' });
     },
@@ -479,12 +489,8 @@ const PAAPI = (function () {
     },
 
     async sendPauta(data) {
-      const { error } = await sb().from('pautas').insert({
-        name: data.name,
-        email: data.email,
-        phone: data.phone,
-        message: data.message
-      });
+      const p = normalizePauta(data);
+      const { error } = await sb().from('pautas').insert(p);
       if (error) throw error;
       return { ok: true, message: 'Pauta recebida!' };
     },

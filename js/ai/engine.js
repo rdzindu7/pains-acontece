@@ -52,10 +52,19 @@ const PAEngine = (function () {
     if (!msg) return { reply: 'Digite sua mensagem ou cole o texto da notícia.', action: null };
 
     if (/^(oi|olá|ola|hey|bom dia|boa tarde|boa noite)/.test(msg)) {
-      return { reply: 'Olá! Sou a IA do Pains Acontece. Cole a notícia bruta e eu verifico, organizo e preparo o preview.', action: 'greeting' };
+      return { reply: 'Olá! Sou a IA editorial do Pains Acontece.\n\nMonitoro Pains MG, a região, Brasil e o mundo em tempo real. Cole uma pauta ou peça "buscar notícias" para eu verificar fontes e preparar a publicação.', action: 'greeting' };
     }
     if (/ajuda|help/.test(msg)) {
-      return { reply: 'Cole uma pauta · diga "verificar" · use Preview antes de publicar · Exporte o JSON para atualizar o GitHub.', action: 'help' };
+      return { reply: 'Comandos:\n• Cole texto → organizo e verifico\n• "verificar" → checagem de fontes\n• "buscar" → varredura RSS ilimitada\n• Preview antes de publicar\n\nPublico automaticamente fatos verificados em Brasil/Mundo e Pains.', action: 'help' };
+    }
+    if (/clima|tempo|previsão|previsao/.test(msg)) {
+      return { reply: 'A previsão do tempo de Pains MG é atualizada em tempo real via Open-Meteo na aba **Clima** do menu. Consulte temperatura, umidade, vento e os próximos 5 dias.', action: 'weather' };
+    }
+    if (/^(buscar|varrer|scanner|atualizar|noticias|notícias)/.test(msg)) {
+      return { reply: 'Iniciando varredura inteligente em Pains MG, região, Brasil e mundo… Clique em **Buscar Agora** no assistente IA (ícone cérebro) para publicar fatos verificados automaticamente.', action: 'scan' };
+    }
+    if (/pains|aconteceu|recente/.test(msg) && msg.length < 120) {
+      return { reply: 'Monitoro Pains MG continuamente via RSS e fontes públicas. Use **Buscar Agora** para varredura completa e publicação automática das notícias mais recentes da cidade e região.', action: 'scan' };
     }
 
     const raw = context.lastDraft || message;
