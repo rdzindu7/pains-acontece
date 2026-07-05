@@ -53,6 +53,7 @@ const PAAutoPublisher = (function () {
           cat: item.cat,
           status: 'pub',
           img: item.img,
+          img_source: item.img_source || item.img,
           video: item.video || '',
           author: 'IA Pains Acontece',
           date: item.date,

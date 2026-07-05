@@ -6,6 +6,7 @@
 import { readFileSync, writeFileSync } from 'fs';
 import { dirname, join } from 'path';
 import { fileURLToPath } from 'url';
+import { processArticleImages, pruneArticleImages } from './lib/article-images.mjs';
 
 const __dir = dirname(fileURLToPath(import.meta.url));
 const ROOT = join(__dir, '..');
@@ -35,6 +36,7 @@ function rowToArticle(row) {
     cat: row.cat,
     status: row.status,
     img: row.img,
+    img_source: row.img_source ?? row.imgSource,
     video: row.video,
     author: row.author,
     date: row.date,
@@ -73,13 +75,16 @@ async function main() {
   const articles = await fetchPublished(url, key);
   let existing = [];
   try { existing = JSON.parse(readFileSync(OUT, 'utf8')); } catch {}
+  let list = articles.length ? articles : existing;
   if (!articles.length && existing.length) {
     console.log(`⚠ Supabase vazio — mantendo ${existing.length} artigo(s) em articles.json`);
-    return existing.length;
   }
-  writeFileSync(OUT, JSON.stringify(articles, null, 2) + '\n', 'utf8');
-  console.log(`✓ ${articles.length} artigo(s) → data/articles.json`);
-  return articles.length;
+
+  const { articles: withImages, downloaded } = await processArticleImages(list, ROOT);
+  const { removed } = pruneArticleImages(withImages, ROOT);
+  writeFileSync(OUT, JSON.stringify(withImages, null, 2) + '\n', 'utf8');
+  console.log(`✓ ${withImages.length} artigo(s) → data/articles.json (${downloaded} img baixadas, ${removed} órfãs removidas)`);
+  return withImages.length;
 }
 
 main().catch(err => {

@@ -6,8 +6,8 @@ const PAPainsMedia = (function () {
   })();
 
   const WIKI = {
-    igreja: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Igreja_Nossa_Senhora_do_Ros%C3%A1rio_-_Pains_MG.jpg/1280px-Igreja_Nossa_Senhora_do_Ros%C3%A1rio_-_Pains_MG.jpg',
-    pedreiras: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/Pedreiras_de_Pains_-_MG.JPG/1280px-Pedreiras_de_Pains_-_MG.JPG'
+    igreja: ROOT + 'pains-acontece-logo.png',
+    pedreiras: ROOT + 'pains-acontece-logo.png'
   };
 
   const LOCAL = {

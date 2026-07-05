@@ -103,6 +103,31 @@ const PAAPI = (function () {
     return !!(sessionStorage.getItem('pa_auth_mode') || sessionStorage.getItem('pa_token'));
   }
 
+  async function withArticleImages(data) {
+    if (typeof PAArticleImages !== 'undefined' && PAArticleImages.prepareForPublish) {
+      try {
+        return await PAArticleImages.prepareForPublish(data);
+      } catch (e) {
+        console.warn('[api] article-images', e);
+      }
+    }
+    return data;
+  }
+
+  function isRemoteImg(url) {
+    return !!(url && /^https?:\/\//i.test(String(url)));
+  }
+
+  async function dropArticleImages(id, art) {
+    if (typeof PAArticleImages !== 'undefined' && PAArticleImages.removeForArticle) {
+      try {
+        await PAArticleImages.removeForArticle(id, art);
+      } catch (e) {
+        console.warn('[api] drop image', e);
+      }
+    }
+  }
+
   function isPublicSitePage() {
     return !/\/pages\/admin\.html/i.test(location.pathname);
   }
@@ -190,6 +215,7 @@ const PAAPI = (function () {
       cat: row.cat,
       status: row.status,
       img: row.img,
+      img_source: row.img_source ?? row.imgSource,
       video: row.video,
       author: row.author,
       date: row.date,
@@ -213,6 +239,7 @@ const PAAPI = (function () {
     if (data.cat !== undefined) row.cat = data.cat;
     if (data.status !== undefined) row.status = data.status;
     if (data.img !== undefined) row.img = data.img;
+    if (data.img_source !== undefined) row.img_source = data.img_source;
     if (data.video !== undefined) row.video = data.video;
     if (data.author !== undefined) row.author = data.author;
     if (data.date !== undefined) row.date = data.date;
@@ -428,12 +455,14 @@ const PAAPI = (function () {
           if (typeof PAScanner !== 'undefined') timeAgo = timeAgo || PAScanner.formatDate(pd);
         }
       }
-      const art = {
-        id: Date.now(), views: 0,
+      const enriched = await withArticleImages({
+        id: data.id || Date.now(),
+        views: 0,
         date: date || new Date().toLocaleDateString('pt-BR'),
         timeAgo: timeAgo || 'Agora',
         ...data
-      };
+      });
+      const art = { ...enriched };
       state.articles.unshift(art);
       saveAdminState(state);
       return art;
@@ -442,25 +471,34 @@ const PAAPI = (function () {
     async updateArticle(id, data) {
       const state = getState();
       if (!state.articles) state.articles = await fetchJson('articles.json');
-      const idx = state.articles.findIndex(a => String(a.id) === String(id));
-      if (idx >= 0) state.articles[idx] = { ...state.articles[idx], ...data };
-      else {
+      const sid = String(id);
+      const idx = state.articles.findIndex(a => String(a.id) === sid);
+      let prev = idx >= 0 ? state.articles[idx] : null;
+      if (!prev) {
         const base = await fetchJson('articles.json');
-        const b = base.find(a => String(a.id) === String(id));
-        if (b) state.articles.push({ ...b, ...data });
+        prev = base.find(a => String(a.id) === sid) || null;
       }
+      let patch = { ...data };
+      if (patch.img && isRemoteImg(patch.img) && typeof PAArticleImages !== 'undefined') {
+        patch = await withArticleImages({ ...prev, ...patch, id });
+      }
+      if (idx >= 0) state.articles[idx] = { ...state.articles[idx], ...patch };
+      else if (prev) state.articles.push({ ...prev, ...patch });
       saveAdminState(state);
-      return state.articles.find(a => String(a.id) === String(id));
+      return state.articles.find(a => String(a.id) === sid);
     },
 
     async deleteArticle(id) {
       const state = getState();
       if (!state.articles) state.articles = await fetchJson('articles.json');
-      state.articles = state.articles.filter(a => String(a.id) !== String(id));
-      const base = await fetchJson('articles.json');
-      if (base.some(a => String(a.id) === String(id))) {
+      const sid = String(id);
+      const base = await fetchJson('articles.json').catch(() => []);
+      const art = state.articles.find(a => String(a.id) === sid) || base.find(a => String(a.id) === sid);
+      await dropArticleImages(id, art);
+      state.articles = state.articles.filter(a => String(a.id) !== sid);
+      if (base.some(a => String(a.id) === sid)) {
         state.deleted = state.deleted || [];
-        if (!state.deleted.includes(String(id))) state.deleted.push(String(id));
+        if (!state.deleted.includes(sid)) state.deleted.push(sid);
       }
       saveAdminState(state);
       return { ok: true };
@@ -538,7 +576,7 @@ const PAAPI = (function () {
       }
       const art = await this.addArticle({
         title: p.title, lead: p.lead, content: p.content, cat: p.cat, status: 'pub',
-        img: p.img, video: p.video || '', author: p.author || 'IA Pains Acontece', verified: p.verified, confidence: p.confidence,
+        img: p.img, img_source: p.img_source || p.img, video: p.video || '', author: p.author || 'IA Pains Acontece', verified: p.verified, confidence: p.confidence,
         world: p.world || p.cat === 'Mundo', source_url: p.source_url,
         pubISO: p.pubISO, date: p.date, timeAgo: p.timeAgo, source: p.source
       });
@@ -567,6 +605,10 @@ const PAAPI = (function () {
     async purgeAllPublications() {
       const base = await fetchJson('articles.json').catch(() => []);
       const state = getState();
+      const allArts = mergeArticles(base, state.articles || []);
+      if (typeof PAArticleImages !== 'undefined' && PAArticleImages.purgeAll) {
+        try { await PAArticleImages.purgeAll(allArts); } catch (e) { console.warn('[api] purge images', e); }
+      }
       const allIds = [...new Set([
         ...base.map(a => String(a.id)),
         ...(state.articles || []).map(a => String(a.id))
@@ -990,12 +1032,13 @@ const PAAPI = (function () {
     },
 
     async addArticle(data) {
-      const row = articleToRow({
+      const enriched = await withArticleImages({
         views: 0,
         date: new Date().toLocaleDateString('pt-BR'),
         timeAgo: 'Agora',
         ...data
       });
+      const row = articleToRow(enriched);
       try {
         const { data: inserted, error } = await sb().from('articles').insert(row).select().single();
         if (!error && inserted) return rowToArticle(inserted);
@@ -1004,7 +1047,7 @@ const PAAPI = (function () {
         console.warn('Supabase indisponível, usando armazenamento local:', e);
       }
       sessionStorage.setItem('pa_auth_mode', 'local');
-      return local.addArticle(data);
+      return local.addArticle(enriched);
     },
 
     async updateArticle(id, data) {

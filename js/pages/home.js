@@ -103,6 +103,9 @@
   }
 
   function imgTag(a) {
+    if (typeof PAArticleImages !== 'undefined' && PAArticleImages.imgHtml) {
+      return PAArticleImages.imgHtml(a);
+    }
     const fb = (typeof PAPainsMedia !== 'undefined') ? PAPainsMedia.pick(a.cat) : '';
     const src = a.img || fb;
     const onerr = fb ? ` onerror="this.onerror=null;this.src='${fb.replace(/'/g, '%27')}'"` : '';
@@ -235,10 +238,11 @@
         <a href="pages/noticia.html?id=${hero.id}" class="btn-hero">Ler matéria completa <i class="fas fa-arrow-right arr"></i></a>
       </div>
       <a href="pages/noticia.html?id=${hero.id}" class="hero-card reveal">
-        <img src="${esc(hero.img)}" alt="${esc(hero.title)}"/>
+        ${typeof PAArticleImages !== 'undefined' && PAArticleImages.imgHtml ? PAArticleImages.imgHtml(hero, ' loading="eager"') : `<img src="${esc(hero.img)}" alt="${esc(hero.title)}" loading="eager"/>`}
       </a>`;
     const reel = document.querySelector('.hero-reel');
-    if (reel) reel.style.backgroundImage = `url('${hero.img}')`;
+    const reelImg = (typeof PAArticleImages !== 'undefined' && PAArticleImages.displayPath) ? PAArticleImages.displayPath(hero) : hero.img;
+    if (reel) reel.style.backgroundImage = `url('${reelImg}')`;
   }
 
   function renderTicker(arts) {

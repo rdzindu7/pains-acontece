@@ -6,7 +6,7 @@
 <link rel="icon" type="image/jpeg" href="../assets/images/favicon.jpg"/>
 <link rel="apple-touch-icon" href="../assets/images/favicon.jpg"/>
 <title>Notícia – Pains Acontece</title>
-<meta name="pa-build" content="2026.07.05-v24"/>
+<meta name="pa-build" content="2026.07.05-v25"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,700;0,900;1,700&display=swap" rel="stylesheet"/>
@@ -339,11 +339,12 @@ body.cat-pains{--accent:#1d7a1d;--accent-glow:rgba(29,122,29,.35)}
 <script src="../js/core/supabase-client.js"></script>
 <script src="../js/ui/article-format.js"></script>
 <script src="../js/ai/scanner.js"></script>
-<script src="../js/core/purge.js?v=20260705v24"></script>
+<script src="../js/core/purge.js?v=20260705v25"></script>
 <script src="../js/core/auto-reload.js?v=20260705v21"></script>
 <script src="../js/core/pains-media.js?v=20260705v44"></script>
+<script src="../js/core/article-images.js?v=20260705v45"></script>
 <script src="../js/core/views-tracker.js?v=20260705v41"></script>
-<script src="../js/core/api.js?v=20260705v43"></script>
+<script src="../js/core/api.js?v=20260705v45"></script>
 <script src="../js/ui/ads.js?v=20260705v36"></script>
 <script src="../js/core/store.js?v=20260705v42"></script>
 
@@ -634,14 +635,15 @@ body.cat-pains{--accent:#1d7a1d;--accent-glow:rgba(29,122,29,.35)}
     const author=art.author||'Redação Pains Acontece';
     const sponsored=art.sponsored?'<span class="sponsored-badge reveal"><i class="fas fa-star"></i> Conteúdo Patrocinado</span>':'';
     const painsFb=(typeof PAPainsMedia!=='undefined')?PAPainsMedia.pick(art.cat):'';
-    const heroImg=art.img||painsFb;
+    const heroImg=(typeof PAArticleImages!=='undefined')?PAArticleImages.displayPath(art):(art.img||painsFb);
+    const thumbHtml=(a,extra='')=>typeof PAArticleImages!=='undefined'&&PAArticleImages.imgHtml?PAArticleImages.imgHtml(a,extra):`<img src="${esc(a.img||'')}" alt="" loading="lazy"${extra}/>`;
     const isYt=art.video&&/youtube\.com|youtu\.be/i.test(art.video);
     const heroMedia=art.video
       ?(isYt
         ?`<iframe src="${esc(art.video.includes('embed')?art.video:art.video.replace('watch?v=','embed/'))}" title="Vídeo" allowfullscreen loading="lazy" style="width:100%;height:100%;border:0"></iframe>`
         :`<video src="${esc(art.video)}" controls playsinline poster="${esc(heroImg)}"></video>`)
       :heroImg
-        ?`<img src="${esc(heroImg)}" alt="" loading="eager" onerror="this.onerror=null;this.src='${esc(painsFb||'../assets/images/pains-acontece-logo.png')}'"/>`
+        ?thumbHtml(art,' loading="eager"')
         :`<img src="../assets/images/pains-acontece-logo.png" alt="Pains Acontece" loading="eager"/>`;
 
     const tocHtml=toc.length?`<div class="aside-card reveal"><h5><i class="fas fa-list-ul"></i> Nesta matéria</h5>
@@ -649,7 +651,7 @@ body.cat-pains{--accent:#1d7a1d;--accent-glow:rgba(29,122,29,.35)}
 
     const miniRel=related.length?`<div class="aside-card reveal reveal-delay-1"><h5><i class="fas fa-newspaper"></i> Leia também</h5>
       <div class="aside-mini-rel">${related.map(r=>`
-        <a href="noticia.html?id=${r.id}"><img src="${esc(r.img)}" alt=""/><span>${esc(r.title)}</span></a>`).join('')}
+        <a href="noticia.html?id=${r.id}">${thumbHtml(r)}<span>${esc(r.title)}</span></a>`).join('')}
       </div></div>`:'';
 
     const dateLabel=(art.date||'').trim()||pubLabel(art).split('·')[0]?.trim()||'';
@@ -714,7 +716,7 @@ body.cat-pains{--accent:#1d7a1d;--accent-glow:rgba(29,122,29,.35)}
       </div>
       <div id="paSocialMount" class="reveal"></div>
       ${related.length?`<div class="related reveal"><h3>Notícias Relacionadas</h3><div class="rel-grid">${related.map((r,i)=>`
-        <a href="noticia.html?id=${r.id}" class="rel-card reveal reveal-delay-${(i%4)+1}"><img src="${esc(r.img)}" alt=""/><div class="body"><h4>${esc(r.title)}</h4><div class="rel-cat">${esc(r.cat)}</div></div></a>`).join('')}</div></div>`:''}
+        <a href="noticia.html?id=${r.id}" class="rel-card reveal reveal-delay-${(i%4)+1}">${thumbHtml(r)}<div class="body"><h4>${esc(r.title)}</h4><div class="rel-cat">${esc(r.cat)}</div></div></a>`).join('')}</div></div>`:''}
     </article>
     <aside class="article-aside">
       ${tocHtml}

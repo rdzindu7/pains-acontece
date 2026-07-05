@@ -286,14 +286,16 @@ async function main() {
     if (seen.has(item.link)) return false;
     const lead = makeLead(item.title, item.summary);
     const img = await resolveItemImage(item, item.cat);
+    const id = Date.now() + articles.length;
     articles.push({
-      id: Date.now() + articles.length,
+      id,
       title: item.title,
       lead,
       content: `<p>${lead}</p><p>Fonte: <em>${item.source}</em>. Matéria verificada pela IA editorial do Pains Acontece.</p>`,
       cat: item.cat,
       status: 'pub',
-      img,
+      img: `assets/images/articles/${id}.jpg`,
+      img_source: img,
       author: 'IA Pains Acontece',
       date: item.pubDate.toLocaleDateString('pt-BR'),
       timeAgo: formatDate(item.pubDate),
@@ -319,8 +321,12 @@ async function main() {
     await pushArticle(item);
   }
 
-  const realImgs = articles.filter(a => !/unsplash\.com/i.test(a.img)).length;
-  console.log(`Imagens reais: ${realImgs}/${articles.length}`);
+  const { processArticleImages } = await import('./lib/article-images.mjs');
+  const root = join(__dirname, '..');
+  const { articles: withImages, downloaded } = await processArticleImages(articles, root);
+  articles = withImages;
+  const realImgs = articles.filter(a => a.img_source && !/unsplash\.com/i.test(a.img_source)).length;
+  console.log(`Imagens baixadas: ${downloaded} | fontes reais: ${realImgs}/${articles.length}`);
 
   articles.sort((a, b) => b.id - a.id);
   writeFileSync(OUT, JSON.stringify(articles, null, 2), 'utf8');

@@ -32,10 +32,10 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data/articles.json
+          git add data/articles.json assets/images/articles/
           if git diff --staged --quiet; then
-            echo "Nenhuma alteração em articles.json"
+            echo "Nenhuma alteração em articles.json / imagens"
           else
-            git commit -m "chore: sync artigos publicados do Supabase [auto]"
+            git commit -m "chore: sync artigos e imagens do Supabase [auto]"
             git push
           fi

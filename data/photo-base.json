@@ -1,12 +1,12 @@
 {
-  "Pains": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Igreja_Nossa_Senhora_do_Ros%C3%A1rio_-_Pains_MG.jpg/1280px-Igreja_Nossa_Senhora_do_Ros%C3%A1rio_-_Pains_MG.jpg",
-  "Região": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/Pedreiras_de_Pains_-_MG.JPG/1280px-Pedreiras_de_Pains_-_MG.JPG",
-  "Polícia": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/Pedreiras_de_Pains_-_MG.JPG/1280px-Pedreiras_de_Pains_-_MG.JPG",
-  "Política": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Igreja_Nossa_Senhora_do_Ros%C3%A1rio_-_Pains_MG.jpg/1280px-Igreja_Nossa_Senhora_do_Ros%C3%A1rio_-_Pains_MG.jpg",
-  "Saúde": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/Pedreiras_de_Pains_-_MG.JPG/1280px-Pedreiras_de_Pains_-_MG.JPG",
-  "Brasil / Mundo": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/Pedreiras_de_Pains_-_MG.JPG/1280px-Pedreiras_de_Pains_-_MG.JPG",
-  "Brasil": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Igreja_Nossa_Senhora_do_Ros%C3%A1rio_-_Pains_MG.jpg/1280px-Igreja_Nossa_Senhora_do_Ros%C3%A1rio_-_Pains_MG.jpg",
-  "Mundo": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/Pedreiras_de_Pains_-_MG.JPG/1280px-Pedreiras_de_Pains_-_MG.JPG",
-  "Agenda": "https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Igreja_Nossa_Senhora_do_Ros%C3%A1rio_-_Pains_MG.jpg/1280px-Igreja_Nossa_Senhora_do_Ros%C3%A1rio_-_Pains_MG.jpg",
-  "Empregos": "https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/Pedreiras_de_Pains_-_MG.JPG/1280px-Pedreiras_de_Pains_-_MG.JPG"
+  "Pains": "assets/images/pains-acontece-logo.png",
+  "Região": "assets/images/pains-acontece-logo.png",
+  "Polícia": "assets/images/pains-acontece-logo.png",
+  "Política": "assets/images/pains-acontece-logo.png",
+  "Saúde": "assets/images/pains-acontece-logo.png",
+  "Brasil / Mundo": "assets/images/pains-acontece-logo.png",
+  "Brasil": "assets/images/pains-acontece-logo.png",
+  "Mundo": "assets/images/pains-acontece-logo.png",
+  "Agenda": "assets/images/pains-acontece-logo.png",
+  "Empregos": "assets/images/pains-acontece-logo.png"
 }
