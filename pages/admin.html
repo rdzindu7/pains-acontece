@@ -7,7 +7,7 @@
 <link rel="apple-touch-icon" href="../assets/images/favicon.jpg"/>
 <title>Painel – Pains Acontece</title>
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
-<meta name="pa-build" content="2026.07.05-v35"/>
+<meta name="pa-build" content="2026.07.05-v37"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
@@ -236,6 +236,9 @@ body{background:var(--k2);font-family:var(--fb);color:var(--w);display:flex}
 .tb-btn.primary:hover{background:linear-gradient(135deg,var(--g3),var(--g));box-shadow:0 4px 22px rgba(29,122,29,.55);transform:translateY(-1px)}
 .tb-btn.ghost{background:rgba(255,255,255,.04);color:var(--muted);border:1px solid rgba(255,255,255,.08)}
 .tb-btn.ghost:hover{background:rgba(255,255,255,.08);color:var(--w);border-color:rgba(255,255,255,.14)}
+.tb-btn.danger{background:rgba(192,57,43,.12);color:#e74c3c;border:1px solid rgba(192,57,43,.35)}
+.tb-btn.danger:hover{background:rgba(192,57,43,.22);color:#ff6b5b;border-color:rgba(192,57,43,.5);transform:translateY(-1px)}
+.tb-btn.danger:disabled{opacity:.45;cursor:not-allowed;transform:none}
 .notif-btn{
   width:36px;height:36px;border-radius:50%;
   background:rgba(255,255,255,.05);border:1px solid var(--border);
@@ -1367,6 +1370,9 @@ body.pa-owner .owner-only.btn-pub{display:flex!important}
         <button class="filter-btn" onclick="filterCat('pub',this)">Publicados</button>
         <button class="filter-btn" onclick="filterCat('draft',this)">Rascunhos</button>
         <button class="filter-btn" onclick="filterCat('review',this)">Revisão</button>
+        <button type="button" class="tb-btn danger" id="btnDeleteAllPubs" onclick="openDeleteAll()" title="Excluir todas as publicações do portal">
+          <i class="fas fa-trash-alt"></i> Remover todas
+        </button>
       </div>
       <div class="pa-surface pub-table">
         <div class="pub-thead">
@@ -2156,6 +2162,19 @@ body.pa-owner .owner-only.btn-pub{display:flex!important}
     </div>
   </div>
 </div>
+
+<!-- MODAL REMOVER TODAS -->
+<div class="modal-backdrop" id="deleteAllModal">
+  <div class="modal" style="max-width:480px">
+    <h3><i class="fas fa-exclamation-triangle" style="color:#e74c3c;margin-right:8px"></i>Remover todas as publicações</h3>
+    <p id="deleteAllMsg">Isso vai excluir permanentemente todas as matérias do portal. Esta ação não pode ser desfeita.</p>
+    <p style="font-size:.75rem;color:rgba(255,255,255,.35);margin-top:8px">Publicadas, rascunhos e itens em revisão serão apagados.</p>
+    <div class="modal-actions">
+      <button class="btn-pub outline" style="padding:10px 20px" onclick="closeModal('deleteAllModal')">Cancelar</button>
+      <button class="btn-pub red-btn" style="padding:10px 20px" id="btnConfirmDeleteAll" onclick="confirmDeleteAll()"><i class="fas fa-trash-alt"></i> Remover todas</button>
+    </div>
+  </div>
+</div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="../js/core/config.js"></script>
 <script src="../js/core/supabase-client.js"></script>
@@ -2700,6 +2719,12 @@ function renderDashboard() {
 
 function renderPubs() {
   const list = document.getElementById('pubList');
+  const total = getArticles().length;
+  const btnAll = document.getElementById('btnDeleteAllPubs');
+  if (btnAll) {
+    btnAll.disabled = total === 0;
+    btnAll.title = total ? `Excluir ${total} publicação${total > 1 ? 'ões' : ''} do portal` : 'Nenhuma publicação para remover';
+  }
   const data = getArticles().filter(a => {
     const matchCat = currentFilter === 'todos' || a.status === currentFilter;
     const matchSearch = a.title.toLowerCase().includes(currentSearch.toLowerCase()) || a.cat.toLowerCase().includes(currentSearch.toLowerCase());
@@ -2764,6 +2789,54 @@ async function confirmDelete() {
   showToast('Publicação excluída com sucesso.', 'error');
   renderPubs();
   renderDashboard();
+}
+
+function openDeleteAll() {
+  const count = getArticles().length;
+  if (!count) {
+    showToast('Não há publicações para remover.', 'info');
+    return;
+  }
+  const msg = document.getElementById('deleteAllMsg');
+  if (msg) {
+    msg.textContent = `Tem certeza que deseja excluir permanentemente ${count} publicação${count > 1 ? 'ões' : ''}? Esta ação não pode ser desfeita.`;
+  }
+  document.getElementById('deleteAllModal')?.classList.add('open');
+}
+
+async function confirmDeleteAll() {
+  const arts = getArticles();
+  if (!arts.length) {
+    closeModal('deleteAllModal');
+    showToast('Não há publicações para remover.', 'info');
+    return;
+  }
+  const btn = document.getElementById('btnConfirmDeleteAll');
+  const total = arts.length;
+  if (btn) {
+    btn.disabled = true;
+    btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Removendo…';
+  }
+  try {
+    for (const a of [...arts]) {
+      await PAStore.deleteArticle(a.id);
+    }
+    closeModal('deleteAllModal');
+    showToast(`${total} publicação${total > 1 ? 'ões removidas' : ' removida'} com sucesso.`, 'error');
+    renderPubs();
+    renderDashboard();
+    if (typeof window.PAHomeRefresh === 'function') window.PAHomeRefresh();
+  } catch (err) {
+    console.error('[admin] deleteAll', err);
+    showToast('Erro ao remover publicações. Algumas podem ter sido excluídas — recarregue a lista.', 'error');
+    renderPubs();
+    renderDashboard();
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = '<i class="fas fa-trash-alt"></i> Remover todas';
+    }
+  }
 }
 
 /* ════ EDITOR ════ */
