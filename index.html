@@ -8,7 +8,7 @@
 <title>Pains Acontece – Notícias, serviços e o que importa em Pains e região</title>
 <meta name="description" content="Portal de notícias hiperlocal de Pains e região."/>
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
-<meta name="pa-build" content="2026.07.05-v2"/>
+<meta name="pa-build" content="2026.07.05-v3"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,700;0,900;1,700&display=swap" rel="stylesheet"/>
@@ -200,6 +200,13 @@ body::before {
   transition: all .2s; margin-left: 6px;
 }
 .h-admin-btn:hover { background: rgba(29,122,29,.2); color: var(--g3); border-color: rgba(29,122,29,.4); }
+.lang-picker { position: relative; }
+.lang-btn { display: flex; align-items: center; gap: 6px; padding: 6px 12px; border-radius: 3px; border: 1px solid rgba(255,255,255,.12); background: rgba(255,255,255,.05); color: rgba(255,255,255,.7); font-size: .68rem; font-weight: 700; cursor: pointer; transition: all .2s; }
+.lang-btn:hover { border-color: var(--g); color: var(--g3); }
+.lang-menu { position: absolute; top: calc(100% + 6px); right: 0; min-width: 150px; background: var(--k3); border: 1px solid rgba(29,122,29,.3); border-radius: 6px; box-shadow: 0 12px 40px rgba(0,0,0,.7); opacity: 0; visibility: hidden; transform: translateY(-6px); transition: all .2s; z-index: 200; overflow: hidden; }
+.lang-menu.open { opacity: 1; visibility: visible; transform: none; }
+.lang-opt { display: block; width: 100%; text-align: left; padding: 10px 14px; border: none; background: none; color: rgba(255,255,255,.75); font-size: .78rem; cursor: pointer; }
+.lang-opt:hover, .lang-opt.active { background: rgba(29,122,29,.15); color: #fff; }
 
 /* NAV — barra verde horizontal igual ao site original */
 .main-nav {
@@ -1222,7 +1229,7 @@ body.cat-filter-mode .category-view { display: block; }
 <div class="cursor-glow" id="cursorGlow"></div>
 <!-- TICKER -->
 <div class="ticker">
-  <div class="ticker-lbl"><i class="fas fa-circle"></i> AO VIVO</div>
+  <div class="ticker-lbl"><i class="fas fa-circle"></i> <span data-i18n="ticker.live">AO VIVO</span></div>
   <div class="ticker-track">
     <div class="ticker-items" id="tickerDynamic">
       <span>Carregando notícias…</span>
@@ -1235,7 +1242,7 @@ body.cat-filter-mode .category-view { display: block; }
   <div class="header-inner">
     <a href="index.html" class="logo"><img src="assets/images/pains-acontece-logo.png" alt="Pains Acontece"/></a>
     <div class="search-wrap">
-      <input type="text" id="siteSearch" placeholder="Buscar notícias, serviços, restaurantes…" aria-label="Buscar"/>
+      <input type="text" id="siteSearch" placeholder="Buscar notícias, serviços, restaurantes…" data-i18n="search.placeholder" aria-label="Buscar"/>
       <button aria-label="Pesquisar"><i class="fas fa-search"></i></button>
     </div>
     <div class="header-right">
@@ -1245,7 +1252,7 @@ body.cat-filter-mode .category-view { display: block; }
       <a href="#" class="h-social fb" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
       <a href="#" class="h-social yt" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
       <a href="pages/login.html" class="h-admin-btn" aria-label="Área administrativa" title="Painel do Administrador">
-        <i class="fas fa-lock"></i> Admin
+        <i class="fas fa-lock"></i> <span data-i18n="admin">Admin</span>
       </a>
     </div>
   </div>
@@ -1255,21 +1262,21 @@ body.cat-filter-mode .category-view { display: block; }
 <nav class="main-nav" id="mainNav">
   <button class="hamburger" onclick="toggleNav()" aria-label="Menu"><i class="fas fa-bars"></i></button>
   <div class="nav-inner" id="navInner">
-    <div class="nav-item"><a href="index.html" data-nav="home" class="active">Home</a></div>
-    <div class="nav-item"><a href="#ultimas" data-nav="ultimas">Últimas</a></div>
-    <div class="nav-item"><a href="#pains" data-nav="pains">Pains</a></div>
-    <div class="nav-item"><a href="#regiao" data-nav="regiao">Região</a></div>
-    <div class="nav-item"><a href="#brasil" data-nav="brasil">Brasil/Mundo</a></div>
-    <div class="nav-item"><a href="#policia" data-nav="policia">Polícia</a></div>
-    <div class="nav-item"><a href="#politica" data-nav="politica">Política</a></div>
-    <div class="nav-item"><a href="#saude" data-nav="saude">Saúde</a></div>
-    <div class="nav-item"><a href="#agenda" data-nav="agenda">Agenda</a></div>
-    <div class="nav-item"><a href="#empregos" data-nav="empregos">Empregos</a></div>
-    <div class="nav-item"><a href="#restaurantes" data-nav="restaurantes">Restaurantes</a></div>
-    <div class="nav-item"><a href="#telefones" data-nav="telefones">Telefones</a></div>
-    <div class="nav-item"><a href="#clima" data-nav="clima">Clima</a></div>
-    <div class="nav-item"><a href="#publicidades" data-nav="publicidades">Anuncie</a></div>
-    <div class="nav-item nav-pauta"><a href="#contato" data-nav="contato">Pauta</a></div>
+    <div class="nav-item"><a href="index.html" data-nav="home" class="active" data-i18n="nav.home">Home</a></div>
+    <div class="nav-item"><a href="#ultimas" data-nav="ultimas" data-i18n="nav.ultimas">Últimas</a></div>
+    <div class="nav-item"><a href="#pains" data-nav="pains" data-i18n="nav.pains">Pains</a></div>
+    <div class="nav-item"><a href="#regiao" data-nav="regiao" data-i18n="nav.regiao">Região</a></div>
+    <div class="nav-item"><a href="#brasil" data-nav="brasil" data-i18n="nav.brasil">Brasil/Mundo</a></div>
+    <div class="nav-item"><a href="#policia" data-nav="policia" data-i18n="nav.policia">Polícia</a></div>
+    <div class="nav-item"><a href="#politica" data-nav="politica" data-i18n="nav.politica">Política</a></div>
+    <div class="nav-item"><a href="#saude" data-nav="saude" data-i18n="nav.saude">Saúde</a></div>
+    <div class="nav-item"><a href="#agenda" data-nav="agenda" data-i18n="nav.agenda">Agenda</a></div>
+    <div class="nav-item"><a href="#empregos" data-nav="empregos" data-i18n="nav.empregos">Empregos</a></div>
+    <div class="nav-item"><a href="#restaurantes" data-nav="restaurantes" data-i18n="nav.restaurantes">Restaurantes</a></div>
+    <div class="nav-item"><a href="#telefones" data-nav="telefones" data-i18n="nav.telefones">Telefones</a></div>
+    <div class="nav-item"><a href="#clima" data-nav="clima" data-i18n="nav.clima">Clima</a></div>
+    <div class="nav-item"><a href="#publicidades" data-nav="publicidades" data-i18n="nav.anuncie">Anuncie</a></div>
+    <div class="nav-item nav-pauta"><a href="#contato" data-nav="contato" data-i18n="nav.pauta">Pauta</a></div>
   </div>
 </nav>
 
@@ -1315,7 +1322,7 @@ body.cat-filter-mode .category-view { display: block; }
 <section class="section wrap home-only" id="ultimas">
   <div class="sec-head reveal">
     <div class="line-v"></div>
-    <h2>Últimas Notícias</h2>
+    <h2 data-i18n="sec.ultimas">Últimas Notícias</h2>
     <div class="rule"></div>
     <a href="#ultimas" class="view-all" data-nav="ultimas" onclick="event.preventDefault();applyNav('ultimas')">Ver todas <i class="fas fa-arrow-right"></i></a>
   </div>
@@ -1606,8 +1613,8 @@ body.cat-filter-mode .category-view { display: block; }
   <div class="wrap">
     <div class="pauta-inner reveal">
       <div class="pauta-icon-wrap"><i class="fas fa-bullhorn"></i></div>
-      <h2 class="pauta-title">Envie sua Pauta</h2>
-      <p class="pauta-sub">Você tem uma denúncia, sugestão ou informação importante para Pains e região? Fale com a nossa redação. Sua voz faz a diferença.</p>
+      <h2 class="pauta-title" data-i18n="pauta.title">Envie sua Pauta</h2>
+      <p class="pauta-sub" data-i18n="pauta.sub">Você tem uma denúncia, sugestão ou informação importante para Pains e região? Fale com a nossa redação. Sua voz faz a diferença.</p>
       <form class="pauta-form" onsubmit="enviarPauta(event)">
         <div class="row2">
           <input type="text" placeholder="Seu nome" required aria-label="Nome"/>
@@ -1615,7 +1622,7 @@ body.cat-filter-mode .category-view { display: block; }
         </div>
         <input type="text" placeholder="Assunto da pauta" required aria-label="Assunto"/>
         <textarea placeholder="Descreva sua pauta com o máximo de detalhes possível…" required aria-label="Descrição"></textarea>
-        <button type="submit" class="btn-pauta"><i class="fas fa-paper-plane"></i>Enviar Pauta</button>
+        <button type="submit" class="btn-pauta"><i class="fas fa-paper-plane"></i><span data-i18n="pauta.send">Enviar Pauta</span></button>
       </form>
     </div>
   </div>
@@ -1735,7 +1742,10 @@ document.querySelectorAll('.ncard, .ncard-xl, .srv-card').forEach(card => {
 <script src="js/ai/agents/camila.js"></script>
 <script src="js/ai/orchestrator.js"></script>
 <script src="js/ai/engine.js"></script>
-<script src="js/core/api.js?v=20260705"></script>
+<script src="js/core/api.js?v=20260705v3"></script>
+<script src="js/ui/i18n.js"></script>
+<script src="js/ai/agents/rafaela.js"></script>
+<script src="js/ai/divulgacao-assistant.js"></script>
 <script src="js/core/store.js"></script>
 <script src="js/ai/content-gate.js"></script>
 <script src="js/ai/autopublisher.js"></script>

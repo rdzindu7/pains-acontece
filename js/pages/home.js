@@ -108,9 +108,15 @@
     </a>`;
   }
 
-  const emptyMsg = isOwnerView()
-    ? '<p style="color:var(--dim);font-size:.82rem;padding:20px 0">Nenhuma notícia nesta seção. A IA está buscando fatos verificados…</p>'
-    : '<p style="color:var(--dim);font-size:.82rem;padding:20px 0">Nenhuma notícia nesta seção no momento. Volte em breve!</p>';
+  function emptyMsgHtml() {
+    const txt = typeof PATranslate !== 'undefined'
+      ? PATranslate.t('empty.section')
+      : 'Nenhuma notícia nesta seção no momento. Volte em breve!';
+    if (isOwnerView()) {
+      return '<p style="color:var(--dim);font-size:.82rem;padding:20px 0">Nenhuma notícia nesta seção. A IA está buscando fatos verificados…</p>';
+    }
+    return `<p style="color:var(--dim);font-size:.82rem;padding:20px 0">${txt}</p>`;
+  }
 
   function filterByCats(arts, cats) {
     if (!cats) return arts;
@@ -184,7 +190,7 @@
   function renderSection(id, arts, mode) {
     const el = document.getElementById(id);
     if (!el) return;
-    if (!arts.length) { el.innerHTML = emptyMsg; return; }
+    if (!arts.length) { el.innerHTML = emptyMsgHtml(); return; }
     if (mode === 'grid') el.innerHTML = arts.map(a => card(a)).join('');
     else if (mode === 'xl') el.innerHTML = card(arts[0], 'xl');
     else el.innerHTML = arts.map(a => listRow(a)).join('');
@@ -230,7 +236,7 @@
   function renderJobs(jobs) {
     const el = document.getElementById('jobsDynamic');
     if (!el) return;
-    if (!jobs.length) { el.innerHTML = emptyMsg; return; }
+    if (!jobs.length) { el.innerHTML = emptyMsgHtml(); return; }
     el.innerHTML = jobs.map(j => `
       <div class="job-item">
         <div class="job-ttl">${esc(j.title)}</div>
@@ -241,7 +247,7 @@
   function renderAgenda(events) {
     const el = document.getElementById('agendaDynamic');
     if (!el) return;
-    if (!events.length) { el.innerHTML = emptyMsg; return; }
+    if (!events.length) { el.innerHTML = emptyMsgHtml(); return; }
     el.innerHTML = events.map(e => `
       <div class="ag-item">
         <div class="ag-date">

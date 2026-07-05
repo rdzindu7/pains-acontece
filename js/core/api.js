@@ -1,12 +1,22 @@
 const PAAPI = (function () {
-  const ADMIN_USER = 'admin@painsacontece.com.br';
-  const ADMIN_PASS = 'Pains@2026';
+  const ADMIN_USERS = [
+    { email: 'admin@painsacontece.com.br', pass: 'Pains@2026', role: 'owner', name: 'Proprietário' },
+    { email: 'redacao@painsacontece.com.br', pass: 'Pains@Red2026', role: 'editor', name: 'Redação' },
+    { email: 'maria@painsacontece.com.br', pass: 'Pains@Maria2026', role: 'editor', name: 'Maria Costa' }
+  ];
   const LS_ADMIN = 'pa_admin_state_v2';
 
-  function resolveRole(email) {
+  function findAdmin(email) {
     const e = (email || '').toLowerCase().trim();
-    if (e === ADMIN_USER.toLowerCase()) return 'owner';
-    return 'editor';
+    return ADMIN_USERS.find(u => u.email.toLowerCase() === e) || null;
+  }
+
+  function resolveRole(email) {
+    return findAdmin(email)?.role || 'editor';
+  }
+
+  function getAdminAccounts() {
+    return ADMIN_USERS.map(u => ({ email: u.email, role: u.role, name: u.name }));
   }
 
   function isOwner() {
@@ -61,6 +71,7 @@ const PAAPI = (function () {
       cat: row.cat,
       status: row.status,
       img: row.img,
+      video: row.video,
       author: row.author,
       date: row.date,
       timeAgo: row.time_ago,
@@ -82,6 +93,7 @@ const PAAPI = (function () {
     if (data.cat !== undefined) row.cat = data.cat;
     if (data.status !== undefined) row.status = data.status;
     if (data.img !== undefined) row.img = data.img;
+    if (data.video !== undefined) row.video = data.video;
     if (data.author !== undefined) row.author = data.author;
     if (data.date !== undefined) row.date = data.date;
     if (data.timeAgo !== undefined) row.time_ago = data.timeAgo;
@@ -179,11 +191,12 @@ const PAAPI = (function () {
   }
 
   function staticAdminLogin(user, pass) {
-    if (user === ADMIN_USER && pass === ADMIN_PASS) {
+    const acc = ADMIN_USERS.find(u => u.email.toLowerCase() === (user || '').toLowerCase().trim() && u.pass === pass);
+    if (acc) {
       sessionStorage.setItem('pa_auth_mode', 'local');
-      const role = resolveRole(user);
-      sessionStorage.setItem('pa_role', role);
-      return { ok: true, token: 'local-admin-' + Date.now(), user, mode: 'local', role };
+      sessionStorage.setItem('pa_role', acc.role);
+      sessionStorage.setItem('pa_user_name', acc.name);
+      return { ok: true, token: 'local-' + acc.role + '-' + Date.now(), user: acc.email, mode: 'local', role: acc.role, name: acc.name };
     }
     return null;
   }
@@ -327,6 +340,14 @@ const PAAPI = (function () {
       state.pending = state.pending.filter(p => p.id !== id);
       saveAdminState(state);
       return Promise.resolve({ ok: true });
+    },
+
+    resetScanner() {
+      const state = getState();
+      state.scanner = { last_scan: null, interval_minutes: 20, seen_urls: [] };
+      state.pending = [];
+      saveAdminState(state);
+      return Promise.resolve({ ok: true, message: 'Busca resetada. Todas as fontes serão verificadas novamente.' });
     },
 
     sendPauta(data) {
@@ -626,6 +647,11 @@ const PAAPI = (function () {
     runScanner: async () => (await getBackend()).runScanner(),
     approvePending: async (id) => (await getBackend()).approvePending(id),
     rejectPending: async (id) => (await getBackend()).rejectPending(id),
+    resetScanner: async () => {
+      const b = await getBackend();
+      if (b.resetScanner) return b.resetScanner();
+      return local.resetScanner();
+    },
     aiChat: (msg, ctx) => PAEngine.chat(msg, ctx),
     aiOrganize: (text, hints) => PAEngine.organizeNews(text, hints),
     sendPauta: async (d) => (await getBackend()).sendPauta(d),
@@ -637,6 +663,7 @@ const PAAPI = (function () {
     deleteJob: async (id) => (await getBackend()).deleteJob?.(id) ?? Promise.reject(new Error('Não disponível')),
     resolveRole,
     isOwner,
+    getAdminAccounts,
     exportForGitHub: async () => (await getBackend()).exportForGitHub(),
     importFromFile: async (f) => (await getBackend()).importFromFile(f),
     getAuthMode: () => sessionStorage.getItem('pa_auth_mode') || (supabaseConfigured() ? 'cloud' : 'local')

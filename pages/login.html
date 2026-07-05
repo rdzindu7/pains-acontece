@@ -233,7 +233,7 @@ body{
 <script src="../js/core/supabase-client.js"></script>
 <script src="../js/ai/scanner.js"></script>
 <script src="../js/ai/engine.js"></script>
-<script src="../js/core/api.js?v=20260705"></script>
+<script src="../js/core/api.js?v=20260705v3"></script>
 <script>
 
 async function doLogin(e) {
@@ -261,6 +261,7 @@ async function doLogin(e) {
       sessionStorage.setItem('pa_token', res.token);
       if (res.mode) sessionStorage.setItem('pa_auth_mode', res.mode);
       sessionStorage.setItem('pa_role', res.role || PAAPI.resolveRole(u));
+      if (res.name) sessionStorage.setItem('pa_user_name', res.name);
       ok = true;
     }
   } catch {}

@@ -42,8 +42,10 @@ img{display:block;max-width:100%}
 .mode-tab:hover{border-color:rgba(29,122,29,.4);color:var(--g3)}
 .mode-tab.active{background:linear-gradient(135deg,var(--g),var(--g2));border-color:var(--g);color:#fff;box-shadow:0 4px 16px rgba(29,122,29,.35)}
 .mode-tab.quick.active{background:linear-gradient(135deg,#8b6914,var(--y));border-color:var(--y)}
-.hero-img{border-radius:6px;overflow:hidden;margin-bottom:36px;border:1px solid rgba(255,255,255,.06)}
+.hero-img,.hero-video{border-radius:6px;overflow:hidden;margin-bottom:36px;border:1px solid rgba(255,255,255,.06)}
 .hero-img img{width:100%;max-height:480px;object-fit:cover}
+.hero-video video{width:100%;max-height:520px;background:#000}
+.content video{width:100%;max-width:720px;border-radius:6px;margin:1.25rem 0;background:#000}
 .content{font-size:1.02rem;color:rgba(255,255,255,.88);line-height:1.85;max-width:72ch}
 .content p{margin:0 0 1.35rem;text-align:justify;hyphens:auto}
 .content p:first-of-type{font-size:1.08rem;color:rgba(255,255,255,.92)}
@@ -164,7 +166,8 @@ footer{text-align:center;padding:28px clamp(12px,3vw,28px);font-size:.72rem;colo
         <button class="mode-tab quick ${isQuick?'active':''}" data-mode="quick"><i class="fas fa-bolt"></i> Notícia Rápida</button>
         <button class="mode-tab ${!isQuick?'active':''}" data-mode="full"><i class="fas fa-file-alt"></i> Matéria Completa</button>
       </div>
-      <div class="hero-img"><img src="${esc(art.img)}" alt="${esc(art.title)}"/></div>
+      ${art.video ? `<div class="hero-video"><video src="${esc(art.video)}" controls playsinline></video></div>` :
+        `<div class="hero-img"><img src="${esc(art.img)}" alt="${esc(art.title)}"/></div>`}
       ${isQuick ? `
         <div class="quick-box">
           <div class="qlabel"><i class="fas fa-bolt"></i> Resumo explicativo</div>

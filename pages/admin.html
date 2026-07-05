@@ -7,7 +7,7 @@
 <link rel="apple-touch-icon" href="../assets/images/favicon.jpg"/>
 <title>Painel – Pains Acontece</title>
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
-<meta name="pa-build" content="2026.07.05-v2"/>
+<meta name="pa-build" content="2026.07.05-v3"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
@@ -605,6 +605,9 @@ body.pa-owner .owner-only.btn-pub{display:flex!important}
       <i class="fas fa-robot"></i> IA Scanner
       <span class="sb-badge" id="iaBadge" style="display:none">0</span>
     </div>
+    <div class="sb-item owner-only" onclick="showPanel('divulgacao',this)" id="sbDivulgacao">
+      <i class="fas fa-bullhorn"></i> IA Divulgação
+    </div>
 
     <div class="sb-section">Conteúdo</div>
     <div class="sb-item" onclick="showPanel('categorias',this)">
@@ -739,6 +742,17 @@ body.pa-owner .owner-only.btn-pub{display:flex!important}
         </div>
       </div>
     </div>
+    <!-- ══ IA DIVULGAÇÃO ══ -->
+    <div class="panel" id="panel-divulgacao">
+      <div style="margin-bottom:20px">
+        <h3 style="font-family:var(--ff);font-size:1.6rem;letter-spacing:2px;margin-bottom:4px">
+          <i class="fas fa-bullhorn" style="color:#e67e22"></i> IA de Divulgação
+        </h3>
+        <p style="font-size:.78rem;color:var(--dim)">Rafaela Costa cria campanhas para divulgar o portal em Pains, região e globalmente — WhatsApp, Instagram, Facebook.</p>
+      </div>
+      <div id="divulgacaoMount"></div>
+    </div>
+
     <!-- ══ IA SCANNER ══ -->
     <div class="panel" id="panel-ia">
       <div style="display:flex;align-items:center;gap:16px;margin-bottom:24px;flex-wrap:wrap">
@@ -748,6 +762,9 @@ body.pa-owner .owner-only.btn-pub{display:flex!important}
           </h3>
           <p style="font-size:.78rem;color:var(--dim)">Varredura automática sobre Pains e região — cada notícia precisa da sua aprovação antes de publicar.</p>
         </div>
+        <button class="tb-btn ghost" onclick="resetSearch()" id="btnResetScan" title="Limpar cache e buscar tudo de novo">
+          <i class="fas fa-undo"></i> Resetar Busca
+        </button>
         <button class="tb-btn primary" onclick="runScanNow()" id="btnScan">
           <i class="fas fa-sync-alt"></i> Buscar Agora
         </button>
@@ -844,6 +861,7 @@ body.pa-owner .owner-only.btn-pub{display:flex!important}
             <button class="t-btn" onclick="fmt('insertOrderedList')" title="Lista num."><i class="fas fa-list-ol"></i></button>
             <div class="sep"></div>
             <button class="t-btn" onclick="insertLink()" title="Link"><i class="fas fa-link"></i></button>
+            <button class="t-btn" onclick="insertVideoInContent()" title="Inserir vídeo"><i class="fas fa-video"></i></button>
             <button class="t-btn" onclick="fmt('removeFormat')" title="Limpar"><i class="fas fa-eraser"></i></button>
           </div>
           <div class="inp-field">
@@ -913,6 +931,21 @@ body.pa-owner .owner-only.btn-pub{display:flex!important}
                 <span>JPG, PNG · Máx. 5MB</span>
               </div>
               <input type="file" id="thumbInput" accept="image/*" style="display:none" onchange="previewThumb(this)"/>
+            </div>
+          </div>
+
+          <!-- VÍDEO DA NOTÍCIA -->
+          <div class="side-box">
+            <div class="side-box-head"><i class="fas fa-video"></i>Vídeo da Notícia</div>
+            <div class="side-box-body">
+              <div id="videoPreview"></div>
+              <div class="img-drop" onclick="document.getElementById('videoInput').click()" style="padding:20px">
+                <i class="fas fa-film"></i>
+                <p>Upload de vídeo</p>
+                <span>MP4, WebM · Máx. 25MB</span>
+              </div>
+              <input type="file" id="videoInput" accept="video/mp4,video/webm,video/quicktime" style="display:none" onchange="previewVideo(this)"/>
+              <button class="btn-pub outline" style="padding:8px;font-size:.65rem" onclick="clearVideo()" id="btnClearVideo" style="display:none"><i class="fas fa-times"></i> Remover vídeo</button>
             </div>
           </div>
 
@@ -1193,6 +1226,8 @@ body.pa-owner .owner-only.btn-pub{display:flex!important}
   </div><!-- /content -->
 </div><!-- /main -->
 
+<input type="file" id="contentVideoInput" accept="video/mp4,video/webm,video/quicktime" style="display:none" onchange="onContentVideoSelected(this)"/>
+
 <!-- TOAST CONTAINER -->
 <div class="toast-wrap" id="toastWrap"></div>
 
@@ -1328,9 +1363,11 @@ body.pa-owner .owner-only.btn-pub{display:flex!important}
 <script src="../js/ai/agents/camila.js"></script>
 <script src="../js/ai/orchestrator.js"></script>
 <script src="../js/ai/engine.js"></script>
-<script src="../js/core/api.js?v=20260705"></script>
+<script src="../js/core/api.js?v=20260705v3"></script>
 <script src="../js/core/store.js"></script>
 <script src="../js/ai/assistant.js"></script>
+<script src="../js/ai/agents/rafaela.js"></script>
+<script src="../js/ai/divulgacao-assistant.js"></script>
 <script>
 /* ════ AUTH GUARD ════ */
 let isOwnerUser = false;
@@ -1375,19 +1412,19 @@ function applyRoleRestrictions() {
   if (!sessionStorage.getItem('pa_role')) {
     sessionStorage.setItem('pa_role', PAAPI.resolveRole(u));
   }
-  const name = u.split('@')[0].charAt(0).toUpperCase() + u.split('@')[0].slice(1);
-  document.getElementById('sbName').textContent = name;
-  document.getElementById('sbAvatar').textContent = name.charAt(0).toUpperCase();
-  document.getElementById('bigAvatar').textContent = name.charAt(0).toUpperCase();
-  document.getElementById('phName').textContent = name.charAt(0).toUpperCase() + name.slice(1);
+  const displayName = sessionStorage.getItem('pa_user_name') || u.split('@')[0].charAt(0).toUpperCase() + u.split('@')[0].slice(1);
+  document.getElementById('sbName').textContent = displayName.split(' ')[0];
+  document.getElementById('sbAvatar').textContent = displayName.charAt(0).toUpperCase();
+  document.getElementById('bigAvatar').textContent = displayName.charAt(0).toUpperCase();
+  document.getElementById('phName').textContent = displayName;
   document.getElementById('phEmail').textContent = u;
   applyRoleRestrictions();
 })();
 
 /* ════ NAVIGATION ════ */
 function showPanel(id, el) {
-  if (id === 'ia' && !isOwnerUser) {
-    showToast('IA Scanner disponível apenas para o proprietário.', 'info');
+  if ((id === 'ia' || id === 'divulgacao') && !isOwnerUser) {
+    showToast('Recurso disponível apenas para o proprietário.', 'info');
     id = 'dashboard';
     el = document.querySelector('.sb-item');
   }
@@ -1403,6 +1440,10 @@ function showPanel(id, el) {
   if (id === 'midia') renderMedia();
   if (id === 'nova') initEditor();
   if (id === 'ia' && isOwnerUser) renderPending();
+  if (id === 'divulgacao' && isOwnerUser) {
+    const mount = document.getElementById('divulgacaoMount');
+    if (mount && typeof PADivulgacaoIA !== 'undefined') PADivulgacaoIA.mountInline(mount);
+  }
   if (id === 'categorias') renderCategories();
   if (id === 'agenda') renderEvents();
   if (id === 'empregos_adm') renderJobs();
@@ -1507,6 +1548,17 @@ async function updateScannerStatus() {
     if (s.pending > 0) { badge.style.display = ''; badge.textContent = s.pending; }
     else badge.style.display = 'none';
   } catch {}
+}
+
+async function resetSearch() {
+  if (!confirm('Resetar busca? Isso limpa o cache de fontes já verificadas e todas as notícias pendentes da IA.')) return;
+  try {
+    const res = await PAAPI.resetScanner();
+    knownPendingIds.clear();
+    await renderPending();
+    await updateScannerStatus();
+    showToast(res.message || 'Busca resetada!', 'success');
+  } catch { showToast('Erro ao resetar busca.', 'error'); }
 }
 
 async function runScanNow() {
@@ -1689,6 +1741,13 @@ function editArticle(id) {
   document.getElementById('artContent').innerHTML = a.content || `<p>Conteúdo da notícia: <strong>${a.title}</strong></p><p>Edite o texto aqui…</p>`;
   const catSel = document.getElementById('artCat');
   if (catSel) { catSel.value = a.cat; PASelect.sync('artCat'); }
+  if (a.video) {
+    artVideoData = a.video;
+    const vp = document.getElementById('videoPreview');
+    const btn = document.getElementById('btnClearVideo');
+    if (vp) { vp.style.display = 'block'; vp.innerHTML = `<video src="${a.video}" controls style="width:100%;border-radius:4px;max-height:180px"></video>`; }
+    if (btn) btn.style.display = 'flex';
+  } else clearVideo();
   const statusSel = document.getElementById('artStatus');
   if (statusSel) { statusSel.value = a.status; PASelect.sync('artStatus'); }
   showToast(`Editando: ${a.title.substring(0,40)}…`, 'info');
@@ -1751,6 +1810,7 @@ async function publishArticle(skipPreview) {
     cat: document.getElementById('artCat').value,
     status: document.getElementById('artStatus')?.value === 'draft' ? 'draft' : (document.getElementById('artStatus')?.value === 'review' ? 'review' : 'pub'),
     img: document.getElementById('thumbPreview')?.querySelector('img')?.src || '../assets/images/pains-acontece-logo.png',
+    video: artVideoData || '',
     timeAgo: 'Agora'
   };
   if (editingId) {
@@ -1780,6 +1840,7 @@ function clearEditor() {
   document.getElementById('tagWrap').innerHTML = '';
   document.getElementById('thumbPreview').style.display = 'none';
   document.getElementById('thumbPreview').innerHTML = '';
+  clearVideo();
   const cat = document.getElementById('artCat');
   const st = document.getElementById('artStatus');
   if (cat) { cat.selectedIndex = 0; PASelect.sync('artCat'); }
@@ -1787,9 +1848,12 @@ function clearEditor() {
 }
 
 /* ════ THUMB PREVIEW ════ */
+let artVideoData = '';
+
 function previewThumb(input) {
   const file = input.files[0];
   if (!file) return;
+  if (file.size > 5 * 1024 * 1024) { showToast('Imagem muito grande. Máximo 5MB.', 'error'); return; }
   const reader = new FileReader();
   reader.onload = e => {
     const prev = document.getElementById('thumbPreview');
@@ -1797,6 +1861,52 @@ function previewThumb(input) {
     prev.innerHTML = `<img src="${e.target.result}" alt="Preview" style="border-radius:4px;margin-bottom:8px"/>`;
   };
   reader.readAsDataURL(file);
+}
+
+function previewVideo(input) {
+  const file = input.files[0];
+  if (!file) return;
+  if (file.size > 25 * 1024 * 1024) { showToast('Vídeo muito grande. Máximo 25MB.', 'error'); input.value = ''; return; }
+  const reader = new FileReader();
+  reader.onload = e => {
+    artVideoData = e.target.result;
+    const prev = document.getElementById('videoPreview');
+    const btn = document.getElementById('btnClearVideo');
+    prev.style.display = 'block';
+    prev.innerHTML = `<video src="${artVideoData}" controls style="width:100%;border-radius:4px;margin-bottom:8px;max-height:180px"></video>`;
+    if (btn) btn.style.display = 'flex';
+    showToast(`Vídeo "${file.name}" pronto para publicar!`, 'success');
+  };
+  reader.readAsDataURL(file);
+}
+
+function clearVideo() {
+  artVideoData = '';
+  const prev = document.getElementById('videoPreview');
+  const inp = document.getElementById('videoInput');
+  const btn = document.getElementById('btnClearVideo');
+  if (prev) { prev.innerHTML = ''; prev.style.display = 'none'; }
+  if (inp) inp.value = '';
+  if (btn) btn.style.display = 'none';
+}
+
+function insertVideoInContent() {
+  document.getElementById('contentVideoInput')?.click();
+}
+
+function onContentVideoSelected(input) {
+  const file = input.files[0];
+  if (!file) return;
+  if (file.size > 25 * 1024 * 1024) { showToast('Vídeo muito grande. Máximo 25MB.', 'error'); input.value = ''; return; }
+  const reader = new FileReader();
+  reader.onload = e => {
+    const content = document.getElementById('artContent');
+    const vid = `<p><video src="${e.target.result}" controls style="width:100%;max-width:640px;border-radius:6px"></video></p>`;
+    content.innerHTML += vid;
+    showToast('Vídeo inserido no conteúdo!', 'success');
+  };
+  reader.readAsDataURL(file);
+  input.value = '';
 }
 
 /* ════ TAGS ════ */
