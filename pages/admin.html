@@ -2818,9 +2818,8 @@ async function confirmDeleteAll() {
     btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Removendo…';
   }
   try {
-    for (const a of [...arts]) {
-      await PAStore.deleteArticle(a.id);
-    }
+    await PAAPI.purgeAllPublications();
+    await PAStore.refreshFromCloud?.().catch(() => PAStore.init());
     closeModal('deleteAllModal');
     showToast(`${total} publicação${total > 1 ? 'ões removidas' : ' removida'} com sucesso.`, 'error');
     renderPubs();
@@ -2828,7 +2827,7 @@ async function confirmDeleteAll() {
     if (typeof window.PAHomeRefresh === 'function') window.PAHomeRefresh();
   } catch (err) {
     console.error('[admin] deleteAll', err);
-    showToast('Erro ao remover publicações. Algumas podem ter sido excluídas — recarregue a lista.', 'error');
+    showToast('Erro ao remover publicações. Tente novamente.', 'error');
     renderPubs();
     renderDashboard();
   } finally {

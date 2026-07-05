@@ -79,7 +79,14 @@ const PAStore = (function () {
   }
 
   function articlesForAdmin() {
-    return [...articles];
+    let deleted = [];
+    try {
+      const state = JSON.parse(localStorage.getItem('pa_admin_state_v2') || '{}');
+      deleted = (state.deleted || []).map(String);
+    } catch {}
+    if (!deleted.length) return [...articles];
+    const hidden = new Set(deleted);
+    return articles.filter(a => !hidden.has(String(a.id)));
   }
 
   async function addArticle(payload) {

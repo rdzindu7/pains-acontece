@@ -105,21 +105,36 @@ const PAAPI = (function () {
 
   async function fetchArticleFromJson(id) {
     try {
+      const sid = String(id);
       const base = await fetchJson('articles.json');
+      const fromBase = base.find(a => String(a.id) === sid);
+      if (fromBase) return fromBase;
       const state = getState();
-      const merged = mergeArticles(base, state.articles);
-      return merged.find(a => String(a.id) === String(id)) || null;
+      return (state.articles || []).find(a => String(a.id) === sid) || null;
     } catch {
       return null;
     }
   }
 
+  /** Lista pública — nunca aplica deleted (só o painel admin filtra removidas). */
   async function fetchArticlesFromJson(status) {
     try {
       const base = await fetchJson('articles.json');
       const state = getState();
       let list = mergeArticles(base, state.articles);
-      if (state.deleted?.length && isAdminSession()) {
+      if (status) list = list.filter(a => a.status === status);
+      return list;
+    } catch {
+      return [];
+    }
+  }
+
+  async function fetchArticlesForAdmin(status) {
+    try {
+      const base = await fetchJson('articles.json');
+      const state = getState();
+      let list = mergeArticles(base, state.articles);
+      if (state.deleted?.length) {
         list = list.filter(a => !state.deleted.includes(String(a.id)));
       }
       if (status) list = list.filter(a => a.status === status);
@@ -270,8 +285,39 @@ const PAAPI = (function () {
       sessionStorage.setItem('pa_auth_mode', 'local');
       return local;
     }
+    /* Visitante sem login: JSON local (rápido e completo). Nuvem só com sessão admin. */
+    if (!sessionStorage.getItem('pa_auth_mode')) return local;
     if (await isCloudReady()) return remote;
     return local;
+  }
+
+  async function getArticlesPublic(status) {
+    let remoteList = [];
+    if (supabaseConfigured() && sessionStorage.getItem('pa_auth_mode')) {
+      try {
+        if (await isCloudReady()) {
+          let q = sb().from('articles').select('*').order('id', { ascending: false });
+          if (status) q = q.eq('status', status);
+          const { data, error } = await q;
+          if (!error) remoteList = (data || []).map(rowToArticle);
+        }
+      } catch {}
+    }
+    const jsonList = await fetchArticlesFromJson(status);
+    if (remoteList.length) return mergeArticles(jsonList, remoteList);
+    return jsonList;
+  }
+
+  async function getArticlePublic(id) {
+    const fromJson = await fetchArticleFromJson(id);
+    if (fromJson) return fromJson;
+    try {
+      if (supabaseConfigured() && sessionStorage.getItem('pa_auth_mode') && await isCloudReady()) {
+        const { data, error } = await sb().from('articles').select('*').eq('id', id).maybeSingle();
+        if (!error && data) return rowToArticle(data);
+      }
+    } catch {}
+    return (getState().articles || []).find(a => String(a.id) === String(id)) || null;
   }
 
   function normalizePauta(data) {
@@ -1082,9 +1128,12 @@ const PAAPI = (function () {
     login,
     logout,
     isSupabaseMode: async () => (await getBackend()).isSupabaseMode(),
-    getArticles: async (s) => (await getBackend()).getArticles(s),
-    getArticle: async (id) => (await getBackend()).getArticle(id),
+    getArticles: async (s) => getArticlesPublic(s),
+    getArticle: async (id) => getArticlePublic(id),
+    getArticlesAdmin: async (s) => (await getBackend()).getArticles(s),
     fetchArticleFromJson,
+    getArticlePublic,
+    getArticlesPublic,
     addArticle: async (d) => (await getBackend()).addArticle(d),
     updateArticle: async (id, d) => (await getBackend()).updateArticle(id, d),
     deleteArticle: async (id) => (await getBackend()).deleteArticle(id),
