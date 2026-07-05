@@ -366,6 +366,17 @@ const PAAPI = (function () {
       return Promise.resolve({ ok: true, message: 'Busca resetada. Todas as fontes serão verificadas novamente.' });
     },
 
+    purgeAllPublications() {
+      const state = getState();
+      state.articles = [];
+      state.deleted = [];
+      state.pending = [];
+      state.scanner = normalizeScanner({ last_scan: null, seen_urls: [] });
+      saveAdminState(state);
+      try { localStorage.removeItem('pa_articles_cache_v2'); } catch {}
+      return Promise.resolve({ ok: true, removed: 'all' });
+    },
+
     sendPauta(data) {
       const state = getState();
       state.pautas = state.pautas || [];
@@ -640,6 +651,15 @@ const PAAPI = (function () {
 
     importFromFile() {
       return Promise.reject(new Error('Com Supabase ativo, os dados já estão na nuvem. Importação não é necessária.'));
+    },
+
+    async purgeAllPublications() {
+      await sb().from('pending_articles').delete().neq('id', '');
+      await sb().from('articles').delete().gte('id', 0);
+      await sb().from('scanner_state').upsert({
+        id: 1, seen_urls: [], last_scan: null, interval_minutes: SCAN_INTERVAL_MINUTES
+      });
+      return local.purgeAllPublications();
     }
   };
 
@@ -675,6 +695,11 @@ const PAAPI = (function () {
       const b = await getBackend();
       if (b.resetScanner) return b.resetScanner();
       return local.resetScanner();
+    },
+    purgeAllPublications: async () => {
+      const b = await getBackend();
+      if (b.purgeAllPublications) return b.purgeAllPublications();
+      return local.purgeAllPublications();
     },
     aiChat: (msg, ctx) => PAEngine.chat(msg, ctx),
     aiOrganize: (text, hints) => PAEngine.organizeNews(text, hints),
