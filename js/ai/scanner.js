@@ -130,7 +130,7 @@ const PAScanner = (function () {
       try {
         const res = await fetch(u, { signal: AbortSignal.timeout(18000) });
         const text = await res.text();
-        if (text && text.includes('<item') && !text.includes('<html')) return text;
+        if (text && text.includes('<item') && !/<html/i.test(text)) return text;
       } catch {}
     }
     return null;
@@ -179,12 +179,46 @@ const PAScanner = (function () {
     return items;
   }
 
-  async function fetchAllFeeds() {
+  let feedCache = null;
+  let feedCacheAt = 0;
+  const CACHE_TTL = 8 * 60 * 1000;
+
+  const STOPWORDS = new Set([
+    'sobre', 'como', 'qual', 'quais', 'quando', 'onde', 'porque', 'por', 'para', 'com', 'sem',
+    'uma', 'uns', 'umas', 'the', 'and', 'que', 'dos', 'das', 'nos', 'nas', 'pelo', 'pela',
+    'isso', 'essa', 'esse', 'este', 'esta', 'aqui', 'ali', 'mais', 'menos', 'muito', 'pouco',
+    'noticia', 'noticias', 'recente', 'recentes', 'aconteceu', 'ultimas', 'buscar', 'verificar'
+  ]);
+
+  function keywords(text) {
+    const n = norm(text);
+    const tokens = n.split(/[^a-z0-9]+/).filter(w => w.length >= 3 && !STOPWORDS.has(w));
+    const places = ['pains', 'formiga', 'piumhi', 'minas', 'gerais', 'brasil', 'mundo', 'regiao'];
+    places.forEach(p => { if (n.includes(p) && !tokens.includes(p)) tokens.unshift(p); });
+    return [...new Set(tokens)];
+  }
+
+  function matchScore(text, keys) {
+    if (!keys.length) return 0;
+    const n = norm(text);
+    let hits = 0;
+    keys.forEach(k => { if (n.includes(k)) hits++; });
+    return hits / keys.length;
+  }
+
+  async function getFeedItems(force) {
+    if (!force && feedCache && Date.now() - feedCacheAt < CACHE_TTL) return feedCache;
     const results = await Promise.all(RSS_FEEDS.map(async cfg => {
       const items = await fetchFeed(cfg);
       return items.map(i => ({ ...i, feedPriority: cfg.priority || 0, world: !!cfg.world }));
     }));
-    return results.flat();
+    feedCache = results.flat();
+    feedCacheAt = Date.now();
+    return feedCache;
+  }
+
+  async function fetchAllFeeds() {
+    return getFeedItems(false);
   }
 
   async function scanNews(seenUrls = []) {
@@ -201,25 +235,95 @@ const PAScanner = (function () {
     return { items, seenUrls: [...seen], total: all.length };
   }
 
+  async function searchHeadlines(query, limit = 8) {
+    const keys = keywords(query);
+    const all = await getFeedItems(false);
+    if (!all.length) return [];
+
+    return all
+      .map(item => ({
+        ...item,
+        score: matchScore(item.title + ' ' + stripHtml(item.summary), keys) + (item.feedPriority || 0) * 0.05
+      }))
+      .filter(i => i.score >= 0.2 || (keys.includes('pains') && norm(i.title).includes('pains')))
+      .sort((a, b) => b.score - a.score || b.pubDate - a.pubDate)
+      .slice(0, limit);
+  }
+
+  async function searchPublished(query, limit = 8) {
+    let articles = [];
+    try {
+      if (typeof PAStore !== 'undefined' && PAStore.getArticles) {
+        articles = PAStore.getArticles('pub');
+      }
+      if (!articles.length && typeof PAAPI !== 'undefined') {
+        articles = await PAAPI.getArticles('pub');
+      }
+    } catch {}
+    const keys = keywords(query);
+    return articles
+      .map(a => ({
+        ...a,
+        score: matchScore((a.title || '') + ' ' + (a.lead || ''), keys) + (a.verified ? 0.15 : 0)
+      }))
+      .filter(a => a.score >= 0.15)
+      .sort((a, b) => b.score - a.score)
+      .slice(0, limit);
+  }
+
   async function verifyText(text) {
-    const results = await Promise.all(RSS_FEEDS.slice(0, 4).map(fetchFeed));
-    const all = results.flat();
-    const words = norm(text).split(/\s+/).filter(w => w.length > 4);
-    const matches = all.filter(item => words.filter(w => norm(item.title + ' ' + item.summary).includes(w)).length >= Math.min(4, words.length * 0.3));
-    const trusted = matches.filter(m => isTrusted(m.link));
-    let confidence = 35;
-    if (matches.length) confidence += 25;
-    if (trusted.length) confidence += 25;
-    if (matches.length >= 2) confidence += 15;
-    confidence = Math.min(95, confidence);
+    const keys = keywords(text);
+    const [all, published] = await Promise.all([
+      getFeedItems(false),
+      searchPublished(text, 12)
+    ]);
+
+    const feedMatches = all
+      .map(item => ({
+        ...item,
+        score: matchScore(item.title + ' ' + stripHtml(item.summary), keys)
+      }))
+      .filter(i => i.score >= 0.25)
+      .sort((a, b) => b.score - a.score);
+
+    const trusted = feedMatches.filter(m => isTrusted(m.link));
+    const pubMatches = published.filter(a => matchScore((a.title || '') + ' ' + (a.lead || ''), keys) >= 0.2);
+
+    let confidence = 38;
+    if (feedMatches.length) confidence += 18;
+    if (feedMatches.length >= 2) confidence += 12;
+    if (feedMatches.length >= 4) confidence += 8;
+    if (trusted.length) confidence += 15;
+    if (pubMatches.length) confidence += 12;
+    if (keys.includes('pains') && feedMatches.some(m => norm(m.title).includes('pains'))) confidence += 10;
+    if (!all.length && pubMatches.length) confidence = Math.max(confidence, 62);
+    confidence = Math.min(96, confidence);
+
+    const sources = [
+      ...pubMatches.slice(0, 3).map(a => ({ title: a.title, url: 'pages/noticia.html?id=' + a.id, source: 'Pains Acontece', local: true })),
+      ...feedMatches.slice(0, 5).map(m => ({ title: m.title, url: m.link, source: m.source }))
+    ].slice(0, 6);
+
+    const verified = confidence >= 58 || pubMatches.length >= 1 || trusted.length >= 1;
+
     return {
-      verified: confidence >= 60, confidence,
-      sources: matches.slice(0, 5).map(m => ({ title: m.title, url: m.link, source: m.source })),
-      message: confidence >= 60
-        ? `Informação corroborada por ${matches.length} fonte(s). Confiança: ${confidence}%.`
-        : `Verificação parcial (${confidence}%). Revise antes de publicar.`
+      verified,
+      confidence,
+      sources,
+      feedCount: feedMatches.length,
+      publishedCount: pubMatches.length,
+      feedsLoaded: all.length,
+      message: verified
+        ? `Informação corroborada por ${sources.length} fonte(s)${pubMatches.length ? ' (inclui matérias do portal)' : ''}. Confiança: ${confidence}%.`
+        : all.length
+          ? `Poucas correspondências nas fontes (${feedMatches.length} de ${all.length} analisadas). Confiança: ${confidence}%.`
+          : 'Feeds temporariamente indisponíveis — use "Buscar Agora" para nova varredura.'
     };
   }
 
-  return { scanNews, scanNewsFull, verifyText, detectCategory, pickImage, formatDate, RSS_FEEDS };
+  return {
+    scanNews, scanNewsFull, verifyText, searchHeadlines, searchPublished,
+    detectCategory, pickImage, formatDate, keywords, RSS_FEEDS,
+    invalidateCache: () => { feedCache = null; feedCacheAt = 0; }
+  };
 })();

@@ -65,6 +65,7 @@ const PAPublicIA = (function () {
     scanning = true;
     addMsg('bot', '<i class="fas fa-satellite-dish"></i> Varredura inteligente em andamento: Pains MG, região, Brasil e mundo…');
     try {
+      PAScanner.invalidateCache?.();
       const result = await PAAutoPublisher.run(true);
       await PAStore.init();
       if (typeof window.PAHomeRefresh === 'function') window.PAHomeRefresh();
@@ -79,6 +80,12 @@ const PAPublicIA = (function () {
     scanning = false;
   }
 
+  async function sendDirect(text) {
+    const input = document.getElementById('papiaInput');
+    if (input) input.value = text;
+    await send();
+  }
+
   async function send() {
     const input = document.getElementById('papiaInput');
     const msg = (input?.value || '').trim();
@@ -86,7 +93,7 @@ const PAPublicIA = (function () {
     addMsg('user', esc(msg));
     input.value = '';
 
-    if (/^(buscar|varrer|scanner|atualizar|noticias|notícias)/i.test(msg)) {
+    if (/^(buscar|varrer|scanner|atualizar)(\s|$)/i.test(msg)) {
       await runSearch();
       return;
     }
@@ -97,12 +104,18 @@ const PAPublicIA = (function () {
     document.getElementById('papiaMsgs')?.appendChild(typing);
 
     try {
+      if (typeof PAStore !== 'undefined' && !PAStore.getArticles('pub').length) {
+        await PAStore.init().catch(() => {});
+      }
       const res = await PAAPI.aiChat(msg, {});
       typing.remove();
       let extra = '';
-      if (res.verification) {
+      if (res.verification && res.action !== 'greeting' && res.action !== 'help') {
         const ok = res.verification.verified;
-        extra = `<br><span style="font-size:.65rem;color:${ok ? '#2ecc2e' : '#c9a227'}">${ok ? '✓' : '⚠'} ${res.verification.confidence}% confiança</span>`;
+        extra = `<br><span style="font-size:.65rem;color:${ok ? '#2ecc2e' : '#c9a227'}">${ok ? '✓' : '◆'} ${res.verification.confidence}% · ${res.verification.sources?.length || 0} fonte(s)</span>`;
+      }
+      if (res.action === 'scan') {
+        extra += '<br><button class="papia-act" style="margin-top:8px" onclick="PAPublicIA.runSearch()">▶ Executar Busca Agora</button>';
       }
       addMsg('bot', fmt(res.reply) + extra);
     } catch {
@@ -114,9 +127,9 @@ const PAPublicIA = (function () {
   function quick(cmd) {
     const input = document.getElementById('papiaInput');
     if (cmd === 'buscar') { runSearch(); return; }
-    if (cmd === 'pains') input.value = 'O que aconteceu recentemente em Pains MG?';
-    if (cmd === 'mundo') input.value = 'buscar notícias do mundo';
-    if (cmd === 'clima') input.value = 'como está o clima em Pains?';
+    if (cmd === 'pains') { sendDirect('O que aconteceu recentemente em Pains MG?'); return; }
+    if (cmd === 'mundo') { sendDirect('Quais as notícias do Brasil e mundo agora?'); return; }
+    if (cmd === 'clima') { sendDirect('como está o clima em Pains?'); return; }
     if (input?.value.trim()) send();
   }
 

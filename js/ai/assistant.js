@@ -136,7 +136,7 @@ const PAIA = (function () {
         extra = `<div class="verif ${cls}">${lbl} — ${res.verification.confidence}%</div>`;
       }
       addMsg('bot', res.reply, extra);
-      if (res.article) {
+      if (res.article && res.action === 'organize') {
         lastArticle = res.article;
         applyToEditor(true);
       }
