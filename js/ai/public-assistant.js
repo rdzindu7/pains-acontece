@@ -396,11 +396,18 @@ const PAPublicIA = (function () {
     if (input?.value.trim()) send();
   }
 
+  function teamSubtitle() {
+    const team = typeof PAOrchestrator !== 'undefined' ? PAOrchestrator.getTeam() : [];
+    if (team.length > 3) return team.map(a => esc(a.name.split(' ')[0])).join(' · ');
+    return 'Sofia · Lucas · Camila' + (typeof PATiago !== 'undefined' ? ' · Tiago' : '');
+  }
+
   function teamHtml() {
     const team = typeof PAOrchestrator !== 'undefined' ? PAOrchestrator.getTeam() : [
       { id: 'sofia', name: 'Sofia Mendes', role: 'Atendimento', icon: 'fa-headset', color: '#5dade2' },
       { id: 'lucas', name: 'Lucas Ferreira', role: 'Fontes', icon: 'fa-search', color: '#2ecc71' },
-      { id: 'camila', name: 'Camila Rocha', role: 'Editora', icon: 'fa-pen-nib', color: '#c9a227' }
+      { id: 'camila', name: 'Camila Rocha', role: 'Editora', icon: 'fa-pen-nib', color: '#c9a227' },
+      ...(typeof PATiago !== 'undefined' && PATiago.PROFILE ? [PATiago.PROFILE] : [])
     ];
     return team.map(a => `
       <div class="papia-team-member" data-agent="${a.id}" style="--ag-c:${a.color}">
@@ -467,7 +474,7 @@ const PAPublicIA = (function () {
         <div class="av"><i class="fas fa-users"></i></div>
         <div class="meta">
           <h4>${isOwnerMode() ? 'Equipe IA Editorial' : 'Tire suas dúvidas'}</h4>
-          <div class="sub">Sofia · Lucas · Camila</div>
+          <div class="sub" id="papiaTeamSub">${teamSubtitle()}</div>
         </div>
         <button type="button" onclick="PAPublicIA.toggle(false)" title="Fechar" aria-label="Fechar"><i class="fas fa-times"></i></button>
       </div>
@@ -493,9 +500,31 @@ const PAPublicIA = (function () {
     addMsg('bot', welcomeMsg(), PASofia?.PROFILE);
   }
 
+  function refreshForArticle() {
+    const team = document.getElementById('papiaTeam');
+    const actions = document.getElementById('papiaActions');
+    const sub = document.getElementById('papiaTeamSub');
+    if (team) team.innerHTML = teamHtml();
+    if (actions) actions.innerHTML = actionsHtml();
+    if (sub) sub.textContent = teamSubtitle().replace(/<[^>]+>/g, '');
+    if (window.PACurrentArticle && document.getElementById('papiaMsgs')) {
+      const msgs = document.getElementById('papiaMsgs');
+      if (msgs.children.length <= 1) {
+        msgs.innerHTML = '';
+        setActiveAgent('sofia');
+        addMsg('bot', welcomeMsg(), PASofia?.PROFILE);
+      }
+    }
+  }
+
+  function openAssistant() {
+    if (!document.getElementById('papiaPanel')) createUI();
+    toggle(true);
+  }
+
   function init() {
     const onHome = !!document.getElementById('heroDynamic');
-    const onArticle = !!document.querySelector('main#main') && /noticia\.html/i.test(location.pathname);
+    const onArticle = document.body.classList.contains('page-noticia') || /noticia\.html/i.test(location.pathname);
     if (!onHome && !onArticle) return;
     createUI();
   }
@@ -507,5 +536,5 @@ const PAPublicIA = (function () {
 
   whenReady(init);
 
-  return { init, toggle, send, quick, runSearch };
+  return { init, toggle, send, quick, runSearch, refreshForArticle, openAssistant };
 })();

@@ -75,7 +75,9 @@ const PAOrchestrator = (function () {
   }
 
   function getTeam() {
-    return [PASofia.PROFILE, PALucas.PROFILE, PACamila.PROFILE];
+    const team = [PASofia.PROFILE, PALucas.PROFILE, PACamila.PROFILE];
+    if (typeof PATiago !== 'undefined' && PATiago.PROFILE) team.push(PATiago.PROFILE);
+    return team;
   }
 
   return { process, runScan, setAgentCallback, getTeam };

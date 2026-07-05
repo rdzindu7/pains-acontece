@@ -6,7 +6,7 @@
 <link rel="icon" type="image/jpeg" href="../assets/images/favicon.jpg"/>
 <link rel="apple-touch-icon" href="../assets/images/favicon.jpg"/>
 <title>Notícia – Pains Acontece</title>
-<meta name="pa-build" content="2026.07.05-v31"/>
+<meta name="pa-build" content="2026.07.05-v34"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,700;0,900;1,700&display=swap" rel="stylesheet"/>
@@ -66,6 +66,12 @@ body::before{content:'';position:fixed;inset:0;
 .top-inner a:first-child:hover img{transform:scale(1.05);filter:drop-shadow(0 0 14px rgba(29,122,29,.7))}
 .back{font-size:.76rem;color:var(--g3);display:flex;align-items:center;gap:8px;transition:color .2s,gap .2s,transform .2s}
 .back:hover{color:var(--y);gap:10px;transform:translateX(-2px)}
+.top-ia-btn{font-size:.72rem;font-weight:600;color:#fff;display:inline-flex;align-items:center;gap:7px;
+  padding:8px 14px;border-radius:20px;border:1px solid rgba(29,122,29,.45);
+  background:linear-gradient(135deg,rgba(29,122,29,.35),rgba(13,77,13,.2));cursor:pointer;font-family:inherit;
+  transition:all .25s var(--ease);white-space:nowrap}
+.top-ia-btn i{color:var(--g3);font-size:.78rem}
+.top-ia-btn:hover{border-color:var(--g3);transform:translateY(-1px);box-shadow:0 6px 20px rgba(29,122,29,.35)}
 
 /* Skeleton */
 .art-skeleton{padding:0 0 80px;animation:skFadeIn .4s var(--ease)}
@@ -240,13 +246,6 @@ body::before{content:'';position:fixed;inset:0;
 .aside-toc a::before{content:'';width:4px;height:4px;border-radius:50%;background:var(--g3);margin-top:7px;flex-shrink:0;opacity:.5;transition:opacity .2s}
 .aside-toc a:hover,.aside-toc a.active{color:var(--g3);background:rgba(29,122,29,.1);padding-left:12px}
 .aside-toc a:hover::before,.aside-toc a.active::before{opacity:1}
-.aside-ia-btn{width:100%;padding:14px 16px;border-radius:10px;border:1px solid rgba(29,122,29,.4);
-  background:linear-gradient(135deg,rgba(29,122,29,.25),rgba(13,77,13,.15));color:#fff;font-size:.78rem;font-weight:600;
-  cursor:pointer;display:flex;align-items:center;gap:10px;transition:all .3s var(--ease);font-family:inherit}
-.aside-ia-btn i{font-size:1rem;color:var(--g3)}
-.aside-ia-btn:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(29,122,29,.35);border-color:var(--g3)}
-.aside-ia-btn .ia-pulse{width:8px;height:8px;border-radius:50%;background:var(--g3);animation:iaPulse 1.8s ease infinite;margin-left:auto}
-@keyframes iaPulse{0%,100%{opacity:1;box-shadow:0 0 0 0 rgba(46,204,46,.5)}50%{opacity:.5;box-shadow:0 0 0 6px rgba(46,204,46,0)}}
 .aside-mini-rel{display:flex;flex-direction:column;gap:10px}
 .aside-mini-rel a{display:flex;gap:10px;align-items:center;padding:8px;border-radius:8px;
   transition:background .25s,transform .25s}
@@ -320,6 +319,9 @@ body.cat-pains{--accent:#1d7a1d;--accent-glow:rgba(29,122,29,.35)}
   <div class="top-inner">
     <a href="../index.html"><img src="../assets/images/pains-acontece-logo.png" alt="Pains Acontece"/></a>
     <div style="margin-left:auto;display:flex;align-items:center;gap:12px">
+      <button type="button" class="top-ia-btn" id="btnTopIA" title="Equipe IA — Sofia, Lucas, Camila e Tiago">
+        <i class="fas fa-users"></i> Equipe IA
+      </button>
       <div id="paUserNav" class="pa-user-nav"></div>
       <a href="../index.html" class="back"><i class="fas fa-arrow-left"></i> Voltar</a>
     </div>
@@ -337,20 +339,23 @@ body.cat-pains{--accent:#1d7a1d;--accent-glow:rgba(29,122,29,.35)}
 <script src="../js/core/supabase-client.js"></script>
 <script src="../js/ui/article-format.js"></script>
 <script src="../js/ai/scanner.js"></script>
-<script src="../js/core/purge.js?v=20260705v31"></script>
-<script src="../js/core/api.js?v=20260705v31"></script>
-<script src="../js/ui/ads.js?v=20260705v31"></script>
-<script src="../js/core/store.js?v=20260705v31"></script>
+<script src="../js/core/purge.js?v=20260705v34"></script>
+<script src="../js/core/api.js?v=20260705v34"></script>
+<script src="../js/ui/ads.js?v=20260705v34"></script>
+<script src="../js/core/store.js?v=20260705v34"></script>
 
 <script src="../js/ai/agents/sofia.js"></script>
 <script src="../js/ai/agents/lucas.js"></script>
 <script src="../js/ai/agents/camila.js"></script>
+<script src="../js/ai/agents/tiago.js?v=20260705v34"></script>
+<script src="../js/ai/bus-assistant.js?v=20260705v34"></script>
+<script src="../js/ai/news-search.js?v=20260705v34"></script>
 <script src="../js/ai/orchestrator.js"></script>
-<script src="../js/ai/public-assistant.js"></script>
-<script src="../js/ui/dialog.js?v=20260705v31"></script>
-<script src="../js/core/social.js?v=20260705v31"></script>
-<script src="../js/ui/social-widget.js?v=20260705v31"></script>
-<script src="../js/ui/user-nav.js?v=20260705v31"></script>
+<script src="../js/ai/public-assistant.js?v=20260705v34"></script>
+<script src="../js/ui/dialog.js?v=20260705v34"></script>
+<script src="../js/core/social.js?v=20260705v34"></script>
+<script src="../js/ui/social-widget.js?v=20260705v34"></script>
+<script src="../js/ui/user-nav.js?v=20260705v34"></script>
 <script>
 (async function(){
   const params = new URLSearchParams(location.search);
@@ -467,7 +472,6 @@ body.cat-pains{--accent:#1d7a1d;--accent-glow:rgba(29,122,29,.35)}
 
   document.title=art.title+' – Pains Acontece';
   window.PACurrentArticle=art;
-  if(typeof PAPublicIA!=='undefined')PAPublicIA.init();
   PAStore.incrementViews(id).catch(()=>{});
 
   const related=PAStore.getArticles('pub').filter(a=>a.id!==art.id&&a.cat===art.cat).slice(0,3);
@@ -646,13 +650,6 @@ body.cat-pains{--accent:#1d7a1d;--accent-glow:rgba(29,122,29,.35)}
         <a href="noticia.html?id=${r.id}" class="rel-card reveal reveal-delay-${(i%4)+1}"><img src="${esc(r.img)}" alt=""/><div class="body"><h4>${esc(r.title)}</h4><div class="rel-cat">${esc(r.cat)}</div></div></a>`).join('')}</div></div>`:''}
     </article>
     <aside class="article-aside">
-      <div class="aside-card reveal">
-        <button type="button" class="aside-ia-btn" id="btnAsideIA">
-          <i class="fas fa-robot"></i>
-          <span>Pergunte à IA sobre esta matéria</span>
-          <span class="ia-pulse"></span>
-        </button>
-      </div>
       ${tocHtml}
       <div id="adArticleSidebar"></div>
       ${miniRel}
@@ -668,11 +665,6 @@ body.cat-pains{--accent:#1d7a1d;--accent-glow:rgba(29,122,29,.35)}
       navigator.clipboard.writeText(location.href).then(()=>{
         if(typeof PADialog!=='undefined')PADialog.toast('Link copiado!','success');
       }).catch(()=>PADialog?.alert?.({message:'Não foi possível copiar o link.',variant:'warning'}));
-    });
-    document.getElementById('btnAsideIA')?.addEventListener('click',()=>{
-      const fab=document.querySelector('.papia-fab');
-      if(fab)fab.click();
-      else if(typeof PADialog!=='undefined')PADialog.toast('Assistente IA carregando…','info');
     });
     document.getElementById('fabShare')?.addEventListener('click',()=>{
       document.querySelector('.share')?.scrollIntoView({behavior:'smooth',block:'center'});
@@ -694,7 +686,15 @@ body.cat-pains{--accent:#1d7a1d;--accent-glow:rgba(29,122,29,.35)}
   }
 
   try{PAUserNav.init('#paUserNav')}catch(e){console.warn('[noticia] nav',e)}
+  document.getElementById('btnTopIA')?.addEventListener('click',()=>{
+    if(typeof PAPublicIA!=='undefined')PAPublicIA.openAssistant();
+    else if(typeof PADialog!=='undefined')PADialog.toast('Equipe IA carregando…','info');
+  });
   render();
+  if(typeof PAPublicIA!=='undefined'){
+    if(!document.getElementById('papiaPanel'))PAPublicIA.init();
+    PAPublicIA.refreshForArticle();
+  }
 })();
 </script>
 </body>
