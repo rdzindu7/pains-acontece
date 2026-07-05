@@ -73,12 +73,9 @@ async function main() {
   const articles = await fetchPublished(url, key);
   let existing = [];
   try { existing = JSON.parse(readFileSync(OUT, 'utf8')); } catch {}
-  if (!articles.length && existing.length && process.env.KEEP_LOCAL_ARTICLES === '1') {
-    console.log(`⚠ Supabase vazio — mantendo ${existing.length} artigo(s) locais (KEEP_LOCAL_ARTICLES=1)`);
-    return existing.length;
-  }
   if (!articles.length && existing.length) {
-    console.log(`✓ Supabase vazio — articles.json atualizado para [] (era ${existing.length})`);
+    console.log(`⚠ Supabase vazio — mantendo ${existing.length} artigo(s) em articles.json`);
+    return existing.length;
   }
   writeFileSync(OUT, JSON.stringify(articles, null, 2) + '\n', 'utf8');
   console.log(`✓ ${articles.length} artigo(s) → data/articles.json`);

@@ -109,6 +109,7 @@ const PAAPI = (function () {
   }
 
   function isArticleDeleted(id) {
+    if (!isAdminSession()) return false;
     return getDeletedSet().has(String(id));
   }
 
