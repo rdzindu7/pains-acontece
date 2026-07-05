@@ -13,7 +13,8 @@
     restaurantes:{ type: 'scroll', target: '#restaurantes' },
     telefones:   { type: 'scroll', target: '#telefones', highlight: true },
     clima:       { type: 'scroll', target: '#clima-section', highlight: true },
-    contato:     { type: 'scroll', target: '#contato', highlight: true }
+    contato:     { type: 'scroll', target: '#contato', highlight: true },
+    publicidades:{ type: 'scroll', target: '#publicidades', highlight: true }
   };
 
   let allPub = [];

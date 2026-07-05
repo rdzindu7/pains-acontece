@@ -6,6 +6,8 @@
 <link rel="icon" type="image/jpeg" href="../assets/images/favicon.jpg"/>
 <link rel="apple-touch-icon" href="../assets/images/favicon.jpg"/>
 <title>Painel – Pains Acontece</title>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+<meta name="pa-build" content="2026.07.05-v2"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
@@ -551,7 +553,9 @@ body{background:var(--k2);font-family:var(--fb);color:var(--w);display:flex}
   color:var(--y2);font-size:.58rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;
   padding:3px 10px;border-radius:20px;margin-left:8px;
 }
-.owner-only.hidden{display:none!important}
+.owner-only{display:none!important}
+body.pa-owner .owner-only.sb-item{display:flex!important}
+body.pa-owner .owner-only.btn-pub{display:flex!important}
 
 /* RESPONSIVO */
 @media(max-width:900px){
@@ -592,7 +596,7 @@ body{background:var(--k2);font-family:var(--fb);color:var(--w);display:flex}
     </div>
     <div class="sb-item" onclick="showPanel('publicacoes',this)">
       <i class="fas fa-newspaper"></i> Publicações
-      <span class="sb-badge green">24</span>
+      <span class="sb-badge green" id="sbPubBadge" style="display:none">0</span>
     </div>
     <div class="sb-item" onclick="showPanel('nova',this)">
       <i class="fas fa-plus-circle"></i> Nova Notícia
@@ -728,9 +732,9 @@ body{background:var(--k2);font-family:var(--fb);color:var(--w);display:flex}
 
           <div class="box">
             <div class="box-head"><h3>Pautas Recentes</h3></div>
-            <div class="art-row"><div class="info"><div class="title">Buraco na Rua das Flores há 3 meses</div><div class="meta">João Silva · Há 2h</div></div><span class="pill draft">Nova</span></div>
-            <div class="art-row"><div class="info"><div class="title">Falta de médico no PSF do Bairro João XXIII</div><div class="meta">Maria Costa · Ontem</div></div><span class="pill draft">Nova</span></div>
-            <div class="art-row"><div class="info"><div class="title">Evento de música na praça central</div><div class="meta">Redação · 2 dias</div></div><span class="pill review">Lida</span></div>
+            <div id="dashPautasList">
+              <div style="padding:18px;text-align:center;color:var(--dim);font-size:.78rem">Nenhuma pauta recebida ainda.</div>
+            </div>
           </div>
         </div>
       </div>
@@ -1025,14 +1029,7 @@ body{background:var(--k2);font-family:var(--fb);color:var(--w);display:flex}
       <div style="max-width:600px">
         <div class="box">
           <div class="box-head"><h3>Gerenciar Categorias</h3><button class="tb-btn primary" style="font-size:.65rem;padding:6px 12px" onclick="addCategory()"><i class="fas fa-plus"></i> Nova</button></div>
-          <div id="catList">
-            <div class="art-row"><div class="info"><div class="title">Últimas Notícias</div><div class="meta">47 artigos</div></div><div style="display:flex;gap:6px"><button class="icon-btn edit" onclick="showToast('Editar categoria','info')"><i class="fas fa-edit"></i></button><button class="icon-btn del" onclick="showToast('Categoria excluída','error')"><i class="fas fa-trash"></i></button></div></div>
-            <div class="art-row"><div class="info"><div class="title">Pains</div><div class="meta">38 artigos</div></div><div style="display:flex;gap:6px"><button class="icon-btn edit"><i class="fas fa-edit"></i></button><button class="icon-btn del"><i class="fas fa-trash"></i></button></div></div>
-            <div class="art-row"><div class="info"><div class="title">Polícia</div><div class="meta">32 artigos</div></div><div style="display:flex;gap:6px"><button class="icon-btn edit"><i class="fas fa-edit"></i></button><button class="icon-btn del"><i class="fas fa-trash"></i></button></div></div>
-            <div class="art-row"><div class="info"><div class="title">Política</div><div class="meta">28 artigos</div></div><div style="display:flex;gap:6px"><button class="icon-btn edit"><i class="fas fa-edit"></i></button><button class="icon-btn del"><i class="fas fa-trash"></i></button></div></div>
-            <div class="art-row"><div class="info"><div class="title">Saúde</div><div class="meta">24 artigos</div></div><div style="display:flex;gap:6px"><button class="icon-btn edit"><i class="fas fa-edit"></i></button><button class="icon-btn del"><i class="fas fa-trash"></i></button></div></div>
-            <div class="art-row"><div class="info"><div class="title">Região</div><div class="meta">22 artigos</div></div><div style="display:flex;gap:6px"><button class="icon-btn edit"><i class="fas fa-edit"></i></button><button class="icon-btn del"><i class="fas fa-trash"></i></button></div></div>
-          </div>
+          <div id="catList"></div>
         </div>
       </div>
     </div>
@@ -1331,7 +1328,7 @@ body{background:var(--k2);font-family:var(--fb);color:var(--w);display:flex}
 <script src="../js/ai/agents/camila.js"></script>
 <script src="../js/ai/orchestrator.js"></script>
 <script src="../js/ai/engine.js"></script>
-<script src="../js/core/api.js"></script>
+<script src="../js/core/api.js?v=20260705"></script>
 <script src="../js/core/store.js"></script>
 <script src="../js/ai/assistant.js"></script>
 <script>
@@ -1340,9 +1337,7 @@ let isOwnerUser = false;
 
 function applyRoleRestrictions() {
   isOwnerUser = PAAPI.isOwner();
-  document.querySelectorAll('.owner-only').forEach(el => {
-    el.classList.toggle('hidden', !isOwnerUser);
-  });
+  document.body.classList.toggle('pa-owner', isOwnerUser);
   const roleEl = document.getElementById('sbRole');
   const badge = document.querySelector('.role-badge');
   const roleLabel = isOwnerUser ? 'Proprietário' : 'Editor';
@@ -1635,6 +1630,12 @@ function renderDashboard() {
   set('statDraft', draft.length);
   set('statReview', review.length);
 
+  const badge = document.getElementById('sbPubBadge');
+  if (badge) {
+    if (pub.length > 0) { badge.style.display = ''; badge.textContent = pub.length; }
+    else badge.style.display = 'none';
+  }
+
   const recent = document.getElementById('dashRecentList');
   if (!recent) return;
   const latest = [...arts].slice(0, 5);
@@ -1749,7 +1750,7 @@ async function publishArticle(skipPreview) {
     content: document.getElementById('artContent').innerHTML,
     cat: document.getElementById('artCat').value,
     status: document.getElementById('artStatus')?.value === 'draft' ? 'draft' : (document.getElementById('artStatus')?.value === 'review' ? 'review' : 'pub'),
-    img: 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=600&q=80',
+    img: document.getElementById('thumbPreview')?.querySelector('img')?.src || '../assets/images/pains-acontece-logo.png',
     timeAgo: 'Agora'
   };
   if (editingId) {
@@ -2309,6 +2310,10 @@ if (artStatusEl) {
     pollPending();
   }
   syncCategorySelect();
+  renderCategories();
+  renderMedia();
+  renderEvents();
+  renderJobs();
 })();
 </script>
 </body>

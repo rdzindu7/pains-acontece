@@ -7,6 +7,8 @@
 <link rel="apple-touch-icon" href="assets/images/favicon.jpg"/>
 <title>Pains Acontece – Notícias, serviços e o que importa em Pains e região</title>
 <meta name="description" content="Portal de notícias hiperlocal de Pains e região."/>
+<meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
+<meta name="pa-build" content="2026.07.05-v2"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,700;0,900;1,700&display=swap" rel="stylesheet"/>
@@ -943,6 +945,64 @@ body.cat-filter-mode .category-view { display: block; }
 /* ═══════════════════════════════════════════
    PAUTA BANNER
 ═══════════════════════════════════════════ */
+/* ── PUBLICIDADES / ANUNCIE ── */
+.pub-ads-section {
+  padding: 80px 0 60px;
+  background: linear-gradient(180deg, var(--k) 0%, var(--k2) 100%);
+  border-top: 1px solid rgba(255,255,255,.04);
+}
+.pub-ads-hero {
+  text-align: center; max-width: 720px; margin: 0 auto 40px;
+}
+.pub-ads-hero h2 {
+  font-family: var(--ff); font-size: clamp(2rem, 5vw, 3rem);
+  letter-spacing: 3px; color: #fff; margin-bottom: 12px;
+}
+.pub-ads-hero h2 em { color: var(--y); font-style: normal; }
+.pub-ads-hero p { font-size: .88rem; color: var(--muted); line-height: 1.7; }
+.pub-ads-grid {
+  display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 16px; margin-bottom: 28px;
+}
+.pub-ad-card {
+  background: var(--k3); border: 1px solid rgba(255,255,255,.06);
+  border-radius: 6px; padding: 22px; transition: border-color .3s, transform .3s;
+  position: relative; overflow: hidden;
+}
+.pub-ad-card::before {
+  content: ''; position: absolute; top: 0; left: 0; right: 0; height: 2px;
+  background: linear-gradient(90deg, var(--g), var(--y));
+}
+.pub-ad-card:hover { border-color: rgba(29,122,29,.4); transform: translateY(-3px); }
+.pub-ad-card .pad-name { font-family: var(--ff); font-size: 1.15rem; letter-spacing: 1.5px; color: #fff; margin-bottom: 6px; }
+.pub-ad-card .pad-desc { font-size: .75rem; color: var(--dim); line-height: 1.55; margin-bottom: 14px; min-height: 48px; }
+.pub-ad-card .pad-reach { font-size: .65rem; color: var(--muted); margin-bottom: 10px; }
+.pub-ad-card .pad-reach i { color: var(--g3); margin-right: 4px; }
+.pub-ad-card .pad-price { font-family: var(--ff); font-size: 1.6rem; color: var(--y); letter-spacing: 1px; }
+.pub-ad-card .pad-price span { font-size: .7rem; color: var(--dim); font-family: var(--fb); }
+.pub-ad-card.featured { border-color: rgba(201,162,39,.35); background: linear-gradient(135deg, rgba(29,122,29,.12), rgba(201,162,39,.06)); }
+.pub-ad-card.featured .pad-badge {
+  position: absolute; top: 12px; right: 12px;
+  background: rgba(201,162,39,.2); border: 1px solid rgba(201,162,39,.4);
+  color: var(--y2); font-size: .55rem; font-weight: 800; letter-spacing: 1px;
+  text-transform: uppercase; padding: 3px 8px; border-radius: 20px;
+}
+.pub-ads-cta {
+  text-align: center; padding: 28px;
+  background: rgba(29,122,29,.1); border: 1px solid rgba(29,122,29,.25);
+  border-radius: 8px;
+}
+.pub-ads-cta p { font-size: .82rem; color: var(--muted); margin-bottom: 16px; line-height: 1.6; }
+.btn-anuncie {
+  display: inline-flex; align-items: center; gap: 10px;
+  padding: 14px 28px; background: linear-gradient(135deg, var(--g), var(--g2));
+  color: #fff; border: none; border-radius: 4px; font-weight: 800;
+  font-size: .78rem; letter-spacing: 2px; text-transform: uppercase;
+  cursor: pointer; text-decoration: none; transition: transform .3s, box-shadow .3s;
+  box-shadow: 0 4px 20px rgba(29,122,29,.4);
+}
+.btn-anuncie:hover { transform: translateY(-2px); box-shadow: 0 8px 32px rgba(29,122,29,.6); color: #fff; }
+
 .pauta-section {
   position: relative; overflow: hidden;
   padding: 80px 0;
@@ -1208,6 +1268,7 @@ body.cat-filter-mode .category-view { display: block; }
     <div class="nav-item"><a href="#restaurantes" data-nav="restaurantes">Restaurantes</a></div>
     <div class="nav-item"><a href="#telefones" data-nav="telefones">Telefones</a></div>
     <div class="nav-item"><a href="#clima" data-nav="clima">Clima</a></div>
+    <div class="nav-item"><a href="#publicidades" data-nav="publicidades">Anuncie</a></div>
     <div class="nav-item nav-pauta"><a href="#contato" data-nav="contato">Pauta</a></div>
   </div>
 </nav>
@@ -1480,6 +1541,66 @@ body.cat-filter-mode .category-view { display: block; }
   <div class="grid-3 gap" id="regiaoGrid"></div>
 </section>
 
+<!-- PUBLICIDADES -->
+<section class="pub-ads-section home-only" id="publicidades">
+  <div class="wrap">
+    <div class="pub-ads-hero reveal">
+      <h2>Anuncie no <em>Pains Acontece</em></h2>
+      <p>Alcance moradores de Pains e toda a região do Alto São Francisco. Divulgue sua empresa, serviço ou evento no portal mais acessado do Sudoeste Mineiro.</p>
+    </div>
+    <div class="pub-ads-grid reveal">
+      <div class="pub-ad-card">
+        <div class="pad-name">Banner Principal</div>
+        <div class="pad-desc">Destaque no topo da home — primeira dobra, visível em desktop e mobile.</div>
+        <div class="pad-reach"><i class="fas fa-eye"></i> ~15.000 views/mês</div>
+        <div class="pad-price">R$ 800 <span>/mês</span></div>
+      </div>
+      <div class="pub-ad-card">
+        <div class="pad-name">Sidebar Lateral</div>
+        <div class="pad-desc">Bloco fixo na coluna direita em todas as páginas de notícias.</div>
+        <div class="pad-reach"><i class="fas fa-eye"></i> ~8.000 views/mês</div>
+        <div class="pad-price">R$ 350 <span>/mês</span></div>
+      </div>
+      <div class="pub-ad-card featured">
+        <span class="pad-badge">Mais popular</span>
+        <div class="pad-name">Destaque Editorial</div>
+        <div class="pad-desc">Matéria patrocinada com selo "Conteúdo Patrocinado" na seção principal.</div>
+        <div class="pad-reach"><i class="fas fa-eye"></i> ~12.000 views/mês</div>
+        <div class="pad-price">R$ 1.200 <span>/mês</span></div>
+      </div>
+      <div class="pub-ad-card">
+        <div class="pad-name">Ticker / Faixa</div>
+        <div class="pad-desc">Faixa animada abaixo do menu com texto e link do anunciante.</div>
+        <div class="pad-reach"><i class="fas fa-bullhorn"></i> ~20.000 impressões/mês</div>
+        <div class="pad-price">R$ 450 <span>/mês</span></div>
+      </div>
+      <div class="pub-ad-card">
+        <div class="pad-name">Newsletter</div>
+        <div class="pad-desc">Inclusão no boletim semanal enviado por e-mail e WhatsApp.</div>
+        <div class="pad-reach"><i class="fas fa-envelope"></i> ~2.500 envios/mês</div>
+        <div class="pad-price">R$ 200 <span>/mês</span></div>
+      </div>
+      <div class="pub-ad-card">
+        <div class="pad-name">Redes Sociais</div>
+        <div class="pad-desc">Post patrocinado no Instagram, Facebook e WhatsApp do portal.</div>
+        <div class="pad-reach"><i class="fas fa-share-alt"></i> ~5.000 alcance/post</div>
+        <div class="pad-price">R$ 150 <span>/post</span></div>
+      </div>
+      <div class="pub-ad-card featured">
+        <span class="pad-badge">-20%</span>
+        <div class="pad-name">Pacote Completo</div>
+        <div class="pad-desc">Banner + Sidebar + Destaque + Redes — máxima visibilidade com desconto.</div>
+        <div class="pad-reach"><i class="fas fa-star"></i> Combo premium</div>
+        <div class="pad-price">R$ 2.100 <span>/mês</span></div>
+      </div>
+    </div>
+    <div class="pub-ads-cta reveal">
+      <p>Valores sujeitos a negociação para contratos trimestrais ou anuais. Materiais gráficos podem ser produzidos pela redação.</p>
+      <a href="#contato" class="btn-anuncie" onclick="event.preventDefault();applyNav('contato')"><i class="fab fa-whatsapp"></i> Solicitar Orçamento</a>
+    </div>
+  </div>
+</section>
+
 <!-- PAUTA -->
 <section class="pauta-section" id="contato">
   <div class="wrap">
@@ -1544,7 +1665,7 @@ body.cat-filter-mode .category-view { display: block; }
       <ul>
         <li><a href="#">Quem Somos</a></li>
         <li><a href="#">Envie sua Pauta</a></li>
-        <li><a href="#">Anuncie</a></li>
+        <li><a href="#publicidades" data-nav="publicidades">Anuncie</a></li>
         <li><a href="#">Política Editorial</a></li>
         <li><a href="#">Privacidade</a></li>
         <li><a href="#">Contato</a></li>
@@ -1614,7 +1735,7 @@ document.querySelectorAll('.ncard, .ncard-xl, .srv-card').forEach(card => {
 <script src="js/ai/agents/camila.js"></script>
 <script src="js/ai/orchestrator.js"></script>
 <script src="js/ai/engine.js"></script>
-<script src="js/core/api.js"></script>
+<script src="js/core/api.js?v=20260705"></script>
 <script src="js/core/store.js"></script>
 <script src="js/ai/content-gate.js"></script>
 <script src="js/ai/autopublisher.js"></script>
