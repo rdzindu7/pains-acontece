@@ -7,7 +7,7 @@
 <link rel="apple-touch-icon" href="../assets/images/favicon.jpg"/>
 <title>Painel – Pains Acontece</title>
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
-<meta name="pa-build" content="2026.07.05-v15"/>
+<meta name="pa-build" content="2026.07.05-v16"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
@@ -55,7 +55,7 @@ body{background:var(--k2);font-family:var(--fb);color:var(--w);display:flex}
   display:flex;align-items:center;gap:12px;
   padding:10px 20px;cursor:pointer;
   font-size:.8rem;font-weight:500;color:rgba(255,255,255,.5);
-  transition:background .2s,color .2s;
+  transition:background .25s var(--ease),color .25s var(--ease),transform .25s var(--ease);
   border-left:3px solid transparent;
   position:relative;
 }
@@ -65,6 +65,97 @@ body{background:var(--k2);font-family:var(--fb);color:var(--w);display:flex}
   border-left-color:var(--g3);
 }
 .sb-item i{width:18px;text-align:center;font-size:.85rem;flex-shrink:0}
+
+/* Abas Conteúdo — cards animados */
+.sb-tabs-group{
+  margin:4px 12px 14px;padding:8px;
+  background:rgba(255,255,255,.02);
+  border:1px solid rgba(255,255,255,.05);
+  border-radius:12px;
+  display:flex;flex-direction:column;gap:6px;
+}
+.sb-tab{
+  margin:0;padding:10px 12px;border-left:none;border-radius:10px;
+  overflow:hidden;isolation:isolate;
+  animation:sbTabIn .45s var(--ease) both;
+}
+.sb-tab:nth-child(1){animation-delay:.04s}
+.sb-tab:nth-child(2){animation-delay:.08s}
+.sb-tab:nth-child(3){animation-delay:.12s}
+.sb-tab:nth-child(4){animation-delay:.16s}
+.sb-tab:nth-child(5){animation-delay:.20s}
+@keyframes sbTabIn{
+  from{opacity:0;transform:translateX(-10px)}
+  to{opacity:1;transform:none}
+}
+.sb-tab-ic{
+  width:34px;height:34px;border-radius:9px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.82rem;position:relative;z-index:1;
+  transition:transform .35s var(--ease),box-shadow .35s var(--ease);
+}
+.sb-tab-label{flex:1;position:relative;z-index:1;font-weight:600;letter-spacing:.3px}
+.sb-tab-glow{
+  position:absolute;inset:0;border-radius:10px;opacity:0;
+  transition:opacity .35s var(--ease);
+  pointer-events:none;
+}
+.sb-tab::before{
+  content:'';position:absolute;left:0;top:50%;transform:translateY(-50%) scaleY(0);
+  width:3px;height:60%;border-radius:0 3px 3px 0;
+  background:var(--tab-accent,var(--g3));
+  transition:transform .35s var(--ease);
+}
+.sb-tab:hover{
+  transform:translateX(4px);color:var(--w);
+  background:rgba(255,255,255,.04);
+}
+.sb-tab:hover .sb-tab-ic{transform:scale(1.08) rotate(-4deg)}
+.sb-tab:hover .sb-tab-glow{opacity:1}
+.sb-tab.active{
+  color:#fff;border-left:none;
+  background:rgba(255,255,255,.04);
+  box-shadow:0 4px 20px rgba(0,0,0,.25);
+}
+.sb-tab.active::before{transform:translateY(-50%) scaleY(1)}
+.sb-tab.active .sb-tab-ic{
+  transform:scale(1.05);
+  box-shadow:0 0 18px color-mix(in srgb,var(--tab-accent,var(--g3)) 45%,transparent);
+  animation:sbIconPop .5s var(--ease);
+}
+@keyframes sbIconPop{
+  0%{transform:scale(.9)}50%{transform:scale(1.12)}100%{transform:scale(1.05)}
+}
+.sb-tab--cats{--tab-accent:#2ecc71}
+.sb-tab--cats .sb-tab-ic{background:rgba(46,204,113,.15);color:#2ecc71}
+.sb-tab--cats .sb-tab-glow{background:linear-gradient(90deg,rgba(46,204,113,.12),transparent 70%)}
+.sb-tab--cats.active{background:rgba(46,204,113,.1)}
+.sb-tab--midia{--tab-accent:#a855f7}
+.sb-tab--midia .sb-tab-ic{background:rgba(168,85,247,.15);color:#c084fc}
+.sb-tab--midia .sb-tab-glow{background:linear-gradient(90deg,rgba(168,85,247,.14),transparent 70%)}
+.sb-tab--midia.active{background:rgba(168,85,247,.1)}
+.sb-tab--agenda{--tab-accent:#22d3ee}
+.sb-tab--agenda .sb-tab-ic{background:rgba(34,211,238,.14);color:#22d3ee}
+.sb-tab--agenda .sb-tab-glow{background:linear-gradient(90deg,rgba(34,211,238,.12),transparent 70%)}
+.sb-tab--agenda.active{background:rgba(34,211,238,.09)}
+.sb-tab--empregos{--tab-accent:#f59e0b}
+.sb-tab--empregos .sb-tab-ic{background:rgba(245,158,11,.14);color:#fbbf24}
+.sb-tab--empregos .sb-tab-glow{background:linear-gradient(90deg,rgba(245,158,11,.12),transparent 70%)}
+.sb-tab--empregos.active{background:rgba(245,158,11,.09)}
+.sb-tab--ads{--tab-accent:#f0d060}
+.sb-tab--ads .sb-tab-ic{background:rgba(201,162,39,.18);color:var(--y2)}
+.sb-tab--ads .sb-tab-glow{background:linear-gradient(90deg,rgba(201,162,39,.14),transparent 70%)}
+.sb-tab--ads.active{background:rgba(201,162,39,.1)}
+.sb-tab--midia:hover .sb-tab-ic i{animation:sbMediaSpin .6s var(--ease)}
+.sb-tab--agenda:hover .sb-tab-ic i{animation:sbCalFlip .5s var(--ease)}
+.sb-tab--empregos:hover .sb-tab-ic i{animation:sbBriefBounce .5s var(--ease)}
+.sb-tab--ads:hover .sb-tab-ic i{animation:sbAdPulse .5s var(--ease)}
+@keyframes sbMediaSpin{0%{transform:rotate(0)}40%{transform:rotate(-8deg) scale(1.1)}100%{transform:none}}
+@keyframes sbCalFlip{0%,100%{transform:none}50%{transform:rotateY(180deg)}}
+@keyframes sbBriefBounce{0%,100%{transform:translateY(0)}40%{transform:translateY(-3px)}}
+@keyframes sbAdPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.15)}}
+.sb-tab.tap-pop{animation:sbTapPop .35s var(--ease)}
+@keyframes sbTapPop{0%{transform:scale(1)}40%{transform:scale(.97)}100%{transform:scale(1)}}
 .sb-badge{
   margin-left:auto;background:var(--red);color:#fff;
   font-size:.58rem;font-weight:700;padding:2px 7px;border-radius:20px;
@@ -756,20 +847,32 @@ body.pa-owner .owner-only.btn-pub{display:flex!important}
     </div>
 
     <div class="sb-section">Conteúdo</div>
-    <div class="sb-item" onclick="showPanel('categorias',this)">
-      <i class="fas fa-tags"></i> Categorias
-    </div>
-    <div class="sb-item" onclick="showPanel('midia',this)">
-      <i class="fas fa-photo-film"></i> Mídia
-    </div>
-    <div class="sb-item" onclick="showPanel('agenda',this)">
-      <i class="fas fa-calendar-alt"></i> Agenda
-    </div>
-    <div class="sb-item" onclick="showPanel('empregos_adm',this)">
-      <i class="fas fa-briefcase"></i> Empregos
-    </div>
-    <div class="sb-item" onclick="showPanel('publicidades',this)">
-      <i class="fas fa-ad"></i> Publicidades
+    <div class="sb-tabs-group">
+      <div class="sb-item sb-tab sb-tab--cats" onclick="showPanel('categorias',this)">
+        <span class="sb-tab-ic"><i class="fas fa-tags"></i></span>
+        <span class="sb-tab-label">Categorias</span>
+        <span class="sb-tab-glow" aria-hidden="true"></span>
+      </div>
+      <div class="sb-item sb-tab sb-tab--midia" onclick="showPanel('midia',this)">
+        <span class="sb-tab-ic"><i class="fas fa-photo-film"></i></span>
+        <span class="sb-tab-label">Mídia</span>
+        <span class="sb-tab-glow" aria-hidden="true"></span>
+      </div>
+      <div class="sb-item sb-tab sb-tab--agenda" onclick="showPanel('agenda',this)">
+        <span class="sb-tab-ic"><i class="fas fa-calendar-alt"></i></span>
+        <span class="sb-tab-label">Agenda</span>
+        <span class="sb-tab-glow" aria-hidden="true"></span>
+      </div>
+      <div class="sb-item sb-tab sb-tab--empregos" onclick="showPanel('empregos_adm',this)">
+        <span class="sb-tab-ic"><i class="fas fa-briefcase"></i></span>
+        <span class="sb-tab-label">Empregos</span>
+        <span class="sb-tab-glow" aria-hidden="true"></span>
+      </div>
+      <div class="sb-item sb-tab sb-tab--ads" onclick="showPanel('publicidades',this)">
+        <span class="sb-tab-ic"><i class="fas fa-ad"></i></span>
+        <span class="sb-tab-label">Publicidades</span>
+        <span class="sb-tab-glow" aria-hidden="true"></span>
+      </div>
     </div>
 
     <div class="sb-section">Configurações</div>
@@ -1607,7 +1710,14 @@ function showPanel(id, el) {
   document.querySelectorAll('.sb-item').forEach(i => i.classList.remove('active'));
   const panel = document.getElementById('panel-' + id);
   if (panel) panel.classList.add('active');
-  if (el) el.classList.add('active');
+  if (el) {
+    el.classList.add('active');
+    if (el.classList.contains('sb-tab')) {
+      el.classList.remove('tap-pop');
+      void el.offsetWidth;
+      el.classList.add('tap-pop');
+    }
+  }
   // close sidebar on mobile
   if (window.innerWidth < 900) document.getElementById('sidebar').classList.remove('open');
   // special inits
