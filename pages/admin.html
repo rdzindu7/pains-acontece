@@ -7,7 +7,7 @@
 <link rel="apple-touch-icon" href="../assets/images/favicon.jpg"/>
 <title>Painel – Pains Acontece</title>
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
-<meta name="pa-build" content="2026.07.05-v32"/>
+<meta name="pa-build" content="2026.07.05-v33"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
@@ -1817,7 +1817,7 @@ body.pa-owner .owner-only.btn-pub{display:flex!important}
               <span id="supabaseStatusText" style="font-size:.82rem;color:var(--dim)">Verificando conexão…</span>
             </div>
             <p style="font-size:.8rem;color:var(--dim);line-height:1.6;margin-bottom:14px">
-              Com o Supabase configurado, notícias, pautas e dados do scanner ficam salvos na nuvem em tempo real — sem precisar exportar JSON manualmente.
+              Com o Supabase configurado, notícias ficam na nuvem. O site <strong>sincroniza sozinho</strong> a cada 30 min via GitHub Actions (<code>data/articles.json</code>). Ao publicar, não precisa exportar manualmente.
             </p>
             <ol style="font-size:.75rem;color:var(--muted);line-height:1.8;margin-bottom:16px;padding-left:18px">
               <li>Crie um projeto grátis em <a href="https://supabase.com" target="_blank" rel="noopener" style="color:var(--g3)">supabase.com</a></li>
@@ -2109,12 +2109,13 @@ body.pa-owner .owner-only.btn-pub{display:flex!important}
 <script src="../js/ui/directory.js?v=20260705v23"></script>
 <script src="../js/ui/ads.js?v=20260705v21"></script>
 <script src="../js/ui/corner-notify.js"></script>
-<script src="../js/core/store.js"></script>
+
 <script src="../js/ai/assistant.js?v=20260705v21"></script>
 <script src="../js/ai/agents/rafaela.js"></script>
 <script src="../js/ai/divulgacao-assistant.js"></script>
 <script src="../js/ui/dialog.js?v=20260705v25"></script>
-<script src="../js/core/social.js?v=20260705v32"></script>
+<script src="../js/core/social.js?v=20260705v33"></script>
+<script src="../js/core/store.js?v=20260705v33"></script>
 <script>
 /* ════ AUTH GUARD ════ */
 let isOwnerUser = false;
@@ -2783,6 +2784,8 @@ async function publishArticle(skipPreview) {
     closeModal('previewModal');
     clearEditor();
     await PAStore.init();
+    PAStore.syncLocalCache?.();
+    if (payload.status === 'pub') autoSyncSiteNotice();
     renderDashboard();
     renderPubs();
     showPanel('publicacoes', document.querySelectorAll('.sb-item')[1]);
@@ -3828,6 +3831,10 @@ async function testSupabase() {
     updateSupabaseStatus(false, 'Tabelas pendentes — execute schema.sql no Supabase' + localNote);
     showToast('Execute schema.sql no SQL Editor do Supabase.', 'error', 5000);
   }
+}
+
+function autoSyncSiteNotice() {
+  showToast('Publicado! O site sincroniza automaticamente em até 30 min (GitHub Actions).', 'success', 6000);
 }
 
 async function exportGitHub() {

@@ -157,3 +157,57 @@ CREATE POLICY "verified_admin_update" ON verified_requests
   FOR UPDATE TO authenticated USING (
     (auth.jwt() ->> 'email') = 'admin@painsacontece.com.br'
   );
+
+-- RPC: proprietário concede/remove selo (automático, sem SQL manual)
+CREATE OR REPLACE FUNCTION admin_set_verified(
+  target_user_id UUID,
+  grant_badge BOOLEAN DEFAULT true,
+  years INT DEFAULT 1
+)
+RETURNS JSON LANGUAGE plpgsql SECURITY DEFINER SET search_path = public AS $$
+DECLARE
+  admin_email TEXT := 'admin@painsacontece.com.br';
+  caller_email TEXT := auth.jwt() ->> 'email';
+  until_ts TIMESTAMPTZ;
+  prof profiles%ROWTYPE;
+BEGIN
+  IF coalesce(caller_email, '') <> admin_email
+     AND coalesce(auth.jwt() ->> 'role', '') <> 'service_role' THEN
+    RAISE EXCEPTION 'Acesso negado — apenas o proprietário';
+  END IF;
+
+  IF grant_badge THEN
+    until_ts := NOW() + make_interval(years => GREATEST(years, 1));
+    UPDATE profiles SET
+      verified_badge = true,
+      verified_at = NOW(),
+      verified_until = until_ts,
+      updated_at = NOW()
+    WHERE id = target_user_id
+    RETURNING * INTO prof;
+  ELSE
+    UPDATE profiles SET
+      verified_badge = false,
+      verified_at = NULL,
+      verified_until = NULL,
+      updated_at = NOW()
+    WHERE id = target_user_id
+    RETURNING * INTO prof;
+  END IF;
+
+  IF prof.id IS NULL THEN
+    RAISE EXCEPTION 'Perfil não encontrado para este ID';
+  END IF;
+
+  RETURN json_build_object(
+    'id', prof.id,
+    'email', prof.email,
+    'display_name', prof.display_name,
+    'verified_badge', prof.verified_badge,
+    'verified_until', prof.verified_until
+  );
+END;
+$$;
+
+GRANT EXECUTE ON FUNCTION admin_set_verified(UUID, BOOLEAN, INT) TO authenticated;
+GRANT EXECUTE ON FUNCTION admin_set_verified(UUID, BOOLEAN, INT) TO service_role;

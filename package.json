@@ -1,0 +1,13 @@
+{
+  "name": "pains-acontece",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "sync": "node scripts/sync-articles.mjs",
+    "setup:schemas": "node scripts/apply-all-schemas.mjs",
+    "seed": "node scripts/seed-articles.mjs"
+  },
+  "dependencies": {
+    "postgres": "^3.4.5"
+  }
+}

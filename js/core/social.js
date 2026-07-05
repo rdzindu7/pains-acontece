@@ -514,6 +514,18 @@ const PASocial = (function () {
 
     const client = PASupabase?.getClient?.();
     if (client) {
+      try {
+        const { data, error } = await client.rpc('admin_set_verified', {
+          target_user_id: uid,
+          grant_badge: true,
+          years
+        });
+        if (!error && data) {
+          const prof = typeof data === 'string' ? JSON.parse(data) : data;
+          profilesCache[uid] = prof;
+          return prof;
+        }
+      } catch {}
       const { data, error } = await client.from('profiles').update(patch).eq('id', uid).select().maybeSingle();
       if (error) throw new Error(error.message);
       if (!data) throw new Error('Perfil não encontrado para este ID');
@@ -536,6 +548,18 @@ const PASocial = (function () {
 
     const client = PASupabase?.getClient?.();
     if (client) {
+      try {
+        const { data, error } = await client.rpc('admin_set_verified', {
+          target_user_id: uid,
+          grant_badge: false,
+          years: 1
+        });
+        if (!error && data) {
+          const prof = typeof data === 'string' ? JSON.parse(data) : data;
+          profilesCache[uid] = prof;
+          return prof;
+        }
+      } catch {}
       const { data, error } = await client.from('profiles').update(patch).eq('id', uid).select().maybeSingle();
       if (error) throw new Error(error.message);
       if (!data) throw new Error('Perfil não encontrado para este ID');

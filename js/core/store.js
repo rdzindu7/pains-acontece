@@ -102,5 +102,24 @@ const PAStore = (function () {
     } catch {}
   }
 
-  return { init, getArticles, getArticle, findArticleLocal, articlesForAdmin, addArticle, updateArticle, deleteArticle, incrementViews };
+  function syncLocalCache() {
+    try {
+      localStorage.setItem(LS_KEY, JSON.stringify(articles));
+    } catch {}
+  }
+
+  async function refreshFromCloud() {
+    try {
+      articles = await withTimeout(PAAPI.getArticles(), 8000);
+      syncLocalCache();
+      return articles;
+    } catch {
+      return articles;
+    }
+  }
+
+  return {
+    init, getArticles, getArticle, findArticleLocal, syncLocalCache, refreshFromCloud,
+    articlesForAdmin, addArticle, updateArticle, deleteArticle, incrementViews
+  };
 })();
