@@ -1,13 +1,16 @@
 /**
- * Recarrega abas públicas automaticamente quando:
- * - o admin publica/edita/exclui conteúdo (sinal entre abas)
- * - uma nova versão do site é detectada (poll do purge.js no servidor)
+ * Atualiza abas públicas quando o admin publica ou há novo deploy.
+ * Evita reload em loop: prioriza script carregado, cooldown e refresh suave.
  */
 const PAAutoReload = (function () {
   const LS_SIGNAL = 'pa_update_signal';
-  const POLL_MS = 30000;
+  const SS_RELOAD_AT = 'pa_last_full_reload';
+  const SS_DEPLOY_VER = 'pa_seen_deploy_ver';
+  const POLL_MS = 60000;
+  const RELOAD_COOLDOWN_MS = 20000;
   let knownBuild = null;
   let reloading = false;
+  let refreshing = false;
   let pollTimer = null;
 
   function isAdminPage() {
@@ -15,8 +18,10 @@ const PAAutoReload = (function () {
   }
 
   function currentBuild() {
-    return document.querySelector('meta[name="pa-build"]')?.content
-      || (typeof PAContentPurge !== 'undefined' ? PAContentPurge.VER : null);
+    if (typeof PAContentPurge !== 'undefined' && PAContentPurge.VER) {
+      return PAContentPurge.VER;
+    }
+    return document.querySelector('meta[name="pa-build"]')?.content || null;
   }
 
   function purgeScriptUrl() {
@@ -37,18 +42,58 @@ const PAAutoReload = (function () {
     }
   }
 
-  function prepareCache() {
+  function canFullReload() {
+    const last = parseInt(sessionStorage.getItem(SS_RELOAD_AT) || '0', 10);
+    return Date.now() - last >= RELOAD_COOLDOWN_MS;
+  }
+
+  function markFullReload() {
+    try { sessionStorage.setItem(SS_RELOAD_AT, String(Date.now())); } catch {}
+  }
+
+  function clearArticlesCache() {
+    try { localStorage.removeItem('pa_articles_cache_v2'); } catch {}
+  }
+
+  async function softRefresh() {
+    if (refreshing || isAdminPage()) return false;
+    refreshing = true;
     try {
-      localStorage.removeItem('pa_articles_cache_v2');
-      if (typeof PAContentPurge !== 'undefined') PAContentPurge.run();
-    } catch {}
+      clearArticlesCache();
+      if (typeof PAStore !== 'undefined' && typeof PAStore.init === 'function') {
+        await PAStore.init();
+      }
+      if (typeof window.PAHomeRefresh === 'function') {
+        window.PAHomeRefresh();
+        return true;
+      }
+      if (typeof window.PANoticiaRefresh === 'function') {
+        await window.PANoticiaRefresh();
+        return true;
+      }
+    } catch (e) {
+      console.warn('[PAAutoReload] soft refresh', e);
+    } finally {
+      refreshing = false;
+    }
+    return false;
   }
 
   function reloadPage() {
-    if (reloading) return;
+    if (reloading || !canFullReload()) return;
     reloading = true;
-    prepareCache();
-    setTimeout(() => location.reload(), 350);
+    markFullReload();
+    clearArticlesCache();
+    if (typeof PAContentPurge !== 'undefined') {
+      try { PAContentPurge.run(); } catch {}
+    }
+    setTimeout(() => location.reload(), 400);
+  }
+
+  async function onContentUpdate() {
+    if (isAdminPage()) return;
+    const ok = await softRefresh();
+    if (!ok) reloadPage();
   }
 
   function signalUpdate() {
@@ -58,40 +103,47 @@ const PAAutoReload = (function () {
       from: isAdminPage() ? 'admin' : 'site'
     });
     try { localStorage.setItem(LS_SIGNAL, payload); } catch {}
-    window.dispatchEvent(new CustomEvent('pa-site-update'));
-  }
-
-  function onExternalUpdate() {
-    if (isAdminPage()) return;
-    reloadPage();
   }
 
   async function checkDeploy() {
     const remote = await fetchRemoteBuild();
     if (!remote) return;
-    if (knownBuild && remote !== knownBuild) {
+
+    const local = currentBuild();
+    if (!local) {
       knownBuild = remote;
-      reloadPage();
       return;
     }
+
+    if (remote === local) {
+      knownBuild = remote;
+      try { sessionStorage.setItem(SS_DEPLOY_VER, remote); } catch {}
+      return;
+    }
+
+    const seen = sessionStorage.getItem(SS_DEPLOY_VER);
+    if (seen === remote) return;
+
     knownBuild = remote;
+    try { sessionStorage.setItem(SS_DEPLOY_VER, remote); } catch {}
+
+    const ok = await softRefresh();
+    if (!ok && canFullReload()) reloadPage();
   }
 
   function init() {
     knownBuild = currentBuild();
     window.addEventListener('storage', e => {
-      if (e.key === LS_SIGNAL && e.newValue) onExternalUpdate();
+      if (e.key === LS_SIGNAL && e.newValue) onContentUpdate();
     });
-    window.addEventListener('pa-site-update', onExternalUpdate);
     document.addEventListener('visibilitychange', () => {
       if (document.visibilityState === 'visible') checkDeploy();
     });
-    window.addEventListener('focus', () => { checkDeploy(); });
     checkDeploy();
     pollTimer = setInterval(checkDeploy, POLL_MS);
   }
 
-  return { init, signalUpdate, checkDeploy };
+  return { init, signalUpdate, checkDeploy, softRefresh };
 })();
 
 PAAutoReload.init();

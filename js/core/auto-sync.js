@@ -128,7 +128,6 @@ const PAAutoSync = (function () {
         return { ok: true, mode: 'github' };
       }
       await triggerWorkflow();
-      if (typeof PAAutoReload !== 'undefined') PAAutoReload.signalUpdate();
       if (gh.reason === 'no_token' && typeof PADialog !== 'undefined') {
         PADialog.toast('Salvo na nuvem. O site atualiza em até 5 min (sync automático).', 'info');
       }

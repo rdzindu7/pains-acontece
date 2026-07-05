@@ -6,7 +6,7 @@
 <link rel="icon" type="image/jpeg" href="../assets/images/favicon.jpg"/>
 <link rel="apple-touch-icon" href="../assets/images/favicon.jpg"/>
 <title>Notícia – Pains Acontece</title>
-<meta name="pa-build" content="2026.07.05-v27"/>
+<meta name="pa-build" content="2026.07.05-v29"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,700;0,900;1,700&display=swap" rel="stylesheet"/>
@@ -340,13 +340,13 @@ body.cat-pains{--accent:#1d7a1d;--accent-glow:rgba(29,122,29,.35)}
 <script src="../js/ui/article-format.js"></script>
 <script src="../js/ai/scanner.js"></script>
 <script src="../js/core/purge.js?v=20260705v29"></script>
-<script src="../js/core/auto-reload.js?v=20260705v21"></script>
+<script src="../js/core/auto-reload.js?v=20260705v30"></script>
 <script src="../js/core/pains-media.js?v=20260705v44"></script>
 <script src="../js/core/article-images.js?v=20260705v45"></script>
 <script src="../js/core/views-tracker.js?v=20260705v41"></script>
 <script src="../js/core/api.js?v=20260705v49"></script>
 <script src="../js/ui/ads.js?v=20260705v36"></script>
-<script src="../js/core/store.js?v=20260705v42"></script>
+<script src="../js/core/store.js?v=20260705v50"></script>
 
 <script src="../js/ai/agents/sofia.js"></script>
 <script src="../js/ai/agents/lucas.js"></script>
@@ -754,6 +754,10 @@ body.cat-pains{--accent:#1d7a1d;--accent-glow:rgba(29,122,29,.35)}
     }
   }
 
+  window.PANoticiaRefresh=async function(){
+    const fresh=await loadArticleDirect(id);
+    if(fresh){art=fresh;render();}
+  };
   try{PAUserNav.init('#paUserNav')}catch(e){console.warn('[noticia] nav',e)}
   document.getElementById('btnTopIA')?.addEventListener('click',()=>{
     if(typeof PAPublicIA!=='undefined')PAPublicIA.openAssistant();
