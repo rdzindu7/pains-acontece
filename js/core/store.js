@@ -89,10 +89,15 @@ const PAStore = (function () {
     return articles.filter(a => !hidden.has(String(a.id)));
   }
 
+  function notifySiteUpdate() {
+    if (typeof PAAutoReload !== 'undefined') PAAutoReload.signalUpdate();
+  }
+
   async function addArticle(payload) {
     const art = await PAAPI.addArticle(payload);
     articles.unshift(art);
     localStorage.setItem(LS_KEY, JSON.stringify(articles));
+    notifySiteUpdate();
     return art;
   }
 
@@ -102,12 +107,14 @@ const PAStore = (function () {
     if (idx >= 0) articles[idx] = art || { ...articles[idx], ...payload };
     else if (art) articles.unshift(art);
     localStorage.setItem(LS_KEY, JSON.stringify(articles));
+    notifySiteUpdate();
   }
 
   async function deleteArticle(id) {
     await PAAPI.deleteArticle(id);
     articles = articles.filter(a => String(a.id) !== String(id));
     localStorage.setItem(LS_KEY, JSON.stringify(articles));
+    notifySiteUpdate();
   }
 
   async function incrementViews(id) {

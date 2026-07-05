@@ -69,6 +69,7 @@ const PAAutoPublisher = (function () {
     }
 
     localStorage.setItem(LS_LAST, String(Date.now()));
+    if (published > 0 && typeof PAAutoReload !== 'undefined') PAAutoReload.signalUpdate();
     return { skipped: false, published, scanned: items.length };
   }
 

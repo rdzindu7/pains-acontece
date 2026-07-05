@@ -7,7 +7,7 @@
 <link rel="apple-touch-icon" href="../assets/images/favicon.jpg"/>
 <title>Painel – Pains Acontece</title>
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
-<meta name="pa-build" content="2026.07.05-v37"/>
+<meta name="pa-build" content="2026.07.05-v18"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
@@ -2185,7 +2185,8 @@ body.pa-owner .owner-only.btn-pub{display:flex!important}
 <script src="../js/ai/agents/camila.js"></script>
 <script src="../js/ai/orchestrator.js"></script>
 <script src="../js/ai/engine.js"></script>
-<script src="../js/core/purge.js?v=20260705v21"></script>
+<script src="../js/core/purge.js?v=20260705v18"></script>
+<script src="../js/core/auto-reload.js?v=20260705v18"></script>
 <script src="../js/ai/agents/tiago.js?v=20260705v26"></script>
 <script src="../js/ai/bus-assistant.js?v=20260705v26"></script>
 <script src="../js/core/api.js?v=20260705v26"></script>
@@ -2510,6 +2511,7 @@ async function approvePending(id) {
     closeModal('previewModal');
     showToast('Notícia publicada no portal!', 'success');
     await PAStore.init();
+    if (typeof PAAutoReload !== 'undefined') PAAutoReload.signalUpdate();
     await renderPending();
     await updateScannerStatus();
     renderDashboard();
@@ -2820,6 +2822,7 @@ async function confirmDeleteAll() {
   try {
     await PAAPI.purgeAllPublications();
     await PAStore.refreshFromCloud?.().catch(() => PAStore.init());
+    if (typeof PAAutoReload !== 'undefined') PAAutoReload.signalUpdate();
     closeModal('deleteAllModal');
     showToast(`${total} publicação${total > 1 ? 'ões removidas' : ' removida'} com sucesso.`, 'error');
     renderPubs();
@@ -3974,7 +3977,8 @@ async function testSupabase() {
 }
 
 function autoSyncSiteNotice() {
-  showToast('Publicado! O site sincroniza automaticamente em até 30 min (GitHub Actions).', 'success', 6000);
+  if (typeof PAAutoReload !== 'undefined') PAAutoReload.signalUpdate();
+  showToast('Publicado! As abas abertas do portal atualizam sozinhas.', 'success', 5000);
 }
 
 async function exportGitHub() {
@@ -3999,6 +4003,7 @@ async function importGitHub(input) {
   try {
     await PAAPI.importFromFile(file);
     await PAStore.init();
+    if (typeof PAAutoReload !== 'undefined') PAAutoReload.signalUpdate();
     renderPubs();
     showToast('JSON importado com sucesso!', 'success');
   } catch { showToast('Arquivo JSON inválido.', 'error'); }
