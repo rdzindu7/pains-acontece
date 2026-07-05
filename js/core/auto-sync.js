@@ -1,11 +1,18 @@
 /**
- * Sincronização automática: publicou → Supabase → GitHub (articles.json) → site atualiza.
+ * Sincronização automática: publicou → Supabase (site lê direto da nuvem).
+ * GitHub opcional — desligado quando useGitHubSync === false.
  */
 const PAAutoSync = (function () {
   const LS_TOKEN = 'pa_github_sync_token';
   const DEBOUNCE_MS = 2500;
   let timer = null;
   let running = false;
+
+  function githubEnabled() {
+    if (PAConfig?.useGitHubSync === false) return false;
+    const cfg = PAConfig?.githubSync || {};
+    return cfg.enabled !== false;
+  }
 
   function repoInfo() {
     const cfg = PAConfig?.githubSync || {};
@@ -118,6 +125,13 @@ const PAAutoSync = (function () {
     if (running) return { ok: false, reason: 'busy' };
     running = true;
     try {
+      if (!githubEnabled()) {
+        if (typeof PAAutoReload !== 'undefined') PAAutoReload.signalUpdate();
+        if (typeof PADialog !== 'undefined') {
+          PADialog.toast('Salvo na nuvem — o site atualiza automaticamente.', 'success');
+        }
+        return { ok: true, mode: 'supabase' };
+      }
       const articles = await exportArticles();
       const gh = await commitToGitHub(articles);
       if (gh.ok) {

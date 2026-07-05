@@ -1887,14 +1887,14 @@ body.pa-owner .owner-only.btn-pub{display:flex!important}
               <span id="supabaseStatusText" style="font-size:.82rem;color:var(--dim)">Verificando conexão…</span>
             </div>
             <p style="font-size:.8rem;color:var(--dim);line-height:1.6;margin-bottom:14px">
-              Com o Supabase configurado, notícias ficam na nuvem. O site <strong>sincroniza sozinho</strong> a cada 30 min via GitHub Actions (<code>data/articles.json</code>). Ao publicar, não precisa exportar manualmente.
+              Com o Supabase configurado, notícias ficam na nuvem e o site <strong>lê direto do banco</strong>. Ao publicar, visitantes veem na hora — sem GitHub nem export manual.
             </p>
             <ol style="font-size:.75rem;color:var(--muted);line-height:1.8;margin-bottom:16px;padding-left:18px">
               <li>Crie um projeto grátis em <a href="https://supabase.com" target="_blank" rel="noopener" style="color:var(--g3)">supabase.com</a></li>
               <li>Execute o arquivo <code>supabase/schema.sql</code> no SQL Editor</li>
               <li>Em <strong>Settings → API</strong>, copie URL e anon key para <code>js/core/config.js</code></li>
               <li>Em <strong>Authentication → Users</strong>, crie o admin: <code>admin@painsacontece.com.br</code></li>
-              <li>Faça commit no GitHub — o site atualiza automaticamente</li>
+              <li>Suba os arquivos do site no seu hospedeiro (ou use <code>npm run dev</code> local)</li>
             </ol>
             <div style="display:flex;gap:10px;flex-wrap:wrap">
               <button class="btn-pub green" onclick="testSupabase()"><i class="fas fa-plug"></i> Testar Conexão</button>
@@ -1903,10 +1903,10 @@ body.pa-owner .owner-only.btn-pub{display:flex!important}
           </div>
         </div>
         <div class="profile-sec" id="githubFallbackSec">
-          <div class="profile-sec-head"><i class="fab fa-github"></i><h3>Modo Offline (sem Supabase)</h3></div>
+          <div class="profile-sec-head"><i class="fas fa-hdd"></i><h3>Modo Offline (sem Supabase)</h3></div>
           <div class="profile-sec-body">
             <p style="font-size:.8rem;color:var(--dim);line-height:1.6;margin-bottom:14px">
-              Se o Supabase não estiver configurado, as edições ficam no navegador. Exporte o JSON e envie para o GitHub manualmente.
+              Se o Supabase não estiver configurado, as edições ficam no navegador. Exporte o JSON e substitua <code>data/articles.json</code> no servidor.
             </p>
             <div style="display:flex;gap:10px;flex-wrap:wrap">
               <button class="btn-pub green" onclick="exportGitHub()"><i class="fas fa-download"></i> Exportar JSON</button>
@@ -2185,15 +2185,15 @@ body.pa-owner .owner-only.btn-pub{display:flex!important}
 <script src="../js/ai/agents/camila.js"></script>
 <script src="../js/ai/orchestrator.js"></script>
 <script src="../js/ai/engine.js"></script>
-<script src="../js/core/purge.js?v=20260705v30"></script>
-<script src="../js/core/auto-sync.js?v=20260705v29"></script>
+<script src="../js/core/purge.js?v=20260705v55"></script>
+<script src="../js/core/auto-sync.js?v=20260705v55"></script>
 <script src="../js/core/auto-reload.js?v=20260705v31"></script>
 <script src="../js/core/pains-media.js?v=20260705v44"></script>
 <script src="../js/core/article-images.js?v=20260705v46"></script>
 <script src="../js/core/views-tracker.js?v=20260705v52"></script>
 <script src="../js/ai/agents/tiago.js?v=20260705v26"></script>
 <script src="../js/ai/bus-assistant.js?v=20260705v26"></script>
-<script src="../js/core/api.js?v=20260705v52"></script>
+<script src="../js/core/api.js?v=20260705v55"></script>
 <script src="../js/ui/directory.js?v=20260705v23"></script>
 <script src="../js/ui/ads.js?v=20260705v21"></script>
 <script src="../js/ui/corner-notify.js"></script>
@@ -3991,7 +3991,12 @@ async function testSupabase() {
 
 function autoSyncSiteNotice() {
   if (typeof PAAutoReload !== 'undefined') PAAutoReload.signalUpdate();
-  showToast('Publicado! O site atualiza automaticamente no GitHub.', 'success', 5000);
+  const cloud = PAConfig?.useGitHubSync === false;
+  showToast(
+    cloud ? 'Publicado! Visitantes veem na nuvem automaticamente.' : 'Publicado! O site atualiza automaticamente no GitHub.',
+    'success',
+    5000
+  );
 }
 
 async function exportGitHub(silent) {
@@ -4006,7 +4011,7 @@ async function exportGitHub(silent) {
       const cloud = await PAAPI.isSupabaseMode();
       const msg = cloud
         ? 'Backup JSON exportado!'
-        : 'JSON exportado! Substitua data/articles.json no GitHub.';
+        : 'JSON exportado! Substitua data/articles.json no servidor.';
       showToast(msg, 'success', 5000);
     }
     return data.articles;

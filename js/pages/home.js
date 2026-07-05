@@ -640,19 +640,39 @@
     return [...map.values()].sort((a, b) => (Number(b.id) || 0) - (Number(a.id) || 0));
   }
 
+  function withTimeout(promise, ms) {
+    return Promise.race([
+      promise,
+      new Promise((_, reject) => setTimeout(() => reject(new Error('timeout')), ms || 8000))
+    ]);
+  }
+
   async function init() {
     let raw = await fetchPubFromJson();
+    if (raw.length) applyArticles(raw, filterForDisplay(raw));
+
+    if (typeof PAAPI !== 'undefined' && PAAPI.getArticles) {
+      try {
+        const merged = await withTimeout(PAAPI.getArticles('pub'), 7000);
+        if (merged?.length) {
+          raw = merged;
+          applyArticles(raw, filterForDisplay(raw));
+        }
+      } catch {}
+    }
+
     const hasAuth = !!(sessionStorage.getItem('pa_auth_mode') || sessionStorage.getItem('pa_token'));
     if (hasAuth || isOwnerView()) {
       try {
         await PAStore.init({ admin: hasAuth });
         raw = mergePubLists(raw, PAStore.getArticles('pub'));
+        if (raw.length) applyArticles(raw, filterForDisplay(raw));
       } catch {}
     }
     if (!raw.length) {
       try { localStorage.removeItem('pa_articles_cache_v2'); } catch {}
+      applyArticles([], []);
     }
-    applyArticles(raw, filterForDisplay(raw));
 
     setupNav();
     setupPhoneSearch();

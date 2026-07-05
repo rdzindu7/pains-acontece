@@ -7,14 +7,16 @@
  *    - anon public  → supabaseAnonKey
  * 3. Execute supabase/schema.sql no SQL Editor
  * 4. Crie usuário admin em Authentication → Users (não commite senhas)
- * 5. Cole as chaves abaixo e faça commit no GitHub
+ * 5. Cole as chaves abaixo
  */
 const PAConfig = {
   supabaseUrl: 'https://blcomwofpyorypqjdhfb.supabase.co',
   supabaseAnonKey: 'sb_publishable_Kkznz1j873N8ztepzRDCcQ__eXd6MXS',
   ownerEmail: 'admin@painsacontece.com.br',
   siteUrl: 'https://rdzindu7.github.io/pains-acontece',
+  useGitHubSync: false,
   githubSync: {
+    enabled: false,
     owner: 'rdzindu7',
     repo: 'pains-acontece',
     branch: 'main',

@@ -373,18 +373,19 @@ const PAAPI = (function () {
   }
 
   async function getArticlesPublic(status) {
+    const jsonList = await fetchArticlesFromJson(status);
     let remoteList = [];
-    if (supabaseConfigured() && sessionStorage.getItem('pa_auth_mode')) {
+    if (supabaseConfigured()) {
       try {
-        if (await isCloudReady()) {
+        const ready = await withTimeout(isCloudReady(), 3500);
+        if (ready) {
           let q = sb().from('articles').select('*').order('id', { ascending: false });
           if (status) q = q.eq('status', status);
-          const { data, error } = await q;
+          const { data, error } = await withTimeout(q, 4000);
           if (!error) remoteList = (data || []).map(rowToArticle);
         }
       } catch {}
     }
-    const jsonList = await fetchArticlesFromJson(status);
     const state = getState();
     const localPub = (state.articles || []).filter(a => !status || a.status === status);
     let merged = mergeArticles(jsonList, localPub);
@@ -411,14 +412,14 @@ const PAAPI = (function () {
 
   async function getArticlePublic(id) {
     if (isArticleDeleted(id)) return null;
-    const fromJson = await fetchArticleFromJson(id);
-    if (fromJson) return fromJson;
     try {
-      if (supabaseConfigured() && sessionStorage.getItem('pa_auth_mode') && await isCloudReady()) {
+      if (supabaseConfigured() && await isCloudReady()) {
         const { data, error } = await sb().from('articles').select('*').eq('id', id).maybeSingle();
-        if (!error && data) return rowToArticle(data);
+        if (!error && data && data.status === 'pub') return rowToArticle(data);
       }
     } catch {}
+    const fromJson = await fetchArticleFromJson(id);
+    if (fromJson) return fromJson;
     return (getState().articles || []).find(a => String(a.id) === String(id)) || null;
   }
 
