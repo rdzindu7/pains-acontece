@@ -574,6 +574,142 @@ const PAAPI = (function () {
       return { ok: true };
     },
 
+    async getServices() {
+      const state = getState();
+      const base = await fetchJson('services.json').catch(() => []);
+      let list = mergeById(base, state.services);
+      const deleted = state.deletedServices || [];
+      if (deleted.length) list = list.filter(s => !deleted.includes(String(s.id)));
+      return list.filter(s => s.active !== false);
+    },
+
+    async getServicesAdmin() {
+      const state = getState();
+      const base = await fetchJson('services.json').catch(() => []);
+      let list = mergeById(base, state.services);
+      const deleted = state.deletedServices || [];
+      if (deleted.length) list = list.filter(s => !deleted.includes(String(s.id)));
+      return list;
+    },
+
+    async addService(data) {
+      const state = getState();
+      if (!state.services) state.services = [];
+      const item = {
+        id: Date.now(),
+        active: data.active !== false,
+        title: data.title || '',
+        description: data.description || '',
+        icon: data.icon || 'fa-building',
+        image: data.image || '',
+        link: data.link || '#',
+        phone: data.phone || ''
+      };
+      state.services.unshift(item);
+      saveAdminState(state);
+      return item;
+    },
+
+    async updateService(id, data) {
+      const state = getState();
+      if (!state.services) state.services = [];
+      const idx = state.services.findIndex(s => String(s.id) === String(id));
+      if (idx >= 0) {
+        state.services[idx] = { ...state.services[idx], ...data };
+        saveAdminState(state);
+        return state.services[idx];
+      }
+      const base = await fetchJson('services.json').catch(() => []);
+      const b = base.find(s => String(s.id) === String(id));
+      if (b) {
+        state.services.push({ ...b, ...data });
+        saveAdminState(state);
+        return state.services[state.services.length - 1];
+      }
+      throw new Error('Serviço não encontrado');
+    },
+
+    async deleteService(id) {
+      const state = getState();
+      state.services = (state.services || []).filter(s => String(s.id) !== String(id));
+      const base = await fetchJson('services.json').catch(() => []);
+      if (base.some(s => String(s.id) === String(id))) {
+        state.deletedServices = state.deletedServices || [];
+        if (!state.deletedServices.includes(String(id))) state.deletedServices.push(String(id));
+      }
+      saveAdminState(state);
+      return { ok: true };
+    },
+
+    async getRestaurants() {
+      const state = getState();
+      const base = await fetchJson('restaurants.json').catch(() => []);
+      let list = mergeById(base, state.restaurants);
+      const deleted = state.deletedRestaurants || [];
+      if (deleted.length) list = list.filter(r => !deleted.includes(String(r.id)));
+      return list.filter(r => r.active !== false);
+    },
+
+    async getRestaurantsAdmin() {
+      const state = getState();
+      const base = await fetchJson('restaurants.json').catch(() => []);
+      let list = mergeById(base, state.restaurants);
+      const deleted = state.deletedRestaurants || [];
+      if (deleted.length) list = list.filter(r => !deleted.includes(String(r.id)));
+      return list;
+    },
+
+    async addRestaurant(data) {
+      const state = getState();
+      if (!state.restaurants) state.restaurants = [];
+      const item = {
+        id: Date.now(),
+        active: data.active !== false,
+        sponsored: data.sponsored !== false,
+        name: data.name || '',
+        type: data.type || '',
+        location: data.location || 'Pains, MG',
+        phone: data.phone || '',
+        description: data.description || '',
+        image: data.image || '',
+        menu: data.menu || ''
+      };
+      state.restaurants.unshift(item);
+      saveAdminState(state);
+      return item;
+    },
+
+    async updateRestaurant(id, data) {
+      const state = getState();
+      if (!state.restaurants) state.restaurants = [];
+      const idx = state.restaurants.findIndex(r => String(r.id) === String(id));
+      if (idx >= 0) {
+        state.restaurants[idx] = { ...state.restaurants[idx], ...data };
+        saveAdminState(state);
+        return state.restaurants[idx];
+      }
+      const base = await fetchJson('restaurants.json').catch(() => []);
+      const b = base.find(r => String(r.id) === String(id));
+      if (b) {
+        state.restaurants.push({ ...b, ...data });
+        saveAdminState(state);
+        return state.restaurants[state.restaurants.length - 1];
+      }
+      throw new Error('Restaurante não encontrado');
+    },
+
+    async deleteRestaurant(id) {
+      const state = getState();
+      state.restaurants = (state.restaurants || []).filter(r => String(r.id) !== String(id));
+      const base = await fetchJson('restaurants.json').catch(() => []);
+      if (base.some(r => String(r.id) === String(id))) {
+        state.deletedRestaurants = state.deletedRestaurants || [];
+        if (!state.deletedRestaurants.includes(String(id))) state.deletedRestaurants.push(String(id));
+      }
+      saveAdminState(state);
+      return { ok: true };
+    },
+
     exportForGitHub() {
       const state = getState();
       return fetchJson('articles.json').then(base => {
@@ -863,6 +999,16 @@ const PAAPI = (function () {
     addAd: async (d) => (await getBackend()).addAd?.(d) ?? Promise.reject(new Error('Não disponível')),
     updateAd: async (id, d) => (await getBackend()).updateAd?.(id, d) ?? Promise.reject(new Error('Não disponível')),
     deleteAd: async (id) => (await getBackend()).deleteAd?.(id) ?? Promise.reject(new Error('Não disponível')),
+    getServices: async () => (await getBackend()).getServices?.() ?? [],
+    getServicesAdmin: async () => (await getBackend()).getServicesAdmin?.() ?? [],
+    addService: async (d) => (await getBackend()).addService?.(d) ?? Promise.reject(new Error('Não disponível')),
+    updateService: async (id, d) => (await getBackend()).updateService?.(id, d) ?? Promise.reject(new Error('Não disponível')),
+    deleteService: async (id) => (await getBackend()).deleteService?.(id) ?? Promise.reject(new Error('Não disponível')),
+    getRestaurants: async () => (await getBackend()).getRestaurants?.() ?? [],
+    getRestaurantsAdmin: async () => (await getBackend()).getRestaurantsAdmin?.() ?? [],
+    addRestaurant: async (d) => (await getBackend()).addRestaurant?.(d) ?? Promise.reject(new Error('Não disponível')),
+    updateRestaurant: async (id, d) => (await getBackend()).updateRestaurant?.(id, d) ?? Promise.reject(new Error('Não disponível')),
+    deleteRestaurant: async (id) => (await getBackend()).deleteRestaurant?.(id) ?? Promise.reject(new Error('Não disponível')),
     resolveRole,
     isOwner,
     getAdminAccounts,

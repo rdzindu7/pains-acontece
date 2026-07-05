@@ -1,0 +1,62 @@
+[
+  {
+    "id": 1,
+    "name": "Chef's Bar",
+    "type": "Bar & Restaurante",
+    "location": "Pains, MG",
+    "phone": "",
+    "description": "Ambiente aconchegante com petiscos, chopp e pratos da cozinha mineira. Ideal para encontros em família e happy hour no centro de Pains.",
+    "image": "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&q=80",
+    "menu": "",
+    "active": true,
+    "sponsored": true
+  },
+  {
+    "id": 2,
+    "name": "Bar e Rest. do Crispim",
+    "type": "Bar & Petisco",
+    "location": "Pains, MG",
+    "phone": "",
+    "description": "Tradição local com porções generosas, cerveja gelada e o melhor clima de bar da cidade.",
+    "image": "https://images.unsplash.com/photo-1572116469696-31de0f17cc34?w=800&q=80",
+    "menu": "",
+    "active": true,
+    "sponsored": true
+  },
+  {
+    "id": 3,
+    "name": "Chaves Burger",
+    "type": "Hamburguer Artesanal",
+    "location": "Pains, MG",
+    "phone": "",
+    "description": "Hambúrgueres artesanais com ingredientes selecionados. Opções clássicas e especiais da casa.",
+    "image": "https://images.unsplash.com/photo-1568900136366-3f2f94734a8e?w=800&q=80",
+    "menu": "",
+    "active": true,
+    "sponsored": true
+  },
+  {
+    "id": 4,
+    "name": "Pizzaria Grande Fatia",
+    "type": "Pizzaria",
+    "location": "Pains, MG",
+    "phone": "",
+    "description": "Pizzas em fatias generosas e opções completas para delivery e balcão. Sabores tradicionais e especiais.",
+    "image": "https://images.unsplash.com/photo-1513104890138-7c749659a591?w=800&q=80",
+    "menu": "",
+    "active": true,
+    "sponsored": true
+  },
+  {
+    "id": 5,
+    "name": "Cálice de Fogo Bar",
+    "type": "Bar & Drinks",
+    "location": "Pains, MG",
+    "phone": "",
+    "description": "Drinks autorais, música e ambiente descontraído para suas noites em Pains.",
+    "image": "https://images.unsplash.com/photo-1514362545857-3bc16c4c7b68?w=800&q=80",
+    "menu": "",
+    "active": true,
+    "sponsored": true
+  }
+]

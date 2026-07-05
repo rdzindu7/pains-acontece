@@ -11,7 +11,8 @@
     saude:       { type: 'news', title: 'Saúde', cats: ['Saúde'] },
     agenda:      { type: 'scroll', target: '#agenda' },
     empregos:    { type: 'scroll', target: '#empregos' },
-    restaurantes:{ type: 'scroll', target: '#restaurantes' },
+    servicos:    { type: 'scroll', target: '#servicos', highlight: true },
+    restaurantes:{ type: 'scroll', target: '#restaurantes', highlight: true },
     telefones:   { type: 'scroll', target: '#telefones', highlight: true },
     clima:       { type: 'scroll', target: '#clima-section', highlight: true },
     contato:     { type: 'scroll', target: '#contato', highlight: true },
@@ -634,6 +635,10 @@
 
     if (typeof PAAds !== 'undefined') {
       PAAds.init(allPub).catch(() => {});
+    }
+
+    if (typeof PADirectory !== 'undefined') {
+      PADirectory.init().then(() => observeReveals()).catch(() => {});
     }
 
     const search = document.getElementById('siteSearch');

@@ -8,7 +8,7 @@
 <title>Pains Acontece – Notícias, serviços e o que importa em Pains e região</title>
 <meta name="description" content="Portal de notícias hiperlocal de Pains e região."/>
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
-<meta name="pa-build" content="2026.07.05-v21"/>
+<meta name="pa-build" content="2026.07.05-v23"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,700;0,900;1,700&display=swap" rel="stylesheet"/>
@@ -897,60 +897,7 @@ body.cat-filter-mode .category-view { display: block; }
 .social-cta.wa:hover { box-shadow: 0 8px 32px rgba(7,94,84,.6); }
 .social-cta.ig:hover { box-shadow: 0 8px 32px rgba(193,53,132,.6); }
 
-/* ═══════════════════════════════════════════
-   SERVIÇOS GRID
-═══════════════════════════════════════════ */
-.srv-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr)); gap: 12px; }
-.srv-card {
-  background: rgba(255,255,255,.03);
-  border: 1px solid rgba(255,255,255,.05);
-  border-radius: 4px; padding: 22px 16px 20px;
-  text-align: center; cursor: pointer;
-  transition: border-color .3s, background .3s, transform .3s var(--ease);
-  position: relative; overflow: hidden;
-}
-.srv-card::before {
-  content: '';
-  position: absolute; bottom: 0; left: 0; right: 0;
-  height: 2px;
-  background: linear-gradient(90deg, transparent, var(--g), transparent);
-  transform: scaleX(0);
-  transition: transform .4s var(--ease);
-}
-.srv-card:hover::before { transform: scaleX(1); }
-.srv-card:hover { border-color: rgba(29,122,29,.4); background: rgba(29,122,29,.08); transform: translateY(-3px); }
-.srv-card i { font-size: 1.6rem; color: var(--y); margin-bottom: 12px; display: block; transition: transform .3s; }
-.srv-card:hover i { transform: scale(1.2); }
-.srv-card h4 { font-size: .78rem; font-weight: 700; color: var(--w); margin-bottom: 5px; }
-.srv-card p { font-size: .68rem; color: var(--dim); line-height: 1.4; }
-
-/* ═══════════════════════════════════════════
-   RESTAURANTES
-═══════════════════════════════════════════ */
-.rest-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 260px), 1fr)); gap: 12px; }
-.rest-card {
-  background: rgba(255,255,255,.03);
-  border: 1px solid rgba(255,255,255,.05);
-  border-radius: 4px; padding: 18px;
-  transition: border-color .3s, transform .3s var(--ease);
-  cursor: pointer;
-}
-.rest-card:hover { border-color: rgba(201,162,39,.4); transform: translateY(-3px); }
-.rest-icon { font-size: 1.8rem; margin-bottom: 10px; }
-.rest-name { font-weight: 700; font-size: .88rem; color: var(--w); margin-bottom: 3px; }
-.rest-type { font-size: .7rem; color: var(--dim); margin-bottom: 10px; }
-.rest-phone { font-size: .75rem; color: var(--g3); display: flex; align-items: center; gap: 6px; }
-.rest-phone i { font-size: .65rem; }
-.rest-add {
-  border: 1px dashed rgba(29,122,29,.4);
-  display: flex; flex-direction: column; align-items: center;
-  justify-content: center; gap: 8px; text-align: center;
-  transition: border-color .3s;
-}
-.rest-add:hover { border-color: var(--g3); }
-.rest-add i { font-size: 1.6rem; color: var(--g3); }
-.rest-add .rn { color: var(--g3); font-size: .82rem; font-weight: 700; }
-.rest-add .rt { font-size: .68rem; color: var(--dim); }
+/* Serviços e restaurantes — estilos em js/ui/directory.js */
 
 /* ═══════════════════════════════════════════
    TELEFONES
@@ -1340,7 +1287,7 @@ body.cat-filter-mode .category-view { display: block; }
     <div class="nav-item"><a href="#saude" data-nav="saude" data-i18n="nav.saude">Saúde</a></div>
     <div class="nav-item"><a href="#agenda" data-nav="agenda" data-i18n="nav.agenda">Agenda</a></div>
     <div class="nav-item"><a href="#empregos" data-nav="empregos" data-i18n="nav.empregos">Empregos</a></div>
-    <div class="nav-item"><a href="#restaurantes" data-nav="restaurantes" data-i18n="nav.restaurantes">Restaurantes</a></div>
+    <div class="nav-item"><a href="#restaurantes" data-nav="restaurantes" data-i18n="nav.restaurantes">Restaurantes & Lanchonetes</a></div>
     <div class="nav-item"><a href="#telefones" data-nav="telefones" data-i18n="nav.telefones">Telefones</a></div>
     <div class="nav-item"><a href="#clima" data-nav="clima" data-i18n="nav.clima">Clima</a></div>
     <div class="nav-item"><a href="#publicidades" data-nav="publicidades" data-i18n="nav.anuncie">Anuncie</a></div>
@@ -1494,89 +1441,31 @@ body.cat-filter-mode .category-view { display: block; }
     </aside>
   </div><!-- /ed-layout -->
 </section>
-<!-- SERVIÇOS DE PAINS -->
-<section class="section wrap home-only" style="padding-top:0;" id="pains">
+
+<!-- GUIA LOCAL — Serviços, Restaurantes e Telefones -->
+<div class="guia-local home-only" id="guia-local">
+<section class="section wrap" style="padding-top:0;" id="servicos">
   <div class="sec-head reveal">
     <div class="line-v"></div>
     <h2>Serviços de Pains</h2>
     <div class="rule"></div>
+    <a href="#servicos" class="view-all" data-nav="servicos" onclick="event.preventDefault();applyNav('servicos')">Guia completo <i class="fas fa-arrow-right"></i></a>
   </div>
-  <div class="srv-grid">
-    <a href="https://www.pains.mg.gov.br" target="_blank" rel="noopener" class="srv-card reveal reveal-delay-1">
-      <i class="fas fa-landmark"></i><h4>Prefeitura Municipal</h4><p>Serviços online, ouvidoria e informações</p>
-    </a>
-    <a href="#" class="srv-card reveal reveal-delay-2">
-      <i class="fas fa-microphone-alt"></i><h4>Câmara de Vereadores</h4><p>Ouvidoria, projetos de lei e sessões</p>
-    </a>
-    <a href="#" class="srv-card reveal reveal-delay-3">
-      <i class="fas fa-hospital"></i><h4>Saúde Pública</h4><p>Consultas, vacinas e UBS</p>
-    </a>
-    <a href="#" class="srv-card reveal reveal-delay-4">
-      <i class="fas fa-graduation-cap"></i><h4>Educação</h4><p>Secretaria e matrículas</p>
-    </a>
-    <a href="#" class="srv-card reveal reveal-delay-1">
-      <i class="fas fa-shield-alt"></i><h4>Segurança</h4><p>PM, Bombeiros e Defesa Civil</p>
-    </a>
-    <a href="#" class="srv-card reveal reveal-delay-2">
-      <i class="fas fa-bus"></i><h4>Transporte</h4><p>Linhas intermunicipais e horários</p>
-    </a>
-    <a href="#" class="srv-card reveal reveal-delay-3">
-      <i class="fas fa-bolt"></i><h4>CEMIG / Água</h4><p>Ocorrências e contas</p>
-    </a>
-    <a href="#" class="srv-card reveal reveal-delay-4">
-      <i class="fas fa-file-alt"></i><h4>Documentos</h4><p>Cartório, RG, CPF e 2ª via</p>
-    </a>
-  </div>
+  <p class="reveal" style="font-size:.78rem;color:var(--dim);margin:-8px 0 16px;max-width:560px">Acesso rápido aos serviços públicos e utilidades de Pains MG — editável pelo painel admin.</p>
+  <div id="servicesDynamic"></div>
 </section>
 
-<!-- ONDE COMER -->
 <section class="section wrap" style="padding-top:0;" id="restaurantes">
   <div class="sec-head reveal">
     <div class="line-v" style="background:linear-gradient(180deg,var(--y),#8b5e00)"></div>
-    <h2>Onde Comer em Pains</h2>
+    <h2>Restaurantes & Lanchonetes</h2>
     <div class="rule"></div>
-    <a href="#" class="view-all">Ver todos <i class="fas fa-arrow-right"></i></a>
+    <a href="#restaurantes" class="view-all" data-nav="restaurantes" onclick="event.preventDefault();applyNav('restaurantes')">Ver todos <i class="fas fa-arrow-right"></i></a>
   </div>
-  <div class="rest-grid">
-    <div class="rest-card reveal reveal-delay-1">
-      <div class="rest-icon">🍽️</div>
-      <div class="rest-name">Chef's Bar</div>
-      <div class="rest-type">Bar & Restaurante · Pains</div>
-      <a href="tel:" class="rest-phone"><i class="fas fa-phone-alt"></i>(37) 9 ????-????</a>
-    </div>
-    <div class="rest-card reveal reveal-delay-2">
-      <div class="rest-icon">🍺</div>
-      <div class="rest-name">Bar e Rest. do Crispim</div>
-      <div class="rest-type">Bar & Petisco · Pains</div>
-      <a href="tel:" class="rest-phone"><i class="fas fa-phone-alt"></i>(37) 9 ????-????</a>
-    </div>
-    <div class="rest-card reveal reveal-delay-3">
-      <div class="rest-icon">🍔</div>
-      <div class="rest-name">Chaves Burger</div>
-      <div class="rest-type">Hamburguer Artesanal · Pains</div>
-      <a href="tel:" class="rest-phone"><i class="fas fa-phone-alt"></i>(37) 9 ????-????</a>
-    </div>
-    <div class="rest-card reveal reveal-delay-1">
-      <div class="rest-icon">🍕</div>
-      <div class="rest-name">Pizzaria Grande Fatia</div>
-      <div class="rest-type">Pizzaria · Pains</div>
-      <a href="tel:" class="rest-phone"><i class="fas fa-phone-alt"></i>(37) 9 ????-????</a>
-    </div>
-    <div class="rest-card reveal reveal-delay-2">
-      <div class="rest-icon">🍷</div>
-      <div class="rest-name">Cálice de Fogo Bar</div>
-      <div class="rest-type">Bar & Drinks · Pains</div>
-      <a href="tel:" class="rest-phone"><i class="fas fa-phone-alt"></i>(37) 9 ????-????</a>
-    </div>
-    <div class="rest-card rest-add reveal reveal-delay-3">
-      <i class="fas fa-plus-circle"></i>
-      <div class="rn">Cadastre seu estabelecimento</div>
-      <div class="rt">Anuncie no Pains Acontece</div>
-    </div>
-  </div>
+  <p class="reveal" style="font-size:.78rem;color:var(--dim);margin:-8px 0 16px;max-width:560px">Onde comer em Pains — parceiros com foto, descrição, cardápio e telefone. Anuncie seu estabelecimento.</p>
+  <div id="restaurantsDynamic"></div>
 </section>
 
-<!-- TELEFONES -->
 <section class="section wrap" style="padding-top:0;" id="telefones">
   <div class="sec-head reveal">
     <div class="line-v" style="background:linear-gradient(180deg,var(--y2),var(--y))"></div>
@@ -1602,6 +1491,7 @@ body.cat-filter-mode .category-view { display: block; }
     <a href="tel:+553733842200" class="ph-item" data-name="oab jurídico"><div class="ph-name"><i class="fas fa-balance-scale"></i>OAB – Jurídico</div><span class="ph-num">(37) 3384-2200</span></a>
   </div>
 </section>
+</div><!-- /guia-local -->
 
 <!-- CLIMA COMPLETO -->
 <section class="section clima-section wrap" style="padding-top:0;" id="clima-section">
@@ -1832,8 +1722,9 @@ document.querySelectorAll('.ncard, .ncard-xl, .srv-card').forEach(card => {
 <script src="js/ai/orchestrator.js"></script>
 <script src="js/ai/engine.js"></script>
 <script src="js/core/purge.js?v=20260705v21"></script>
-<script src="js/core/api.js?v=20260705v22"></script>
-<script src="js/ui/ads.js?v=20260705v21"></script>
+<script src="js/core/api.js?v=20260705v23"></script>
+<script src="js/ui/ads.js?v=20260705v23"></script>
+<script src="js/ui/directory.js?v=20260705v23"></script>
 <script src="js/ui/corner-notify.js"></script>
 <script src="js/ui/i18n.js"></script>
 <script src="js/ai/agents/rafaela.js"></script>

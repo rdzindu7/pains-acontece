@@ -1002,6 +1002,16 @@ body.pa-owner .owner-only.btn-pub{display:flex!important}
         <span class="sb-tab-label">Empregos</span>
         <span class="sb-tab-glow" aria-hidden="true"></span>
       </div>
+      <div class="sb-item sb-tab sb-tab--rest" onclick="showPanel('restaurantes_adm',this)">
+        <span class="sb-tab-ic"><i class="fas fa-utensils"></i></span>
+        <span class="sb-tab-label">Restaurantes</span>
+        <span class="sb-tab-glow" aria-hidden="true"></span>
+      </div>
+      <div class="sb-item sb-tab sb-tab--srv" onclick="showPanel('servicos_adm',this)">
+        <span class="sb-tab-ic"><i class="fas fa-landmark"></i></span>
+        <span class="sb-tab-label">Serviços</span>
+        <span class="sb-tab-glow" aria-hidden="true"></span>
+      </div>
       <div class="sb-item sb-tab sb-tab--ads" onclick="showPanel('publicidades',this)">
         <span class="sb-tab-ic"><i class="fas fa-ad"></i></span>
         <span class="sb-tab-label">Publicidades</span>
@@ -1577,6 +1587,36 @@ body.pa-owner .owner-only.btn-pub{display:flex!important}
       </div>
     </div>
 
+    <!-- ══ RESTAURANTES ADMIN ══ -->
+    <div class="panel" id="panel-restaurantes_adm">
+      <div class="pa-page-wrap">
+        <div class="pa-page-hd">
+          <div class="pa-page-hd-text">
+            <div class="pa-page-badge pa-badge--gold"><i class="fas fa-utensils"></i> Guia Gastronômico</div>
+            <h2>Restaurantes & Lanchonetes</h2>
+            <p>Parceiros exibidos na aba Restaurantes — foto, descrição, cardápio e telefone.</p>
+          </div>
+          <button class="tb-btn primary" onclick="showAddRestaurant()"><i class="fas fa-plus"></i> Novo Estabelecimento</button>
+        </div>
+        <div class="ad-mgmt-grid" id="restaurantAdminList"></div>
+      </div>
+    </div>
+
+    <!-- ══ SERVIÇOS ADMIN ══ -->
+    <div class="panel" id="panel-servicos_adm">
+      <div class="pa-page-wrap">
+        <div class="pa-page-hd">
+          <div class="pa-page-hd-text">
+            <div class="pa-page-badge pa-badge--cyan"><i class="fas fa-landmark"></i> Guia de Serviços</div>
+            <h2>Serviços de Pains</h2>
+            <p>Cards de serviços públicos com imagem, descrição, link e telefone.</p>
+          </div>
+          <button class="tb-btn primary" onclick="showAddService()"><i class="fas fa-plus"></i> Novo Serviço</button>
+        </div>
+        <div class="ad-mgmt-grid" id="serviceAdminList"></div>
+      </div>
+    </div>
+
     <!-- ══ PUBLICIDADES ══ -->
     <div class="panel" id="panel-publicidades">
       <div class="pa-page-hd" style="margin-bottom:16px">
@@ -1819,6 +1859,45 @@ body.pa-owner .owner-only.btn-pub{display:flex!important}
   </div>
 </div>
 
+<!-- MODAL RESTAURANTE -->
+<div class="modal-backdrop" id="restModal">
+  <div class="modal" style="max-width:560px;max-height:90vh;overflow-y:auto">
+    <h3><i class="fas fa-utensils" style="color:var(--y)"></i> <span id="restModalTitle">Estabelecimento</span></h3>
+    <div class="modal-form">
+      <div class="inp-field"><label>Nome</label><input type="text" id="restName" placeholder="Ex: Chef's Bar"/></div>
+      <div class="inp-field"><label>Tipo / Categoria</label><input type="text" id="restType" placeholder="Bar & Restaurante"/></div>
+      <div class="inp-field"><label>Local</label><input type="text" id="restLocation" value="Pains, MG"/></div>
+      <div class="inp-field"><label>Telefone (WhatsApp)</label><input type="tel" id="restPhone" placeholder="(37) 9 9999-9999"/></div>
+      <div class="inp-field"><label>Descrição</label><textarea id="restDesc" style="min-height:80px" placeholder="Descrição do estabelecimento…"></textarea></div>
+      <div class="inp-field"><label>URL da imagem</label><input type="url" id="restImage" placeholder="https://… foto do local"/></div>
+      <div class="inp-field"><label>Cardápio (URL ou texto)</label><textarea id="restMenu" style="min-height:70px" placeholder="Link do cardápio ou itens principais…"></textarea></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-pub outline" onclick="closeModal('restModal')">Cancelar</button>
+      <button class="btn-pub green" onclick="saveRestaurant()"><i class="fas fa-save"></i> Salvar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL SERVIÇO -->
+<div class="modal-backdrop" id="serviceModal">
+  <div class="modal" style="max-width:520px">
+    <h3><i class="fas fa-landmark" style="color:var(--g3)"></i> <span id="serviceModalTitle">Serviço</span></h3>
+    <div class="modal-form">
+      <div class="inp-field"><label>Título</label><input type="text" id="srvTitle" placeholder="Prefeitura Municipal"/></div>
+      <div class="inp-field"><label>Descrição</label><textarea id="srvDesc" style="min-height:70px"></textarea></div>
+      <div class="inp-field"><label>Ícone FontAwesome</label><input type="text" id="srvIcon" placeholder="fa-landmark" value="fa-landmark"/></div>
+      <div class="inp-field"><label>URL da imagem</label><input type="url" id="srvImage" placeholder="https://…"/></div>
+      <div class="inp-field"><label>Link</label><input type="text" id="srvLink" placeholder="https:// ou #telefones"/></div>
+      <div class="inp-field"><label>Telefone</label><input type="text" id="srvPhone" placeholder="(37) 3384-1212"/></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-pub outline" onclick="closeModal('serviceModal')">Cancelar</button>
+      <button class="btn-pub green" onclick="saveService()"><i class="fas fa-save"></i> Salvar</button>
+    </div>
+  </div>
+</div>
+
 <!-- MODAL PUBLICIDADE -->
 <div class="modal-backdrop" id="adModal">
   <div class="modal" style="max-width:520px">
@@ -1886,7 +1965,8 @@ body.pa-owner .owner-only.btn-pub{display:flex!important}
 <script src="../js/ai/orchestrator.js"></script>
 <script src="../js/ai/engine.js"></script>
 <script src="../js/core/purge.js?v=20260705v21"></script>
-<script src="../js/core/api.js?v=20260705v22"></script>
+<script src="../js/core/api.js?v=20260705v23"></script>
+<script src="../js/ui/directory.js?v=20260705v23"></script>
 <script src="../js/ui/ads.js?v=20260705v21"></script>
 <script src="../js/ui/corner-notify.js"></script>
 <script src="../js/core/store.js"></script>
@@ -1984,6 +2064,8 @@ function showPanel(id, el) {
   if (id === 'agenda') renderEvents();
   if (id === 'empregos_adm') renderJobs();
   if (id === 'publicidades') renderAdsAdmin();
+  if (id === 'restaurantes_adm') renderRestaurantsAdmin();
+  if (id === 'servicos_adm') renderServicesAdmin();
   document.querySelector('.main').scrollTop = 0;
 }
 
@@ -3272,6 +3354,184 @@ async function deleteAdItem(id) {
     await PAAPI.deleteAd(id);
     showToast('Campanha removida.', 'info');
     renderAdsAdmin();
+  } catch { showToast('Erro ao excluir.', 'error'); }
+}
+
+/* ════ RESTAURANTES ════ */
+let editingRestId = null;
+
+async function renderRestaurantsAdmin() {
+  const list = document.getElementById('restaurantAdminList');
+  if (!list) return;
+  try {
+    const items = await PAAPI.getRestaurantsAdmin();
+    if (!items.length) {
+      list.innerHTML = emptyState('fa-utensils', 'Nenhum restaurante', 'Cadastre estabelecimentos para a aba Restaurantes & Lanchonetes.', 'Novo Estabelecimento', 'showAddRestaurant()');
+      return;
+    }
+    list.innerHTML = items.map(r => `
+      <div class="ad-mgmt-card ${r.active !== false ? 'active' : 'inactive'}">
+        ${r.image ? `<img src="${escHtml(r.image)}" style="width:100%;height:100px;object-fit:cover;border-radius:6px;margin-bottom:10px" alt=""/>` : ''}
+        <div class="ad-mgmt-slot">${escHtml(r.type)}</div>
+        <div class="ad-mgmt-title">${escHtml(r.name)}</div>
+        <div class="ad-mgmt-meta">${escHtml(r.phone || 'Sem telefone')} · ${r.active !== false ? '<span style="color:var(--g3)">Ativo</span>' : 'Inativo'}</div>
+        <div class="ad-mgmt-actions">
+          <button class="btn-pub outline" style="padding:6px 12px;font-size:.62rem" onclick="toggleRestaurantActive(${r.id}, ${r.active === false})">${r.active === false ? 'Ativar' : 'Desativar'}</button>
+          <button class="btn-pub outline" style="padding:6px 12px;font-size:.62rem" onclick="editRestaurant(${r.id})"><i class="fas fa-edit"></i></button>
+          <button class="btn-pub red-btn" style="padding:6px 12px;font-size:.62rem" onclick="deleteRestaurantItem(${r.id})"><i class="fas fa-trash"></i></button>
+        </div>
+      </div>`).join('');
+  } catch {
+    list.innerHTML = emptyState('fa-utensils', 'Erro', 'Recarregue a página.', null, null);
+  }
+}
+
+function showAddRestaurant() {
+  editingRestId = null;
+  document.getElementById('restModalTitle').textContent = 'Novo Estabelecimento';
+  ['restName','restType','restPhone','restDesc','restImage','restMenu'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  document.getElementById('restLocation').value = 'Pains, MG';
+  document.getElementById('restModal').classList.add('open');
+}
+
+async function editRestaurant(id) {
+  const items = await PAAPI.getRestaurantsAdmin();
+  const r = items.find(x => String(x.id) === String(id));
+  if (!r) return;
+  editingRestId = id;
+  document.getElementById('restModalTitle').textContent = 'Editar Estabelecimento';
+  document.getElementById('restName').value = r.name || '';
+  document.getElementById('restType').value = r.type || '';
+  document.getElementById('restLocation').value = r.location || 'Pains, MG';
+  document.getElementById('restPhone').value = r.phone || '';
+  document.getElementById('restDesc').value = r.description || '';
+  document.getElementById('restImage').value = r.image || '';
+  document.getElementById('restMenu').value = r.menu || '';
+  document.getElementById('restModal').classList.add('open');
+}
+
+async function saveRestaurant() {
+  const data = {
+    name: document.getElementById('restName').value.trim(),
+    type: document.getElementById('restType').value.trim(),
+    location: document.getElementById('restLocation').value.trim(),
+    phone: document.getElementById('restPhone').value.trim(),
+    description: document.getElementById('restDesc').value.trim(),
+    image: document.getElementById('restImage').value.trim(),
+    menu: document.getElementById('restMenu').value.trim(),
+    active: true,
+    sponsored: true
+  };
+  if (!data.name) { showToast('Informe o nome do estabelecimento.', 'error'); return; }
+  try {
+    if (editingRestId) await PAAPI.updateRestaurant(editingRestId, data);
+    else await PAAPI.addRestaurant(data);
+    closeModal('restModal');
+    showToast('Estabelecimento salvo no portal!', 'success');
+    renderRestaurantsAdmin();
+  } catch { showToast('Erro ao salvar.', 'error'); }
+}
+
+async function toggleRestaurantActive(id, active) {
+  try {
+    await PAAPI.updateRestaurant(id, { active });
+    renderRestaurantsAdmin();
+  } catch { showToast('Erro ao atualizar.', 'error'); }
+}
+
+async function deleteRestaurantItem(id) {
+  if (!confirm('Excluir este estabelecimento?')) return;
+  try {
+    await PAAPI.deleteRestaurant(id);
+    showToast('Removido.', 'info');
+    renderRestaurantsAdmin();
+  } catch { showToast('Erro ao excluir.', 'error'); }
+}
+
+/* ════ SERVIÇOS ════ */
+let editingSrvId = null;
+
+async function renderServicesAdmin() {
+  const list = document.getElementById('serviceAdminList');
+  if (!list) return;
+  try {
+    const items = await PAAPI.getServicesAdmin();
+    if (!items.length) {
+      list.innerHTML = emptyState('fa-landmark', 'Nenhum serviço', 'Cadastre os serviços públicos de Pains.', 'Novo Serviço', 'showAddService()');
+      return;
+    }
+    list.innerHTML = items.map(s => `
+      <div class="ad-mgmt-card ${s.active !== false ? 'active' : 'inactive'}">
+        ${s.image ? `<img src="${escHtml(s.image)}" style="width:100%;height:90px;object-fit:cover;border-radius:6px;margin-bottom:10px" alt=""/>` : ''}
+        <div class="ad-mgmt-title">${escHtml(s.title)}</div>
+        <div class="ad-mgmt-meta">${escHtml(s.phone || s.link || '—')} · ${s.active !== false ? '<span style="color:var(--g3)">Ativo</span>' : 'Inativo'}</div>
+        <div class="ad-mgmt-actions">
+          <button class="btn-pub outline" style="padding:6px 12px;font-size:.62rem" onclick="toggleServiceActive(${s.id}, ${s.active === false})">${s.active === false ? 'Ativar' : 'Desativar'}</button>
+          <button class="btn-pub outline" style="padding:6px 12px;font-size:.62rem" onclick="editService(${s.id})"><i class="fas fa-edit"></i></button>
+          <button class="btn-pub red-btn" style="padding:6px 12px;font-size:.62rem" onclick="deleteServiceItem(${s.id})"><i class="fas fa-trash"></i></button>
+        </div>
+      </div>`).join('');
+  } catch {
+    list.innerHTML = emptyState('fa-landmark', 'Erro', 'Recarregue a página.', null, null);
+  }
+}
+
+function showAddService() {
+  editingSrvId = null;
+  document.getElementById('serviceModalTitle').textContent = 'Novo Serviço';
+  ['srvTitle','srvDesc','srvImage','srvLink','srvPhone'].forEach(id => { const el = document.getElementById(id); if (el) el.value = ''; });
+  document.getElementById('srvIcon').value = 'fa-landmark';
+  document.getElementById('serviceModal').classList.add('open');
+}
+
+async function editService(id) {
+  const items = await PAAPI.getServicesAdmin();
+  const s = items.find(x => String(x.id) === String(id));
+  if (!s) return;
+  editingSrvId = id;
+  document.getElementById('serviceModalTitle').textContent = 'Editar Serviço';
+  document.getElementById('srvTitle').value = s.title || '';
+  document.getElementById('srvDesc').value = s.description || '';
+  document.getElementById('srvIcon').value = s.icon || 'fa-landmark';
+  document.getElementById('srvImage').value = s.image || '';
+  document.getElementById('srvLink').value = s.link || '';
+  document.getElementById('srvPhone').value = s.phone || '';
+  document.getElementById('serviceModal').classList.add('open');
+}
+
+async function saveService() {
+  const data = {
+    title: document.getElementById('srvTitle').value.trim(),
+    description: document.getElementById('srvDesc').value.trim(),
+    icon: document.getElementById('srvIcon').value.trim() || 'fa-landmark',
+    image: document.getElementById('srvImage').value.trim(),
+    link: document.getElementById('srvLink').value.trim(),
+    phone: document.getElementById('srvPhone').value.trim(),
+    active: true
+  };
+  if (!data.title) { showToast('Informe o título do serviço.', 'error'); return; }
+  try {
+    if (editingSrvId) await PAAPI.updateService(editingSrvId, data);
+    else await PAAPI.addService(data);
+    closeModal('serviceModal');
+    showToast('Serviço salvo no portal!', 'success');
+    renderServicesAdmin();
+  } catch { showToast('Erro ao salvar.', 'error'); }
+}
+
+async function toggleServiceActive(id, active) {
+  try {
+    await PAAPI.updateService(id, { active });
+    renderServicesAdmin();
+  } catch { showToast('Erro ao atualizar.', 'error'); }
+}
+
+async function deleteServiceItem(id) {
+  if (!confirm('Excluir este serviço?')) return;
+  try {
+    await PAAPI.deleteService(id);
+    showToast('Removido.', 'info');
+    renderServicesAdmin();
   } catch { showToast('Erro ao excluir.', 'error'); }
 }
 
