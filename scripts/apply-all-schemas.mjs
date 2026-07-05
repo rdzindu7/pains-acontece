@@ -16,10 +16,14 @@ if (!password) {
 }
 
 const ref = 'blcomwofpyorypqjdhfb';
-const regions = [
-  `postgresql://postgres.${ref}:${encodeURIComponent(password)}@aws-0-us-east-1.pooler.supabase.com:6543/postgres`,
-  `postgresql://postgres.${ref}:${encodeURIComponent(password)}@aws-0-sa-east-1.pooler.supabase.com:6543/postgres`
+const enc = encodeURIComponent(password);
+const hosts = [
+  `aws-1-us-west-1.pooler.supabase.com:6543`,
+  `aws-1-us-west-1.pooler.supabase.com:5432`,
+  `aws-0-us-east-1.pooler.supabase.com:6543`,
+  `aws-0-sa-east-1.pooler.supabase.com:6543`
 ];
+const regions = hosts.map(h => `postgresql://postgres.${ref}:${enc}@${h}/postgres`);
 
 const __dir = dirname(fileURLToPath(import.meta.url));
 const files = ['schema.sql', 'schema-social.sql'].map(f =>

@@ -71,6 +71,12 @@ async function main() {
   const { url, key } = readConfig();
   console.log('Sincronizando artigos publicados do Supabase…');
   const articles = await fetchPublished(url, key);
+  let existing = [];
+  try { existing = JSON.parse(readFileSync(OUT, 'utf8')); } catch {}
+  if (!articles.length && existing.length) {
+    console.log(`⚠ Supabase vazio — mantendo ${existing.length} artigo(s) locais em articles.json`);
+    return existing.length;
+  }
   writeFileSync(OUT, JSON.stringify(articles, null, 2) + '\n', 'utf8');
   console.log(`✓ ${articles.length} artigo(s) → data/articles.json`);
   return articles.length;
