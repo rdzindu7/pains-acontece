@@ -127,7 +127,7 @@ const PAAutoSync = (function () {
     try {
       if (!githubEnabled()) {
         if (typeof PAAutoReload !== 'undefined') PAAutoReload.signalUpdate();
-        if (typeof PADialog !== 'undefined') {
+        if (typeof PADialog !== 'undefined' && !(typeof PAAutomation !== 'undefined' && PAAutomation.silent())) {
           PADialog.toast('Salvo na nuvem — o site atualiza automaticamente.', 'success');
         }
         return { ok: true, mode: 'supabase' };

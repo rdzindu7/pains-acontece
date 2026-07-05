@@ -1,0 +1,15 @@
+{
+    "$schema":  "https://trynia.ai/schema/project.json",
+    "version":  1,
+    "name":  "noticias",
+    "sources":  "rdzindu7/pains-acontece",
+    "vaults":  [
+
+               ],
+    "local":  [
+                  "7403761f-f794-4019-b1b1-7a4215aa230c"
+              ],
+    "defaults":  {
+                     "search_mode":  "scoped"
+                 }
+}

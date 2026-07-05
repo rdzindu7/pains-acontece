@@ -2177,6 +2177,7 @@ body.pa-owner .owner-only.btn-pub{display:flex!important}
 </div>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="../js/core/config.js"></script>
+<script src="../js/core/automation.js?v=20260705v57"></script>
 <script src="../js/core/supabase-client.js"></script>
 <script src="../js/ui/article-format.js"></script>
 <script src="../js/ai/scanner.js?v=20260705v39"></script>
@@ -2185,15 +2186,15 @@ body.pa-owner .owner-only.btn-pub{display:flex!important}
 <script src="../js/ai/agents/camila.js"></script>
 <script src="../js/ai/orchestrator.js"></script>
 <script src="../js/ai/engine.js"></script>
-<script src="../js/core/purge.js?v=20260705v55"></script>
-<script src="../js/core/auto-sync.js?v=20260705v55"></script>
+<script src="../js/core/purge.js?v=20260705v57"></script>
+<script src="../js/core/auto-sync.js?v=20260705v57"></script>
 <script src="../js/core/auto-reload.js?v=20260705v31"></script>
 <script src="../js/core/pains-media.js?v=20260705v44"></script>
 <script src="../js/core/article-images.js?v=20260705v46"></script>
 <script src="../js/core/views-tracker.js?v=20260705v52"></script>
 <script src="../js/ai/agents/tiago.js?v=20260705v26"></script>
 <script src="../js/ai/bus-assistant.js?v=20260705v26"></script>
-<script src="../js/core/api.js?v=20260705v55"></script>
+<script src="../js/core/api.js?v=20260705v57"></script>
 <script src="../js/ui/directory.js?v=20260705v23"></script>
 <script src="../js/ui/ads.js?v=20260705v21"></script>
 <script src="../js/ui/corner-notify.js"></script>
@@ -3991,12 +3992,8 @@ async function testSupabase() {
 
 function autoSyncSiteNotice() {
   if (typeof PAAutoReload !== 'undefined') PAAutoReload.signalUpdate();
-  const cloud = PAConfig?.useGitHubSync === false;
-  showToast(
-    cloud ? 'Publicado! Visitantes veem na nuvem automaticamente.' : 'Publicado! O site atualiza automaticamente no GitHub.',
-    'success',
-    5000
-  );
+  if (typeof PAAutomation !== 'undefined' && PAAutomation.silent()) return;
+  showToast('Publicado! O site atualiza automaticamente.', 'success', 4000);
 }
 
 async function exportGitHub(silent) {

@@ -66,11 +66,27 @@ const PAAutoReload = (function () {
     scheduleSoftRefresh();
   }
 
-  function init() {
-    window.addEventListener('storage', onStorageSignal);
+  let pollTimer = null;
+
+  function startPolling() {
+    if (isAdminPage()) return;
+    const auto = typeof PAAutomation !== 'undefined' && PAAutomation.autoRefresh();
+    if (!auto) return;
+    const ms = typeof PAAutomation !== 'undefined' ? PAAutomation.refreshMs() : 300000;
+    clearInterval(pollTimer);
+    pollTimer = setInterval(() => { softRefresh().catch(() => {}); }, ms);
   }
 
-  return { init, signalUpdate, softRefresh };
+  function init() {
+    window.addEventListener('storage', onStorageSignal);
+    if (document.readyState === 'loading') {
+      document.addEventListener('DOMContentLoaded', startPolling);
+    } else {
+      startPolling();
+    }
+  }
+
+  return { init, signalUpdate, softRefresh, startPolling };
 })();
 
 PAAutoReload.init();

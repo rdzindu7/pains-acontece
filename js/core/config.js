@@ -14,6 +14,15 @@ const PAConfig = {
   supabaseAnonKey: 'sb_publishable_Kkznz1j873N8ztepzRDCcQ__eXd6MXS',
   ownerEmail: 'admin@painsacontece.com.br',
   siteUrl: 'https://rdzindu7.github.io/pains-acontece',
+  automation: {
+    silentMode: true,
+    autoScan: true,
+    autoRefresh: true,
+    autoSync: true,
+    autoPublishIfEmpty: true,
+    refreshMinutes: 5,
+    scanMinutes: 5
+  },
   useGitHubSync: false,
   githubSync: {
     enabled: false,

@@ -1,0 +1,39 @@
+name: Auto Seed Notícias
+
+on:
+  schedule:
+    - cron: '0 */4 * * *'
+  workflow_dispatch:
+  push:
+    branches: [main]
+    paths:
+      - 'scripts/seed-articles.mjs'
+      - '.github/workflows/auto-seed.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  seed:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+
+      - name: Atualizar notícias via RSS
+        run: node scripts/seed-articles.mjs
+
+      - name: Commit e publicar
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add data/articles.json assets/images/articles/ 2>/dev/null || true
+          if git diff --staged --quiet; then
+            echo "Nenhuma notícia nova"
+          else
+            git commit -m "auto: notícias RSS atualizadas [bot]"
+            git push
+          fi

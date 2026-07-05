@@ -153,6 +153,7 @@ const PACornerNotify = (function () {
   }
 
   function getAutoPref() {
+    if (typeof PAAutomation !== 'undefined' && PAAutomation.autoScan()) return true;
     try { return localStorage.getItem(LS_AUTO) !== 'off'; } catch { return true; }
   }
 

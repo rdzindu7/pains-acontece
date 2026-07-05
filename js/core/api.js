@@ -340,6 +340,7 @@ const PAAPI = (function () {
   }
 
   function scheduleAutoSync() {
+    if (typeof PAAutomation !== 'undefined' && !PAAutomation.autoSync()) return;
     if (typeof PAAutoSync !== 'undefined' && isAdminSession()) {
       PAAutoSync.schedule();
     }

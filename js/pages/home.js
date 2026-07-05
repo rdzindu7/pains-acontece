@@ -514,11 +514,22 @@
   let autoScanTimer = null;
   let autoScanRunning = false;
 
+  function shouldAutoPublish() {
+    if (autoScanRunning || typeof PAAutoPublisher === 'undefined') return false;
+    if (isOwnerView()) return true;
+    return typeof PAAutomation !== 'undefined'
+      && PAAutomation.autoPublishEmpty()
+      && !allPub.length
+      && !sessionStorage.getItem('pa_autopub_tried');
+  }
+
   async function executeBackgroundSearch(silent) {
-    if (!isOwnerView() || autoScanRunning || typeof PAAutoPublisher === 'undefined') return null;
+    const forceSilent = silent || (typeof PAAutomation !== 'undefined' && PAAutomation.silent());
+    if (!shouldAutoPublish() && !isOwnerView()) return null;
+    if (!isOwnerView()) sessionStorage.setItem('pa_autopub_tried', '1');
     autoScanRunning = true;
     let notify = null;
-    if (!silent && typeof PACornerNotify !== 'undefined') {
+    if (!forceSilent && typeof PACornerNotify !== 'undefined') {
       notify = PACornerNotify.show({
         title: 'IA buscando notícias',
         body: 'Varredura em andamento — sem interromper sua navegação.',
@@ -540,27 +551,23 @@
       window.removeEventListener('pa-deep-verify', onProgress);
       notify?.dismiss();
       if (result?.published > 0) {
-        await PAStore.init();
-        applyArticles(PAStore.getArticles('pub'));
-        if (typeof PACornerNotify !== 'undefined') {
-          PACornerNotify.show({
-            title: 'Novas notícias publicadas',
-            body: `<strong>${result.published}</strong> matéria(s) verificada(s) e adicionada(s) ao portal.`,
-            icon: 'fa-check-circle',
-            duration: 8000,
-            actions: [{ id: 'ok', label: 'Ok', kind: 'yes' }]
-          });
-        } else {
-          showToast(`${result.published} notícia(s) publicada(s) pela IA`, 'success');
+        await PAStore.init().catch(() => {});
+        const fresh = await fetchPubFromJson();
+        if (fresh.length) applyArticles(fresh, filterForDisplay(fresh));
+        else applyArticles(PAStore.getArticles('pub'));
+        if (!forceSilent) {
+          if (typeof PACornerNotify !== 'undefined') {
+            PACornerNotify.show({
+              title: 'Novas notícias publicadas',
+              body: `<strong>${result.published}</strong> matéria(s) verificada(s) e adicionada(s) ao portal.`,
+              icon: 'fa-check-circle',
+              duration: 8000,
+              actions: [{ id: 'ok', label: 'Ok', kind: 'yes' }]
+            });
+          } else {
+            showToast(`${result.published} notícia(s) publicada(s) pela IA`, 'success');
+          }
         }
-      } else if (!silent && typeof PACornerNotify !== 'undefined') {
-        PACornerNotify.show({
-          title: 'Busca concluída',
-          body: 'Nenhuma matéria nova no momento. Próxima verificação em <strong>5 min</strong>.',
-          icon: 'fa-info-circle',
-          duration: 6000,
-          actions: [{ id: 'ok', label: 'Ok', kind: 'yes' }]
-        });
       }
       return result;
     } catch {
@@ -571,48 +578,34 @@
     }
   }
 
-  function promptAutoSearch() {
-    if (!isOwnerView() || autoScanRunning) return;
-    const pref = typeof PACornerNotify !== 'undefined' ? PACornerNotify.getAutoPref() : true;
-    if (!pref) return;
-
-    if (typeof PACornerNotify === 'undefined') {
+  function runAutoScan() {
+    if (autoScanRunning) return;
+    const fullAuto = typeof PAAutomation !== 'undefined' && PAAutomation.autoScan();
+    if (fullAuto || isOwnerView() || shouldAutoPublish()) {
       executeBackgroundSearch(true);
-      return;
     }
-
-    PACornerNotify.show({
-      title: 'Busca automática',
-      body: 'A IA pode verificar novas notícias de Pains e região. Deseja buscar agora?',
-      icon: 'fa-satellite-dish',
-      actions: [
-        {
-          id: 'yes',
-          label: 'Sim, buscar',
-          kind: 'yes',
-          onClick: () => executeBackgroundSearch(false)
-        },
-        {
-          id: 'no',
-          label: 'Agora não',
-          kind: 'no',
-          onClick: () => {}
-        },
-        {
-          id: 'off',
-          label: 'Não perguntar',
-          kind: 'no',
-          onClick: () => PACornerNotify.setAutoPref(false)
-        }
-      ]
-    });
   }
 
   function startAutoScanLoop() {
-    if (!isOwnerView()) return;
+    const ms = typeof PAAutomation !== 'undefined' ? PAAutomation.scanMs() : AUTO_SCAN_MS;
     clearInterval(autoScanTimer);
-    autoScanTimer = setInterval(promptAutoSearch, AUTO_SCAN_MS);
-    setTimeout(promptAutoSearch, 12000);
+    autoScanTimer = setInterval(runAutoScan, ms);
+    setTimeout(runAutoScan, 8000);
+  }
+
+  function startPublicRefreshLoop() {
+    if (typeof PAAutomation === 'undefined' || !PAAutomation.autoRefresh()) return;
+    const ms = PAAutomation.refreshMs();
+    setInterval(async () => {
+      try {
+        const fresh = await fetchPubFromJson();
+        if (fresh.length) applyArticles(fresh, filterForDisplay(fresh));
+        else if (typeof PAAPI !== 'undefined') {
+          const cloud = await withTimeout(PAAPI.getArticles('pub'), 6000);
+          if (cloud?.length) applyArticles(cloud, filterForDisplay(cloud));
+        }
+      } catch {}
+    }, ms);
   }
 
   function runBackgroundSearch() {
@@ -737,6 +730,7 @@
     }
 
     startAutoScanLoop();
+    startPublicRefreshLoop();
 
     if (isOwnerView()) {
       document.body.classList.add('pa-owner');

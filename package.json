@@ -6,6 +6,7 @@
     "sync": "node scripts/sync-articles.mjs",
     "setup:schemas": "node scripts/apply-all-schemas.mjs",
     "seed": "node scripts/seed-articles.mjs",
+    "auto": "node scripts/seed-articles.mjs",
     "dev": "npx --yes serve -l 3456"
   },
   "dependencies": {
