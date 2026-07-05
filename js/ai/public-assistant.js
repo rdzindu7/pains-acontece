@@ -33,41 +33,82 @@ const PAPublicIA = (function () {
     const s = document.createElement('style');
     s.id = 'papia-styles';
     s.textContent = `
-      .papia-fab{position:fixed;bottom:calc(80px + env(safe-area-inset-bottom));right:calc(20px + env(safe-area-inset-right));width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,#1d7a1d,#0d4d0d);border:2px solid rgba(201,162,39,.4);color:#fff;font-size:1.2rem;cursor:pointer;box-shadow:0 4px 24px rgba(29,122,29,.55);z-index:8000;transition:transform .3s,box-shadow .3s;display:flex;align-items:center;justify-content:center}
+      .papia-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:7999;opacity:0;pointer-events:none;transition:opacity .3s}
+      .papia-backdrop.open{opacity:1;pointer-events:all}
+      .papia-fab{
+        position:fixed;bottom:calc(20px + env(safe-area-inset-bottom));right:calc(20px + env(safe-area-inset-right));
+        width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,#1d7a1d,#0d4d0d);
+        border:2px solid rgba(201,162,39,.4);color:#fff;font-size:1.2rem;cursor:pointer;
+        box-shadow:0 4px 24px rgba(29,122,29,.55);z-index:8000;
+        transition:transform .3s,box-shadow .3s,opacity .3s;display:flex;align-items:center;justify-content:center;
+        -webkit-tap-highlight-color:transparent;touch-action:manipulation;
+      }
       .papia-fab:hover{transform:scale(1.08) rotate(-3deg);box-shadow:0 8px 32px rgba(29,122,29,.75)}
+      .papia-fab.hidden{opacity:0;pointer-events:none;transform:scale(.85)}
       .papia-fab .dot{position:absolute;top:6px;right:6px;width:10px;height:10px;background:#2ecc2e;border-radius:50%;border:2px solid #080808;animation:papiaPulse 1.5s ease infinite}
       @keyframes papiaPulse{0%,100%{opacity:1}50%{opacity:.4}}
-      .papia-panel{position:fixed;bottom:calc(148px + env(safe-area-inset-bottom));right:calc(20px + env(safe-area-inset-right));width:min(420px,calc(100vw - 40px));height:min(560px,calc(100vh - 180px));background:rgba(8,8,8,.97);border:1px solid rgba(29,122,29,.35);border-radius:12px;box-shadow:0 24px 80px rgba(0,0,0,.85);z-index:8000;display:flex;flex-direction:column;transform:scale(.92) translateY(16px);opacity:0;pointer-events:none;transition:all .35s cubic-bezier(.16,1,.3,1);overflow:hidden;backdrop-filter:blur(16px)}
-      .papia-panel.open{transform:none;opacity:1;pointer-events:all}
-      .papia-head{padding:12px 14px;background:linear-gradient(90deg,rgba(13,77,13,.9),rgba(8,8,8,.5));border-bottom:1px solid rgba(255,255,255,.06);display:flex;align-items:center;gap:10px}
+      .papia-panel{
+        position:fixed;bottom:calc(88px + env(safe-area-inset-bottom));right:calc(20px + env(safe-area-inset-right));
+        width:min(420px,calc(100vw - 40px));height:min(560px,calc(100vh - 120px));max-height:calc(100dvh - 100px);
+        background:rgba(8,8,8,.97);border:1px solid rgba(29,122,29,.35);border-radius:12px;
+        box-shadow:0 24px 80px rgba(0,0,0,.85);z-index:8001;display:flex;flex-direction:column;
+        transform:scale(.92) translateY(16px);opacity:0;pointer-events:none;visibility:hidden;
+        transition:transform .35s cubic-bezier(.16,1,.3,1),opacity .35s,visibility .35s;overflow:hidden;backdrop-filter:blur(16px);
+      }
+      .papia-panel.open{transform:none;opacity:1;pointer-events:all;visibility:visible}
+      .papia-head{padding:12px 14px;background:linear-gradient(90deg,rgba(13,77,13,.9),rgba(8,8,8,.5));border-bottom:1px solid rgba(255,255,255,.06);display:flex;align-items:center;gap:10px;flex-shrink:0}
       .papia-head .av{width:38px;height:38px;border-radius:50%;background:linear-gradient(135deg,#1d7a1d,#2ecc2e);display:flex;align-items:center;justify-content:center;flex-shrink:0}
-      .papia-head h4{font-family:'Bebas Neue',sans-serif;letter-spacing:1.5px;font-size:1.05rem;flex:1;line-height:1.2}
+      .papia-head .meta{flex:1;min-width:0}
+      .papia-head h4{font-family:'Bebas Neue',sans-serif;letter-spacing:1.5px;font-size:1.05rem;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
       .papia-head .sub{font-size:.55rem;color:rgba(255,255,255,.45);letter-spacing:.8px;text-transform:uppercase}
-      .papia-head button{background:none;border:none;color:rgba(255,255,255,.4);cursor:pointer;font-size:1rem}
-      .papia-team{display:flex;gap:6px;padding:8px 14px;border-bottom:1px solid rgba(255,255,255,.04);background:rgba(0,0,0,.2)}
-      .papia-team-member{flex:1;text-align:center;padding:6px 4px;border-radius:6px;border:1px solid rgba(255,255,255,.06);font-size:.52rem;color:rgba(255,255,255,.4);transition:all .3s}
+      .papia-head button{background:none;border:none;color:rgba(255,255,255,.4);cursor:pointer;font-size:1rem;padding:8px;flex-shrink:0}
+      .papia-team{display:flex;gap:6px;padding:8px 12px;border-bottom:1px solid rgba(255,255,255,.04);background:rgba(0,0,0,.2);flex-shrink:0}
+      .papia-team-member{flex:1;min-width:0;text-align:center;padding:6px 4px;border-radius:6px;border:1px solid rgba(255,255,255,.06);font-size:.52rem;color:rgba(255,255,255,.4);transition:all .3s}
       .papia-team-member i{display:block;font-size:.75rem;margin-bottom:3px}
-      .papia-team-member strong{display:block;font-size:.58rem;letter-spacing:.5px;color:rgba(255,255,255,.7)}
+      .papia-team-member strong{display:block;font-size:.58rem;letter-spacing:.5px;color:rgba(255,255,255,.7);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
       .papia-team-member.active{border-color:var(--ag-c,var(--g));background:rgba(29,122,29,.12);color:#fff;box-shadow:0 0 12px rgba(29,122,29,.2)}
       .papia-team-member.active strong{color:var(--ag-c,#2ecc2e)}
-      .papia-msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px}
-      .papia-msg{max-width:92%;padding:10px 14px;border-radius:10px;font-size:.78rem;line-height:1.55}
+      .papia-msgs{flex:1;min-height:0;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:10px;-webkit-overflow-scrolling:touch}
+      .papia-msg{max-width:92%;padding:10px 14px;border-radius:10px;font-size:.78rem;line-height:1.55;word-break:break-word}
       .papia-msg.bot{background:rgba(29,122,29,.12);border:1px solid rgba(29,122,29,.25);align-self:flex-start}
       .papia-msg.user{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);align-self:flex-end}
       .papia-msg.typing{color:rgba(255,255,255,.4);font-style:italic}
-      .papia-agent-tag{font-size:.58rem;color:var(--ag-color,#2ecc2e);margin-bottom:6px;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,.06);display:flex;align-items:center;gap:6px}
+      .papia-agent-tag{font-size:.58rem;color:var(--ag-color,#2ecc2e);margin-bottom:6px;padding-bottom:6px;border-bottom:1px solid rgba(255,255,255,.06);display:flex;align-items:center;gap:6px;flex-wrap:wrap}
       .papia-agent-tag i{opacity:.85}
-      .papia-actions{padding:8px 12px;display:flex;gap:6px;flex-wrap:wrap;border-top:1px solid rgba(255,255,255,.04)}
-      .papia-act{font-size:.58rem;font-weight:700;letter-spacing:.8px;text-transform:uppercase;padding:6px 11px;border-radius:20px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:rgba(255,255,255,.55);cursor:pointer;transition:all .2s}
-      .papia-act:hover{background:rgba(29,122,29,.2);color:#2ecc2e;border-color:rgba(29,122,29,.35)}
-      .papia-foot{padding:12px;display:flex;gap:8px;border-top:1px solid rgba(255,255,255,.06)}
-      .papia-foot input{flex:1;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:10px 12px;color:#fff;font-size:.78rem;outline:none}
+      .papia-actions{padding:8px 12px;display:grid;grid-template-columns:1fr 1fr;gap:6px;border-top:1px solid rgba(255,255,255,.04);flex-shrink:0}
+      .papia-act{font-size:.58rem;font-weight:700;letter-spacing:.5px;text-transform:uppercase;padding:8px 6px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:rgba(255,255,255,.55);cursor:pointer;transition:all .2s;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;-webkit-tap-highlight-color:transparent}
+      .papia-act:hover,.papia-act:active{background:rgba(29,122,29,.2);color:#2ecc2e;border-color:rgba(29,122,29,.35)}
+      .papia-foot{padding:10px 12px calc(10px + env(safe-area-inset-bottom));display:flex;gap:8px;border-top:1px solid rgba(255,255,255,.06);flex-shrink:0;align-items:center}
+      .papia-foot input{flex:1;min-width:0;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:10px 12px;color:#fff;font-size:.78rem;outline:none}
       .papia-foot input:focus{border-color:#1d7a1d}
-      .papia-foot button{width:44px;height:44px;border-radius:8px;background:#1d7a1d;border:none;color:#fff;cursor:pointer}
+      .papia-foot button{width:44px;height:44px;border-radius:8px;background:#1d7a1d;border:none;color:#fff;cursor:pointer;flex-shrink:0}
       .papia-link{color:var(--g3);text-decoration:underline;font-weight:600}
-      @media(max-width:600px){.papia-panel{right:12px;width:calc(100vw - 24px)}.papia-fab{right:14px;bottom:calc(72px + env(safe-area-inset-bottom))}}
+      @media(min-width:601px){
+        .papia-actions{display:flex;flex-wrap:wrap;gap:6px}
+        .papia-act{width:auto;padding:6px 11px;border-radius:20px}
+      }
+      @media(max-width:600px){
+        .papia-panel.open{inset:0;width:100%;max-width:100%;height:100%;max-height:100%;height:100dvh;bottom:0;right:0;border-radius:0;border:none}
+        .papia-fab{right:calc(14px + env(safe-area-inset-right));bottom:calc(16px + env(safe-area-inset-bottom));width:50px;height:50px}
+        .papia-head{padding-top:calc(12px + env(safe-area-inset-top))}
+        .papia-actions{padding:10px 12px;gap:8px}
+        .papia-act{padding:10px 6px}
+        body.pa-has-padiv .papia-fab{bottom:calc(80px + env(safe-area-inset-bottom))}
+      }
     `;
     document.head.appendChild(s);
+  }
+
+  function syncOpenState() {
+    const panel = document.getElementById('papiaPanel');
+    const fab = document.getElementById('papiaFab');
+    const backdrop = document.getElementById('papiaBackdrop');
+    const mobile = window.innerWidth <= 600;
+    panel?.classList.toggle('open', open);
+    backdrop?.classList.toggle('open', open && mobile);
+    fab?.classList.toggle('hidden', open && mobile);
+    document.body.style.overflow = open && mobile ? 'hidden' : '';
+    if (open) setTimeout(() => document.getElementById('papiaInput')?.focus(), 100);
   }
 
   function setActiveAgent(agentId) {
@@ -86,10 +127,9 @@ const PAPublicIA = (function () {
     msgs.scrollTop = msgs.scrollHeight;
   }
 
-  function toggle() {
-    open = !open;
-    document.getElementById('papiaPanel')?.classList.toggle('open', open);
-    if (open) document.getElementById('papiaInput')?.focus();
+  function toggle(force) {
+    open = typeof force === 'boolean' ? force : !open;
+    syncOpenState();
   }
 
   async function ensureArticles() {
@@ -337,17 +377,17 @@ const PAPublicIA = (function () {
     const onArticle = !!window.PACurrentArticle;
     if (isOwnerMode()) {
       return `
-        <button class="papia-act" onclick="PAPublicIA.quick('buscar')"><i class="fas fa-rss"></i> Buscar Agora</button>
-        <button class="papia-act" onclick="PAPublicIA.quick('ultimas')">Últimas</button>
-        <button class="papia-act" onclick="PAPublicIA.quick('pains')">Pains MG</button>
-        <button class="papia-act" onclick="PAPublicIA.quick('clima')">Clima</button>`;
+        <button type="button" class="papia-act" onclick="PAPublicIA.quick('buscar')"><i class="fas fa-rss"></i> Buscar Agora</button>
+        <button type="button" class="papia-act" onclick="PAPublicIA.quick('ultimas')">Últimas</button>
+        <button type="button" class="papia-act" onclick="PAPublicIA.quick('pains')">Pains MG</button>
+        <button type="button" class="papia-act" onclick="PAPublicIA.quick('clima')">Clima</button>`;
     }
     return `
-      <button class="papia-act" onclick="PAPublicIA.quick('ultimas')"><i class="fas fa-newspaper"></i> Últimas</button>
-      ${onArticle ? '<button class="papia-act" onclick="PAPublicIA.quick(\'explicar\')">Explicar matéria</button>' : ''}
-      <button class="papia-act" onclick="PAPublicIA.quick('pains')">Pains</button>
-      <button class="papia-act" onclick="PAPublicIA.quick('clima')">Clima</button>
-      <button class="papia-act" onclick="PAPublicIA.quick('duvida')">Tirar dúvida</button>`;
+      <button type="button" class="papia-act" onclick="PAPublicIA.quick('ultimas')"><i class="fas fa-newspaper"></i> Últimas</button>
+      ${onArticle ? '<button type="button" class="papia-act" onclick="PAPublicIA.quick(\'explicar\')">Explicar matéria</button>' : ''}
+      <button type="button" class="papia-act" onclick="PAPublicIA.quick('pains')">Pains</button>
+      <button type="button" class="papia-act" onclick="PAPublicIA.quick('clima')">Clima</button>
+      <button type="button" class="papia-act" onclick="PAPublicIA.quick('duvida')">Tirar dúvida</button>`;
   }
 
   function welcomeMsg() {
@@ -364,11 +404,20 @@ const PAPublicIA = (function () {
   function createUI() {
     if (document.getElementById('papiaPanel')) return;
     injectStyles();
+
+    const backdrop = document.createElement('div');
+    backdrop.className = 'papia-backdrop';
+    backdrop.id = 'papiaBackdrop';
+    backdrop.addEventListener('click', () => { if (open) toggle(false); });
+
     const fab = document.createElement('button');
+    fab.type = 'button';
     fab.className = 'papia-fab';
+    fab.id = 'papiaFab';
     fab.title = 'Equipe IA — Tire suas dúvidas';
+    fab.setAttribute('aria-label', 'Abrir equipe IA');
     fab.innerHTML = '<i class="fas fa-users"></i><span class="dot"></span>';
-    fab.addEventListener('click', toggle);
+    fab.addEventListener('click', () => toggle());
 
     const panel = document.createElement('div');
     panel.className = 'papia-panel';
@@ -376,22 +425,29 @@ const PAPublicIA = (function () {
     panel.innerHTML = `
       <div class="papia-head">
         <div class="av"><i class="fas fa-users"></i></div>
-        <div><h4>${isOwnerMode() ? 'Equipe IA Editorial' : 'Tire suas dúvidas'}</h4><div class="sub">Sofia · Lucas · Camila</div></div>
-        <button onclick="PAPublicIA.toggle()" title="Fechar"><i class="fas fa-times"></i></button>
+        <div class="meta">
+          <h4>${isOwnerMode() ? 'Equipe IA Editorial' : 'Tire suas dúvidas'}</h4>
+          <div class="sub">Sofia · Lucas · Camila</div>
+        </div>
+        <button type="button" onclick="PAPublicIA.toggle(false)" title="Fechar" aria-label="Fechar"><i class="fas fa-times"></i></button>
       </div>
       <div class="papia-team" id="papiaTeam">${teamHtml()}</div>
       <div class="papia-msgs" id="papiaMsgs"></div>
       <div class="papia-actions" id="papiaActions">${actionsHtml()}</div>
       <div class="papia-foot">
         <input id="papiaInput" placeholder="${isOwnerMode() ? 'Pergunte ou digite buscar…' : 'Pergunte sobre qualquer publicação…'}" aria-label="Mensagem"/>
-        <button onclick="PAPublicIA.send()"><i class="fas fa-paper-plane"></i></button>
+        <button type="button" onclick="PAPublicIA.send()"><i class="fas fa-paper-plane"></i></button>
       </div>`;
 
+    document.body.appendChild(backdrop);
     document.body.appendChild(fab);
     document.body.appendChild(panel);
+    document.body.classList.add('pa-has-papia');
+
     document.getElementById('papiaInput')?.addEventListener('keydown', e => {
       if (e.key === 'Enter') { e.preventDefault(); send(); }
     });
+    window.addEventListener('resize', () => syncOpenState());
 
     setActiveAgent('sofia');
     addMsg('bot', welcomeMsg(), PASofia?.PROFILE);
@@ -404,7 +460,12 @@ const PAPublicIA = (function () {
     createUI();
   }
 
+  function whenReady(fn) {
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fn);
+    else fn();
+  }
+
+  whenReady(init);
+
   return { init, toggle, send, quick, runSearch };
 })();
-
-document.addEventListener('DOMContentLoaded', () => PAPublicIA.init());

@@ -7,7 +7,7 @@
 <link rel="apple-touch-icon" href="../assets/images/favicon.jpg"/>
 <title>Painel – Pains Acontece</title>
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
-<meta name="pa-build" content="2026.07.05-v11"/>
+<meta name="pa-build" content="2026.07.05-v12"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
@@ -1444,7 +1444,10 @@ function applyRoleRestrictions() {
   const acc = PAAPI.getAdminAccounts().find(a => a.email.toLowerCase() === u.toLowerCase());
   if (!sessionStorage.getItem('pa_user_name') && acc) sessionStorage.setItem('pa_user_name', acc.name);
   applyRoleRestrictions();
-  if (isOwnerUser && typeof PADivulgacaoIA !== 'undefined') PADivulgacaoIA.init();
+  if (isOwnerUser) {
+    if (typeof PAIA !== 'undefined') PAIA.init();
+    if (typeof PADivulgacaoIA !== 'undefined') PADivulgacaoIA.init();
+  }
   loadProfile();
   renderProfile();
 })();

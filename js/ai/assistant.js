@@ -1,5 +1,6 @@
 const PAIA = (function () {
   let open = false;
+  let mounted = false;
   let lastDraft = '';
   let lastArticle = null;
   let chatHistory = [];
@@ -19,45 +20,97 @@ const PAIA = (function () {
     const s = document.createElement('style');
     s.id = 'paia-styles';
     s.textContent = `
-      .paia-fab{position:fixed;bottom:24px;right:24px;width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#1d7a1d,#0d4d0d);border:none;color:#fff;font-size:1.3rem;cursor:pointer;box-shadow:0 4px 24px rgba(29,122,29,.5);z-index:8000;transition:transform .3s,box-shadow .3s;display:flex;align-items:center;justify-content:center}
+      .paia-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:7999;opacity:0;pointer-events:none;transition:opacity .3s;-webkit-tap-highlight-color:transparent}
+      .paia-backdrop.open{opacity:1;pointer-events:all}
+      .paia-fab{
+        position:fixed;bottom:calc(20px + env(safe-area-inset-bottom));right:calc(20px + env(safe-area-inset-right));
+        width:56px;height:56px;border-radius:50%;background:linear-gradient(135deg,#1d7a1d,#0d4d0d);border:none;color:#fff;
+        font-size:1.3rem;cursor:pointer;box-shadow:0 4px 24px rgba(29,122,29,.5);z-index:8000;
+        transition:transform .3s,box-shadow .3s,opacity .3s;display:flex;align-items:center;justify-content:center;
+        -webkit-tap-highlight-color:transparent;touch-action:manipulation;
+      }
       .paia-fab:hover{transform:scale(1.08);box-shadow:0 8px 32px rgba(29,122,29,.7)}
+      .paia-fab.hidden{opacity:0;pointer-events:none;transform:scale(.85)}
       .paia-fab .badge{position:absolute;top:-2px;right:-2px;width:18px;height:18px;background:#c9a227;border-radius:50%;font-size:.55rem;font-weight:800;display:flex;align-items:center;justify-content:center;border:2px solid #080808}
-      .paia-panel{position:fixed;bottom:92px;right:24px;width:380px;max-width:calc(100vw - 48px);height:520px;max-height:calc(100vh - 120px);background:#111;border:1px solid rgba(255,255,255,.08);border-radius:12px;box-shadow:0 24px 80px rgba(0,0,0,.8);z-index:8000;display:flex;flex-direction:column;transform:scale(.9) translateY(20px);opacity:0;pointer-events:none;transition:all .35s cubic-bezier(.16,1,.3,1);overflow:hidden}
-      .paia-panel.open{transform:none;opacity:1;pointer-events:all}
-      .paia-head{padding:14px 16px;background:rgba(29,122,29,.12);border-bottom:1px solid rgba(255,255,255,.06);display:flex;align-items:center;gap:10px;flex-shrink:0}
-      .paia-head .av{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#1d7a1d,#2ecc2e);display:flex;align-items:center;justify-content:center;font-size:1rem}
-      .paia-head h4{font-family:'Bebas Neue',sans-serif;letter-spacing:1.5px;font-size:1rem;flex:1}
-      .paia-head .status{font-size:.6rem;color:#2ecc2e;font-weight:700}
-      .paia-head button{background:none;border:none;color:rgba(255,255,255,.4);cursor:pointer;font-size:1rem;padding:4px}
+      .paia-panel{
+        position:fixed;bottom:calc(88px + env(safe-area-inset-bottom));right:calc(20px + env(safe-area-inset-right));
+        width:min(400px,calc(100vw - 40px));height:min(520px,calc(100vh - 120px));
+        max-height:calc(100dvh - 100px);background:#111;border:1px solid rgba(255,255,255,.08);border-radius:12px;
+        box-shadow:0 24px 80px rgba(0,0,0,.8);z-index:8001;display:flex;flex-direction:column;
+        transform:scale(.92) translateY(16px);opacity:0;pointer-events:none;visibility:hidden;
+        transition:transform .35s cubic-bezier(.16,1,.3,1),opacity .35s,visibility .35s;overflow:hidden;
+      }
+      .paia-panel.open{transform:none;opacity:1;pointer-events:all;visibility:visible}
+      .paia-head{padding:12px 14px;background:rgba(29,122,29,.12);border-bottom:1px solid rgba(255,255,255,.06);display:flex;align-items:center;gap:10px;flex-shrink:0;min-height:0}
+      .paia-head .av{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#1d7a1d,#2ecc2e);display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0}
+      .paia-head .meta{flex:1;min-width:0}
+      .paia-head h4{font-family:'Bebas Neue',sans-serif;letter-spacing:1.5px;font-size:1rem;line-height:1.15;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+      .paia-head .status{font-size:.58rem;color:#2ecc2e;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+      .paia-head button{background:none;border:none;color:rgba(255,255,255,.4);cursor:pointer;font-size:1.1rem;padding:8px;flex-shrink:0;-webkit-tap-highlight-color:transparent}
       .paia-head button:hover{color:#fff}
-      .paia-msgs{flex:1;overflow-y:auto;padding:14px;display:flex;flex-direction:column;gap:10px;scrollbar-width:thin}
-      .paia-msg{max-width:88%;padding:10px 14px;border-radius:10px;font-size:.78rem;line-height:1.55}
+      .paia-msgs{flex:1;min-height:0;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:10px;scrollbar-width:thin;-webkit-overflow-scrolling:touch}
+      .paia-msg{max-width:92%;padding:10px 14px;border-radius:10px;font-size:.8rem;line-height:1.55;word-break:break-word}
       .paia-msg.bot{background:rgba(29,122,29,.12);border:1px solid rgba(29,122,29,.2);align-self:flex-start;border-bottom-left-radius:2px}
       .paia-msg.user{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);align-self:flex-end;border-bottom-right-radius:2px}
       .paia-msg.typing{color:rgba(255,255,255,.4);font-style:italic}
       .paia-msg .verif{display:inline-block;margin-top:6px;padding:3px 8px;border-radius:20px;font-size:.58rem;font-weight:800;letter-spacing:.5px}
       .paia-msg .verif.ok{background:rgba(46,204,46,.15);color:#2ecc2e}
       .paia-msg .verif.warn{background:rgba(201,162,39,.15);color:#c9a227}
-      .paia-foot{padding:12px;border-top:1px solid rgba(255,255,255,.06);display:flex;gap:8px;flex-shrink:0}
-      .paia-foot textarea{flex:1;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:10px 12px;color:#fff;font-family:'Inter',sans-serif;font-size:.78rem;resize:none;height:44px;outline:none}
+      .paia-actions{padding:8px 12px;display:grid;grid-template-columns:1fr 1fr;gap:6px;flex-shrink:0;border-top:1px solid rgba(255,255,255,.04)}
+      .paia-act{font-size:.58rem;font-weight:700;letter-spacing:.4px;text-transform:uppercase;padding:8px 6px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:rgba(255,255,255,.6);cursor:pointer;transition:all .2s;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;-webkit-tap-highlight-color:transparent}
+      .paia-act:hover,.paia-act:active{background:rgba(29,122,29,.15);color:#2ecc2e;border-color:rgba(29,122,29,.3)}
+      .paia-foot{padding:10px 12px calc(10px + env(safe-area-inset-bottom));border-top:1px solid rgba(255,255,255,.06);display:flex;gap:8px;flex-shrink:0;align-items:flex-end}
+      .paia-foot textarea{flex:1;min-width:0;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:10px 12px;color:#fff;font-family:'Inter',sans-serif;font-size:.8rem;resize:none;height:44px;max-height:80px;outline:none;line-height:1.4}
       .paia-foot textarea:focus{border-color:#1d7a1d}
-      .paia-foot button{width:44px;height:44px;border-radius:8px;background:#1d7a1d;border:none;color:#fff;cursor:pointer;flex-shrink:0;transition:background .2s}
+      .paia-foot button{width:44px;height:44px;border-radius:8px;background:#1d7a1d;border:none;color:#fff;cursor:pointer;flex-shrink:0;transition:background .2s;-webkit-tap-highlight-color:transparent}
       .paia-foot button:hover{background:#2ecc2e}
       .paia-foot button:disabled{opacity:.5;cursor:not-allowed}
-      .paia-actions{padding:0 12px 10px;display:flex;gap:6px;flex-wrap:wrap}
-      .paia-act{font-size:.6rem;font-weight:700;letter-spacing:.5px;text-transform:uppercase;padding:5px 10px;border-radius:20px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:rgba(255,255,255,.5);cursor:pointer;transition:all .2s}
-      .paia-act:hover{background:rgba(29,122,29,.15);color:#2ecc2e;border-color:rgba(29,122,29,.3)}
-      @media(max-width:600px){.paia-panel{right:12px;bottom:80px;width:calc(100vw - 24px)}.paia-fab{right:16px;bottom:16px}}
+      @media(min-width:601px){
+        .paia-actions{display:flex;flex-wrap:wrap;gap:6px}
+        .paia-act{width:auto;padding:5px 10px;border-radius:20px}
+      }
+      @media(max-width:600px){
+        .paia-panel.open{
+          inset:0;width:100%;max-width:100%;height:100%;max-height:100%;height:100dvh;
+          bottom:0;right:0;border-radius:0;border:none;
+        }
+        .paia-fab{right:calc(16px + env(safe-area-inset-right));bottom:calc(16px + env(safe-area-inset-bottom));width:52px;height:52px}
+        .paia-head{padding:14px 16px;padding-top:calc(14px + env(safe-area-inset-top))}
+        .paia-actions{padding:10px 12px;gap:8px}
+        .paia-act{padding:10px 8px;font-size:.6rem}
+        body.pa-has-padiv .paia-fab{bottom:calc(84px + env(safe-area-inset-bottom))}
+      }
     `;
     document.head.appendChild(s);
   }
 
+  function syncOpenState() {
+    const panel = document.getElementById('paiaPanel');
+    const fab = document.getElementById('paiaFab');
+    const backdrop = document.getElementById('paiaBackdrop');
+    const mobile = window.innerWidth <= 600;
+    panel?.classList.toggle('open', open);
+    backdrop?.classList.toggle('open', open && mobile);
+    fab?.classList.toggle('hidden', open && mobile);
+    document.body.style.overflow = open && mobile ? 'hidden' : '';
+    if (open) setTimeout(() => document.getElementById('paiaInput')?.focus(), 100);
+  }
+
   function createUI() {
+    if (document.getElementById('paiaPanel')) return;
     injectStyles();
+
+    const backdrop = document.createElement('div');
+    backdrop.className = 'paia-backdrop';
+    backdrop.id = 'paiaBackdrop';
+    backdrop.addEventListener('click', () => { if (open) toggle(); });
+
     const fab = document.createElement('button');
+    fab.type = 'button';
     fab.className = 'paia-fab';
     fab.id = 'paiaFab';
     fab.title = 'Assistente IA Editorial';
+    fab.setAttribute('aria-label', 'Abrir Equipe IA Editorial');
     fab.innerHTML = '<i class="fas fa-robot"></i><span class="badge">IA</span>';
 
     const panel = document.createElement('div');
@@ -66,30 +119,37 @@ const PAIA = (function () {
     panel.innerHTML = `
       <div class="paia-head">
         <div class="av"><i class="fas fa-robot"></i></div>
-        <div><h4>Equipe IA Editorial</h4><div class="status">● Sofia · Lucas · Camila</div></div>
-        <button onclick="PAIA.toggle()" title="Fechar"><i class="fas fa-times"></i></button>
+        <div class="meta">
+          <h4>Equipe IA Editorial</h4>
+          <div class="status">● Sofia · Lucas · Camila</div>
+        </div>
+        <button type="button" onclick="PAIA.toggle()" title="Fechar" aria-label="Fechar"><i class="fas fa-times"></i></button>
       </div>
       <div class="paia-msgs" id="paiaMsgs"></div>
       <div class="paia-actions">
-        <button class="paia-act" onclick="PAIA.quick('verificar')">Verificar Fatos</button>
-        <button class="paia-act" onclick="PAIA.quick('organizar')">Organizar</button>
-        <button class="paia-act" onclick="PAIA.showPreview()">Preview</button>
-        <button class="paia-act" onclick="PAIA.applyToEditor()">Aplicar no Editor</button>
+        <button type="button" class="paia-act" onclick="PAIA.quick('verificar')">Verificar Fatos</button>
+        <button type="button" class="paia-act" onclick="PAIA.quick('organizar')">Organizar</button>
+        <button type="button" class="paia-act" onclick="PAIA.showPreview()">Preview</button>
+        <button type="button" class="paia-act" onclick="PAIA.applyToEditor()">Aplicar no Editor</button>
       </div>
       <div class="paia-foot">
-        <textarea id="paiaInput" placeholder="Cole a notícia ou descreva a pauta…" rows="2"></textarea>
-        <button id="paiaSend" onclick="PAIA.send()"><i class="fas fa-paper-plane"></i></button>
+        <textarea id="paiaInput" placeholder="Cole a notícia ou descreva a pauta…" rows="2" aria-label="Mensagem para a IA"></textarea>
+        <button type="button" id="paiaSend" onclick="PAIA.send()" aria-label="Enviar"><i class="fas fa-paper-plane"></i></button>
       </div>`;
 
+    document.body.appendChild(backdrop);
     document.body.appendChild(fab);
     document.body.appendChild(panel);
+    document.body.classList.add('pa-has-paia');
 
     fab.addEventListener('click', () => toggle());
     document.getElementById('paiaInput').addEventListener('keydown', e => {
       if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
     });
+    window.addEventListener('resize', () => syncOpenState());
 
     addMsg('bot', '**Sofia Mendes** recebe sua demanda → **Lucas Ferreira** busca e verifica fontes → **Camila Rocha** organiza e prepara para publicar. Cole a notícia ou descreva a pauta.');
+    mounted = true;
   }
 
   function addMsg(role, text, extra) {
@@ -103,28 +163,27 @@ const PAIA = (function () {
     chatHistory.push({ role, text });
   }
 
-  function toggle() {
-    open = !open;
-    document.getElementById('paiaPanel')?.classList.toggle('open', open);
-    if (open) document.getElementById('paiaInput')?.focus();
+  function toggle(force) {
+    open = typeof force === 'boolean' ? force : !open;
+    syncOpenState();
   }
 
   async function send() {
     const input = document.getElementById('paiaInput');
     const btn = document.getElementById('paiaSend');
-    const msg = input.value.trim();
+    const msg = input?.value?.trim();
     if (!msg) return;
 
     addMsg('user', msg);
     input.value = '';
     lastDraft = msg;
-    btn.disabled = true;
+    if (btn) btn.disabled = true;
 
     const typing = document.createElement('div');
     typing.className = 'paia-msg bot typing';
     typing.id = 'paiaTyping';
     typing.textContent = 'Sofia encaminhando → Lucas buscando fontes…';
-    document.getElementById('paiaMsgs').appendChild(typing);
+    document.getElementById('paiaMsgs')?.appendChild(typing);
 
     if (typeof PAOrchestrator !== 'undefined') {
       PAOrchestrator.setAgentCallback(({ agent, status }) => {
@@ -141,17 +200,15 @@ const PAIA = (function () {
         const lbl = res.verification.verified ? '✓ VERIFICADO' : '⚠ REVISAR';
         extra = `<div class="verif ${cls}">${lbl} — ${res.verification.confidence}%</div>`;
       }
+      if (res.article) lastArticle = res.article;
       const prefix = res.agent ? `**${res.agent.name}:** ` : '';
       addMsg('bot', prefix + res.reply, extra);
-      if (res.article && res.action === 'organize') {
-        lastArticle = res.article;
-        applyToEditor(true);
-      }
+      if (res.article && res.action === 'organize') applyToEditor(true);
     } catch (err) {
       typing.remove();
       addMsg('bot', 'Não foi possível processar. Verifique sua conexão e tente novamente.', '<div class="verif warn">ERRO</div>');
     }
-    btn.disabled = false;
+    if (btn) btn.disabled = false;
   }
 
   function getEditorHints() {
@@ -159,20 +216,6 @@ const PAIA = (function () {
       title: document.getElementById('artTitle')?.value,
       lead: document.getElementById('artLead')?.value,
       cat: document.getElementById('artCat')?.value
-    };
-  }
-
-  async function localOrganize(text) {
-    const title = text.split(/[.!?]/)[0].trim().slice(0, 90);
-    const lead = text.slice(0, 180);
-    const cat = document.getElementById('artCat')?.value || 'Últimas Notícias';
-    return {
-      title: title.charAt(0).toUpperCase() + title.slice(1),
-      lead,
-      content: '<p>' + text.split('\n').join('</p><p>') + '</p>',
-      cat,
-      verified: false,
-      confidence: 40
     };
   }
 
@@ -233,16 +276,25 @@ const PAIA = (function () {
     else if (action === 'organizar') input.value = draft || '';
     else if (action === 'preview') { showPreview(); return; }
     else if (action === 'apply') { applyToEditor(); return; }
-    if (input.value.trim()) send();
+    if (input?.value?.trim()) send();
+  }
+
+  function canMount() {
+    if (!document.getElementById('panel-nova')) return false;
+    return typeof PAAPI === 'undefined' || PAAPI.isOwner();
   }
 
   function init() {
-    if (!document.getElementById('panel-nova')) return;
-    if (typeof PAAPI !== 'undefined' && !PAAPI.isOwner()) return;
+    if (!canMount()) return;
     createUI();
   }
 
+  function whenReady(fn) {
+    if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', fn);
+    else fn();
+  }
+
+  whenReady(init);
+
   return { init, toggle, send, quick, showPreview, applyToEditor, getLastArticle: () => lastArticle };
 })();
-
-document.addEventListener('DOMContentLoaded', () => PAIA.init());
