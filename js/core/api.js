@@ -294,7 +294,21 @@ const PAAPI = (function () {
     async addArticle(data) {
       const state = getState();
       if (!state.articles) state.articles = [];
-      const art = { id: Date.now(), views: 0, date: new Date().toLocaleDateString('pt-BR'), timeAgo: 'Agora', ...data };
+      let date = data.date;
+      let timeAgo = data.timeAgo;
+      if (data.pubISO) {
+        const pd = new Date(data.pubISO);
+        if (!isNaN(pd.getTime())) {
+          date = date || pd.toLocaleDateString('pt-BR', { timeZone: 'America/Sao_Paulo' });
+          if (typeof PAScanner !== 'undefined') timeAgo = timeAgo || PAScanner.formatDate(pd);
+        }
+      }
+      const art = {
+        id: Date.now(), views: 0,
+        date: date || new Date().toLocaleDateString('pt-BR'),
+        timeAgo: timeAgo || 'Agora',
+        ...data
+      };
       state.articles.unshift(art);
       saveAdminState(state);
       return art;
@@ -400,7 +414,8 @@ const PAAPI = (function () {
       const art = await this.addArticle({
         title: p.title, lead: p.lead, content: p.content, cat: p.cat, status: 'pub',
         img: p.img, author: p.author || 'IA Pains Acontece', verified: p.verified, confidence: p.confidence,
-        world: p.world || p.cat === 'Mundo', source_url: p.source_url
+        world: p.world || p.cat === 'Mundo', source_url: p.source_url,
+        pubISO: p.pubISO, date: p.date, timeAgo: p.timeAgo, source: p.source
       });
       saveAdminState(state);
       return art;
@@ -492,6 +507,66 @@ const PAAPI = (function () {
     async deleteJob(id) {
       const state = getState();
       state.jobs = (state.jobs || []).filter(j => String(j.id) !== String(id));
+      saveAdminState(state);
+      return { ok: true };
+    },
+
+    async getAds() {
+      const state = getState();
+      const base = await fetchJson('ads.json').catch(() => []);
+      let list = mergeById(base, state.ads);
+      const deleted = state.deletedAds || [];
+      if (deleted.length) list = list.filter(a => !deleted.includes(String(a.id)));
+      return list;
+    },
+
+    async addAd(data) {
+      const state = getState();
+      if (!state.ads) state.ads = [];
+      const ad = {
+        id: Date.now(),
+        active: data.active !== false,
+        slot: data.slot || 'banner',
+        title: data.title || '',
+        text: data.text || '',
+        image: data.image || '',
+        link: data.link || '#publicidades',
+        advertiser: data.advertiser || '',
+        cta: data.cta || 'Saiba mais',
+        expires: data.expires || null
+      };
+      state.ads.unshift(ad);
+      saveAdminState(state);
+      return ad;
+    },
+
+    async updateAd(id, data) {
+      const state = getState();
+      if (!state.ads) state.ads = [];
+      const idx = state.ads.findIndex(a => String(a.id) === String(id));
+      if (idx >= 0) {
+        state.ads[idx] = { ...state.ads[idx], ...data };
+        saveAdminState(state);
+        return state.ads[idx];
+      }
+      const base = await fetchJson('ads.json').catch(() => []);
+      const b = base.find(a => String(a.id) === String(id));
+      if (b) {
+        state.ads.push({ ...b, ...data });
+        saveAdminState(state);
+        return state.ads[state.ads.length - 1];
+      }
+      throw new Error('Anúncio não encontrado');
+    },
+
+    async deleteAd(id) {
+      const state = getState();
+      state.ads = (state.ads || []).filter(a => String(a.id) !== String(id));
+      const base = await fetchJson('ads.json').catch(() => []);
+      if (base.some(a => String(a.id) === String(id))) {
+        state.deletedAds = state.deletedAds || [];
+        if (!state.deletedAds.includes(String(id))) state.deletedAds.push(String(id));
+      }
       saveAdminState(state);
       return { ok: true };
     },
@@ -675,7 +750,8 @@ const PAAPI = (function () {
       const art = await this.addArticle({
         title: p.title, lead: p.lead, content: p.content, cat: p.cat, status: 'pub',
         img: p.img, author: p.author || 'IA Pains Acontece', verified: p.verified, confidence: p.confidence,
-        world: p.world || p.cat === 'Mundo', source_url: p.source_url
+        world: p.world || p.cat === 'Mundo', source_url: p.source_url,
+        pubISO: p.pub_iso || p.pubISO, date: p.date, timeAgo: p.time_ago || p.timeAgo, source: p.source
       });
 
       const { error: e2 } = await sb().from('pending_articles').delete().eq('id', id);
@@ -774,6 +850,10 @@ const PAAPI = (function () {
     deleteEvent: async (id) => (await getBackend()).deleteEvent?.(id) ?? Promise.reject(new Error('Não disponível')),
     addJob: async (d) => (await getBackend()).addJob?.(d) ?? Promise.reject(new Error('Não disponível')),
     deleteJob: async (id) => (await getBackend()).deleteJob?.(id) ?? Promise.reject(new Error('Não disponível')),
+    getAds: async () => (await getBackend()).getAds?.() ?? [],
+    addAd: async (d) => (await getBackend()).addAd?.(d) ?? Promise.reject(new Error('Não disponível')),
+    updateAd: async (id, d) => (await getBackend()).updateAd?.(id, d) ?? Promise.reject(new Error('Não disponível')),
+    deleteAd: async (id) => (await getBackend()).deleteAd?.(id) ?? Promise.reject(new Error('Não disponível')),
     resolveRole,
     isOwner,
     getAdminAccounts,

@@ -49,7 +49,7 @@ const PASofia = (function () {
   function greet() {
     return {
       agent: PROFILE,
-      reply: `Olá! Sou **${PROFILE.name}**, ${PROFILE.role} da redação.\n\nTrabalho em equipe com:\n• **Lucas Ferreira** — Analista de Fontes (busca e verificação)\n• **Camila Rocha** — Editora-Chefe (organiza e publica)\n\nPergunte sobre Pains, região, Brasil ou mundo — ou digite **buscar** para varredura completa.`,
+      reply: `Olá! Sou **${PROFILE.name}**, ${PROFILE.role} da redação.\n\n**Equipe integrada:**\n• **Lucas Ferreira** — varre feeds e verifica fatos (últimos 2 dias)\n• **Camila Rocha** — organiza matérias com data de publicação\n\nPergunte sobre Pains, região, Brasil ou mundo — ou digite **buscar** para varredura completa.`,
       action: 'greeting'
     };
   }
@@ -57,7 +57,7 @@ const PASofia = (function () {
   function help() {
     return {
       agent: PROFILE,
-      reply: `**Equipe IA Pains Acontece:**\n\n**${PROFILE.name}** — recebe você e direciona a demanda\n**Lucas Ferreira** — varre RSS, cruza fontes e verifica fatos\n**Camila Rocha** — monta matérias e publica no portal\n\n• Perguntas sobre notícias → Lucas busca automaticamente\n• **buscar** → varredura completa + publicação\n• Cole um texto → Camila organiza a matéria`,
+      reply: `**Equipe IA Pains Acontece:**\n\n**${PROFILE.name}** — recebe e roteia sua demanda\n**Lucas Ferreira** — busca notícias dos últimos **2 dias** em 17 fontes RSS\n**Camila Rocha** — monta matérias com **data de divulgação** e publica\n\n• Perguntas → Lucas investiga automaticamente\n• **buscar** → varredura completa (Pains, região, Brasil, mundo)\n• Cole um texto → Camila organiza para o editor`,
       action: 'help'
     };
   }

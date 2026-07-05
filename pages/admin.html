@@ -795,6 +795,29 @@ body.pa-owner .owner-only.btn-pub{display:flex!important}
 .ia-hero h2{font-family:var(--ff);font-size:1.75rem;letter-spacing:2px;margin-bottom:6px}
 .ia-hero p{font-size:.8rem;color:var(--dim);line-height:1.6;max-width:520px}
 .ia-hero-actions{display:flex;gap:10px;flex-wrap:wrap;position:relative}
+.ia-team-bar{display:flex;align-items:center;gap:8px;padding:14px 18px;margin-bottom:16px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:8px;overflow-x:auto}
+.ia-team-member{display:flex;align-items:center;gap:10px;padding:8px 14px;border-radius:8px;border:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.03);transition:all .35s;flex-shrink:0;min-width:0}
+.ia-team-member.active{border-color:rgba(29,122,29,.45);background:rgba(29,122,29,.12);box-shadow:0 0 20px rgba(29,122,29,.1)}
+.ia-team-member.done{border-color:rgba(46,204,46,.3);background:rgba(46,204,46,.06)}
+.ia-team-av{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0}
+.ia-team-av.sofia{background:linear-gradient(135deg,#5dade2,#2980b9)}
+.ia-team-av.lucas{background:linear-gradient(135deg,#1d7a1d,#2ecc2e)}
+.ia-team-av.camila{background:linear-gradient(135deg,#c9a227,#8b6914)}
+.ia-team-info{min-width:0}
+.ia-team-name{font-size:.72rem;font-weight:800;letter-spacing:.5px}
+.ia-team-role{font-size:.58rem;color:var(--dim)}
+.ia-team-status{font-size:.58rem;color:var(--g3);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px}
+.ia-team-arrow{color:var(--dim);font-size:.7rem;flex-shrink:0;opacity:.5}
+.ia-team-pulse{width:8px;height:8px;border-radius:50%;background:var(--g3);animation:iaPulse 1.2s ease infinite;flex-shrink:0}
+@keyframes iaPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.8)}}
+.ad-mgmt-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;margin-top:16px}
+.ad-mgmt-card{padding:16px;border-radius:8px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.02);transition:border-color .25s}
+.ad-mgmt-card.active{border-color:rgba(29,122,29,.35)}
+.ad-mgmt-card.inactive{opacity:.55}
+.ad-mgmt-slot{font-size:.58rem;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--y);margin-bottom:8px}
+.ad-mgmt-title{font-size:.85rem;font-weight:700;margin-bottom:6px}
+.ad-mgmt-meta{font-size:.68rem;color:var(--dim);margin-bottom:12px}
+.ad-mgmt-actions{display:flex;gap:8px;flex-wrap:wrap}
 .ia-scan-bar{
   display:none;font-size:.75rem;color:var(--g3);margin-bottom:20px;padding:12px 16px;
   background:rgba(29,122,29,.08);border:1px solid rgba(29,122,29,.2);border-radius:8px;
@@ -1129,9 +1152,9 @@ body.pa-owner .owner-only.btn-pub{display:flex!important}
     <div class="panel" id="panel-ia">
       <div class="ia-hero">
         <div class="ia-hero-text">
-          <div class="ia-hero-badge"><i class="fas fa-robot"></i> Lucas Ferreira · IA Editorial</div>
+          <div class="ia-hero-badge"><i class="fas fa-users"></i> Equipe IA Editorial</div>
           <h2>IA de Notícias</h2>
-          <p>Varredura automática sobre Pains e região — cada notícia precisa da sua aprovação antes de publicar.</p>
+          <p>Sofia roteia → Lucas busca nas fontes (últimos <strong>2 dias</strong>) → Camila organiza com data de divulgação. Cada notícia passa pela sua aprovação.</p>
         </div>
         <div class="ia-hero-actions">
           <button class="tb-btn ghost" onclick="resetSearch()" id="btnResetScan" title="Limpar cache e buscar tudo de novo">
@@ -1140,6 +1163,34 @@ body.pa-owner .owner-only.btn-pub{display:flex!important}
           <button class="tb-btn primary" onclick="runScanNow()" id="btnScan">
             <i class="fas fa-sync-alt"></i> Buscar Agora
           </button>
+        </div>
+      </div>
+      <div class="ia-team-bar" id="iaTeamBar">
+        <div class="ia-team-member" data-agent="sofia" id="iaTeamSofia">
+          <div class="ia-team-av sofia"><i class="fas fa-headset"></i></div>
+          <div class="ia-team-info">
+            <div class="ia-team-name">Sofia Mendes</div>
+            <div class="ia-team-role">Coordenadora</div>
+            <div class="ia-team-status" id="iaStatusSofia">Aguardando</div>
+          </div>
+        </div>
+        <i class="fas fa-chevron-right ia-team-arrow"></i>
+        <div class="ia-team-member" data-agent="lucas" id="iaTeamLucas">
+          <div class="ia-team-av lucas"><i class="fas fa-satellite-dish"></i></div>
+          <div class="ia-team-info">
+            <div class="ia-team-name">Lucas Ferreira</div>
+            <div class="ia-team-role">Analista de Fontes</div>
+            <div class="ia-team-status" id="iaStatusLucas">Pronto</div>
+          </div>
+        </div>
+        <i class="fas fa-chevron-right ia-team-arrow"></i>
+        <div class="ia-team-member" data-agent="camila" id="iaTeamCamila">
+          <div class="ia-team-av camila"><i class="fas fa-pen-nib"></i></div>
+          <div class="ia-team-info">
+            <div class="ia-team-name">Camila Rocha</div>
+            <div class="ia-team-role">Editora-Chefe</div>
+            <div class="ia-team-status" id="iaStatusCamila">Aguardando</div>
+          </div>
         </div>
       </div>
       <div id="iaScanStatus" class="ia-scan-bar">
@@ -1603,6 +1654,14 @@ body.pa-owner .owner-only.btn-pub{display:flex!important}
         <i class="fas fa-rocket" style="color:var(--g3);margin-right:6px"></i>
         <strong style="color:var(--w)">Preços de lançamento</strong> — vagas limitadas. *Projeções com base no crescimento orgânico do portal. Parceiros fundadores mantêm condições especiais. Arte pode ser produzida pela redação.
       </div>
+      <div class="box" style="margin-top:20px">
+        <div class="box-head">
+          <h3><i class="fas fa-bullhorn" style="color:var(--g3);margin-right:8px"></i> Campanhas Ativas no Site</h3>
+          <button class="tb-btn primary" onclick="showAddAd()"><i class="fas fa-plus"></i> Nova Campanha</button>
+        </div>
+        <p style="font-size:.75rem;color:var(--dim);margin-bottom:12px">Gerencie os espaços publicitários que aparecem no portal: banner, sidebar, ticker, editorial, newsletter e redes.</p>
+        <div class="ad-mgmt-grid" id="adMgmtList"></div>
+      </div>
     </div>
 
     <!-- ══ CONFIGURAÇÕES ══ -->
@@ -1760,6 +1819,37 @@ body.pa-owner .owner-only.btn-pub{display:flex!important}
   </div>
 </div>
 
+<!-- MODAL PUBLICIDADE -->
+<div class="modal-backdrop" id="adModal">
+  <div class="modal" style="max-width:520px">
+    <h3><i class="fas fa-ad" style="color:var(--y)"></i> <span id="adModalTitle">Nova Campanha</span></h3>
+    <p>Cadastre um anúncio para exibir no portal. Escolha o espaço conforme a tabela de preços.</p>
+    <div class="modal-form">
+      <div class="inp-field"><label>Espaço</label>
+        <select id="adSlot" class="pa-select-native">
+          <option value="banner">Banner Principal</option>
+          <option value="sidebar">Sidebar Lateral</option>
+          <option value="editorial">Destaque Editorial</option>
+          <option value="ticker">Ticker / Faixa</option>
+          <option value="newsletter">Newsletter</option>
+          <option value="social">Redes Sociais</option>
+          <option value="founder">Pacote Fundador</option>
+        </select>
+      </div>
+      <div class="inp-field"><label>Título</label><input type="text" id="adTitle" placeholder="Título do anúncio"/></div>
+      <div class="inp-field"><label>Texto / Descrição</label><textarea id="adText" style="min-height:70px" placeholder="Mensagem do anunciante"></textarea></div>
+      <div class="inp-field"><label>URL da imagem (opcional)</label><input type="url" id="adImage" placeholder="https://…"/></div>
+      <div class="inp-field"><label>Link de destino</label><input type="text" id="adLink" placeholder="#publicidades ou https://…"/></div>
+      <div class="inp-field"><label>Anunciante</label><input type="text" id="adAdvertiser" placeholder="Nome da empresa"/></div>
+      <div class="inp-field"><label>Botão CTA</label><input type="text" id="adCta" placeholder="Saiba mais"/></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn-pub outline" style="padding:10px 20px" onclick="closeModal('adModal')">Cancelar</button>
+      <button class="btn-pub green" style="padding:10px 20px" onclick="saveAd()"><i class="fas fa-save"></i> Salvar Campanha</button>
+    </div>
+  </div>
+</div>
+
 <!-- MODAL LINK -->
 <div class="modal-backdrop" id="linkModal">
   <div class="modal" style="max-width:400px">
@@ -1795,11 +1885,12 @@ body.pa-owner .owner-only.btn-pub{display:flex!important}
 <script src="../js/ai/agents/camila.js"></script>
 <script src="../js/ai/orchestrator.js"></script>
 <script src="../js/ai/engine.js"></script>
-<script src="../js/core/purge.js?v=20260705v19"></script>
-<script src="../js/core/api.js?v=20260705v19"></script>
+<script src="../js/core/purge.js?v=20260705v21"></script>
+<script src="../js/core/api.js?v=20260705v21"></script>
+<script src="../js/ui/ads.js?v=20260705v21"></script>
 <script src="../js/ui/corner-notify.js"></script>
 <script src="../js/core/store.js"></script>
-<script src="../js/ai/assistant.js?v=20260705v20"></script>
+<script src="../js/ai/assistant.js?v=20260705v21"></script>
 <script src="../js/ai/agents/rafaela.js"></script>
 <script src="../js/ai/divulgacao-assistant.js"></script>
 <script>
@@ -1892,6 +1983,7 @@ function showPanel(id, el) {
   if (id === 'categorias') renderCategories();
   if (id === 'agenda') renderEvents();
   if (id === 'empregos_adm') renderJobs();
+  if (id === 'publicidades') renderAdsAdmin();
   document.querySelector('.main').scrollTop = 0;
 }
 
@@ -1947,6 +2039,44 @@ function setScanUI(active, text) {
   if (txt && text) txt.textContent = text;
 }
 
+const IA_TEAM = { sofia: 'Sofia Mendes', lucas: 'Lucas Ferreira', camila: 'Camila Rocha' };
+
+function setIATeamAgent(agentId, status, state) {
+  const id = (agentId || '').toLowerCase().replace(/\s.*/, '');
+  const key = ['sofia', 'lucas', 'camila'].find(k => id.includes(k) || (agentId && agentId.id === k));
+  if (!key) return;
+  const statusEl = document.getElementById('iaStatus' + key.charAt(0).toUpperCase() + key.slice(1));
+  const memberEl = document.getElementById('iaTeam' + key.charAt(0).toUpperCase() + key.slice(1));
+  if (statusEl && status) statusEl.textContent = status;
+  document.querySelectorAll('.ia-team-member').forEach(el => {
+    el.classList.remove('active', 'done');
+  });
+  if (memberEl) {
+    memberEl.classList.add(state === 'done' ? 'done' : 'active');
+  }
+}
+
+function initIATeamListeners() {
+  window.addEventListener('pa-ia-agent', e => {
+    const { agent, status } = e.detail || {};
+    const name = agent?.name || agent?.id || '';
+    const key = ['sofia', 'lucas', 'camila'].find(k => name.toLowerCase().includes(k));
+    if (key) setIATeamAgent(key, status, 'active');
+  });
+  window.addEventListener('pa-deep-verify', e => {
+    const d = e.detail;
+    if (!d || !iaScanning) return;
+    setIATeamAgent('lucas', `Verificando ${d.current}/${d.total}…`, 'active');
+  });
+}
+
+function resetIATeamIdle() {
+  setIATeamAgent('sofia', 'Pronta', 'done');
+  setIATeamAgent('lucas', 'Pronto', 'done');
+  setIATeamAgent('camila', 'Aguardando', 'done');
+  document.querySelectorAll('.ia-team-member').forEach(el => el.classList.remove('active'));
+}
+
 async function renderPending() {
   const list = document.getElementById('pendingList');
   try {
@@ -1974,6 +2104,7 @@ async function renderPending() {
             <span class="ia-chip cat">${escHtml(p.cat)}</span>
             <span class="ia-chip">${escHtml(p.source || 'Web')}</span>
             <span class="ia-chip ${p.verified ? 'ok' : 'warn'}">${p.verified ? '✓ Verificado' : '⚠ Revisar'} · ${p.confidence || 0}%</span>
+            ${p.date ? `<span class="ia-chip"><i class="fas fa-calendar-alt"></i> ${escHtml(p.date)}${p.timeAgo ? ' · ' + escHtml(p.timeAgo) : ''}</span>` : ''}
           </div>
           <div class="ia-pending-lead">${escHtml((p.lead || '').substring(0, 200))}${(p.lead || '').length > 200 ? '…' : ''}</div>
         </div>
@@ -2016,23 +2147,28 @@ async function resetSearch() {
 async function runScanNow() {
   if (iaScanning) return;
   iaScanning = true;
-  setScanUI(true, 'Buscando…');
+  setIATeamAgent('sofia', 'Iniciando varredura…', 'active');
+  setScanUI(true, 'Sofia → Lucas: conectando feeds…');
 
   const onProgress = (e) => {
     const d = e.detail;
     if (!d || !iaScanning) return;
+    setIATeamAgent('lucas', `Verificando ${d.current}/${d.total}…`, 'active');
     setScanUI(true, `Lucas: verificando ${d.current}/${d.total}…`);
   };
   window.addEventListener('pa-deep-verify', onProgress);
+  let res = null;
 
   try {
-    setScanUI(true, 'Lucas Ferreira: conectando feeds…');
-    const res = await PAAPI.runScanner();
-    setScanUI(true, 'Camila Rocha: organizando resultados…');
+    setIATeamAgent('lucas', 'Conectando 17 fontes RSS…', 'active');
+    setScanUI(true, 'Lucas: buscando últimos 2 dias…');
+    res = await PAAPI.runScanner();
+    setIATeamAgent('camila', 'Organizando resultados…', 'active');
+    setScanUI(true, 'Camila: preparando para aprovação…');
     showToast(
       res.found
-        ? `Varredura concluída — ${res.found} nova(s) notícia(s) para aprovação!`
-        : 'Varredura concluída — nenhuma notícia nova hoje (já verificadas ou sem matérias frescas).',
+        ? `Varredura concluída — ${res.found} nova(s) notícia(s) dos últimos 2 dias!`
+        : 'Varredura concluída — nenhuma notícia nova nos últimos 2 dias.',
       res.found ? 'success' : 'info'
     );
     await renderPending();
@@ -2047,6 +2183,8 @@ async function runScanNow() {
     window.removeEventListener('pa-deep-verify', onProgress);
     setScanUI(false);
     iaScanning = false;
+    setIATeamAgent('camila', res?.found ? `${res.found} pendente(s)` : 'Nenhuma nova', 'done');
+    setTimeout(resetIATeamIdle, 4000);
   }
 }
 
@@ -2105,7 +2243,7 @@ function renderPreviewHtml(item) {
         <p style="color:rgba(255,255,255,.5);font-size:.95rem;margin-bottom:20px;line-height:1.6">${escHtml(lead)}</p>
         <div style="font-size:.75rem;color:#555;margin-bottom:20px;display:flex;gap:16px;flex-wrap:wrap">
           <span><i class="fas fa-robot"></i> IA Pains Acontece</span>
-          <span><i class="fas fa-calendar"></i> ${new Date().toLocaleDateString('pt-BR')}</span>
+          <span><i class="fas fa-calendar-alt"></i> ${escHtml(item.date || new Date().toLocaleDateString('pt-BR'))}${item.timeAgo ? ' · ' + escHtml(item.timeAgo) : ''}</span>
           ${item.source ? `<span><i class="fas fa-link"></i> ${escHtml(item.source)}</span>` : ''}
         </div>
         <div style="font-size:.88rem;line-height:1.8;color:rgba(255,255,255,.8)">${content}</div>
@@ -3009,6 +3147,106 @@ async function deleteJobItem(id) {
   } catch { showToast('Erro ao excluir.', 'error'); }
 }
 
+/* ════ PUBLICIDADES ════ */
+const AD_SLOT_LABELS = {
+  banner: 'Banner Principal', sidebar: 'Sidebar Lateral', editorial: 'Destaque Editorial',
+  ticker: 'Ticker / Faixa', newsletter: 'Newsletter', social: 'Redes Sociais', founder: 'Pacote Fundador'
+};
+let editingAdId = null;
+
+async function renderAdsAdmin() {
+  const list = document.getElementById('adMgmtList');
+  if (!list) return;
+  try {
+    const ads = await PAAPI.getAds();
+    if (!ads.length) {
+      list.innerHTML = emptyState('fa-ad', 'Nenhuma campanha', 'Cadastre anúncios para exibir nos espaços do portal.', 'Nova Campanha', 'showAddAd()');
+      return;
+    }
+    list.innerHTML = ads.map(a => `
+      <div class="ad-mgmt-card ${a.active ? 'active' : 'inactive'}">
+        <div class="ad-mgmt-slot">${AD_SLOT_LABELS[a.slot] || a.slot}</div>
+        <div class="ad-mgmt-title">${escHtml(a.title)}</div>
+        <div class="ad-mgmt-meta">${escHtml(a.advertiser || '—')} · ${a.active ? '<span style="color:var(--g3)">Ativo</span>' : 'Inativo'}</div>
+        <div class="ad-mgmt-actions">
+          <button class="btn-pub outline" style="padding:6px 12px;font-size:.62rem" onclick="toggleAdActive(${a.id}, ${!a.active})">${a.active ? 'Desativar' : 'Ativar'}</button>
+          <button class="btn-pub outline" style="padding:6px 12px;font-size:.62rem" onclick="editAd(${a.id})"><i class="fas fa-edit"></i></button>
+          <button class="btn-pub red-btn" style="padding:6px 12px;font-size:.62rem" onclick="deleteAdItem(${a.id})"><i class="fas fa-trash"></i></button>
+        </div>
+      </div>`).join('');
+  } catch {
+    list.innerHTML = emptyState('fa-ad', 'Erro ao carregar', 'Recarregue a página.', null, null);
+  }
+}
+
+function showAddAd() {
+  editingAdId = null;
+  document.getElementById('adModalTitle').textContent = 'Nova Campanha';
+  ['adTitle','adText','adImage','adLink','adAdvertiser','adCta'].forEach(id => {
+    const el = document.getElementById(id);
+    if (el) el.value = '';
+  });
+  const slot = document.getElementById('adSlot');
+  if (slot) slot.selectedIndex = 0;
+  document.getElementById('adModal').classList.add('open');
+}
+
+async function editAd(id) {
+  try {
+    const ads = await PAAPI.getAds();
+    const a = ads.find(x => String(x.id) === String(id));
+    if (!a) return;
+    editingAdId = id;
+    document.getElementById('adModalTitle').textContent = 'Editar Campanha';
+    document.getElementById('adSlot').value = a.slot || 'banner';
+    document.getElementById('adTitle').value = a.title || '';
+    document.getElementById('adText').value = a.text || '';
+    document.getElementById('adImage').value = a.image || '';
+    document.getElementById('adLink').value = a.link || '';
+    document.getElementById('adAdvertiser').value = a.advertiser || '';
+    document.getElementById('adCta').value = a.cta || '';
+    document.getElementById('adModal').classList.add('open');
+  } catch { showToast('Erro ao carregar campanha.', 'error'); }
+}
+
+async function saveAd() {
+  const data = {
+    slot: document.getElementById('adSlot').value,
+    title: document.getElementById('adTitle').value.trim(),
+    text: document.getElementById('adText').value.trim(),
+    image: document.getElementById('adImage').value.trim(),
+    link: document.getElementById('adLink').value.trim() || '#publicidades',
+    advertiser: document.getElementById('adAdvertiser').value.trim(),
+    cta: document.getElementById('adCta').value.trim() || 'Saiba mais',
+    active: true
+  };
+  if (!data.title) { showToast('Informe o título da campanha.', 'error'); return; }
+  try {
+    if (editingAdId) await PAAPI.updateAd(editingAdId, data);
+    else await PAAPI.addAd(data);
+    closeModal('adModal');
+    showToast('Campanha salva — visível no portal!', 'success');
+    renderAdsAdmin();
+  } catch { showToast('Erro ao salvar campanha.', 'error'); }
+}
+
+async function toggleAdActive(id, active) {
+  try {
+    await PAAPI.updateAd(id, { active });
+    showToast(active ? 'Campanha ativada!' : 'Campanha desativada.', 'info');
+    renderAdsAdmin();
+  } catch { showToast('Erro ao atualizar.', 'error'); }
+}
+
+async function deleteAdItem(id) {
+  if (!confirm('Excluir esta campanha?')) return;
+  try {
+    await PAAPI.deleteAd(id);
+    showToast('Campanha removida.', 'info');
+    renderAdsAdmin();
+  } catch { showToast('Erro ao excluir.', 'error'); }
+}
+
 function updateSupabaseStatus(connected, msg) {
   const dot = document.getElementById('supabaseDot');
   const txt = document.getElementById('supabaseStatusText');
@@ -3196,6 +3434,8 @@ if (artStatusEl) {
   renderMedia();
   renderEvents();
   renderJobs();
+  initIATeamListeners();
+  resetIATeamIdle();
 })();
 </script>
 </body>

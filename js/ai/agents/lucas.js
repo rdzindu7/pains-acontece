@@ -36,7 +36,7 @@ const PALucas = (function () {
     const result = typeof PAAutoPublisher !== 'undefined'
       ? await PAAutoPublisher.run(!!force)
       : { published: 0, scanned: 0, skipped: true };
-    const investigation = await investigate('Pains MG notícias hoje');
+    const investigation = await investigate('Pains MG notícias últimos 2 dias');
     return {
       agent: PROFILE,
       scan: result,

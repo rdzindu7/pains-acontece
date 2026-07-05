@@ -79,6 +79,10 @@ img{display:block;max-width:100%}
 .rel-card img{width:100%;height:140px;object-fit:cover}
 .rel-card .body{padding:14px}
 .rel-card h4{font-size:.82rem;font-weight:600;line-height:1.4}
+.article-layout{display:grid;grid-template-columns:1fr 300px;gap:32px;align-items:start}
+.article-main{min-width:0}
+.article-aside{position:sticky;top:80px;display:flex;flex-direction:column;gap:20px}
+.sponsored-badge{display:inline-flex;align-items:center;gap:6px;padding:4px 10px;border-radius:20px;font-size:.58rem;font-weight:800;letter-spacing:1px;text-transform:uppercase;background:rgba(201,162,39,.12);color:var(--y);margin-bottom:12px}
 .not-found{text-align:center;padding:120px 28px}
 .not-found h1{font-family:var(--ff-display);font-size:2rem;margin-bottom:12px}
 .not-found a{color:var(--g3);margin-top:20px;display:inline-block}
@@ -89,6 +93,7 @@ footer{text-align:center;padding:28px clamp(12px,3vw,28px);font-size:.72rem;colo
 .pa-scroll-track{width:8px;height:clamp(100px,24vh,180px);background:#111;border-radius:4px;position:relative;border:1px solid rgba(255,255,255,.08);overflow:hidden}
 .pa-scroll-thumb{position:absolute;left:0;right:0;top:0;min-height:32px;border-radius:3px;background:linear-gradient(90deg,#8a8a8a,#d4d4d4 45%,#a0a0a0);box-shadow:inset 0 1px 0 rgba(255,255,255,.85),0 1px 4px rgba(0,0,0,.5);transition:transform .12s}
 @media(max-width:768px){.pa-scroll-nav{display:none}}
+@media(max-width:900px){.article-layout{grid-template-columns:1fr}.article-aside{position:static}}
 @media(max-width:600px){.article{padding:32px 0 60px}.meta{gap:12px}.rel-grid{grid-template-columns:1fr}}
 </style>
 </head>
@@ -106,8 +111,9 @@ footer{text-align:center;padding:28px clamp(12px,3vw,28px);font-size:.72rem;colo
 <script src="../js/core/supabase-client.js"></script>
 <script src="../js/ui/article-format.js"></script>
 <script src="../js/ai/scanner.js"></script>
-<script src="../js/core/purge.js?v=20260705v15"></script>
-<script src="../js/core/api.js?v=20260705v15"></script>
+<script src="../js/core/purge.js?v=20260705v21"></script>
+<script src="../js/core/api.js?v=20260705v21"></script>
+<script src="../js/ui/ads.js?v=20260705v21"></script>
 <script src="../js/core/store.js"></script>
 <script src="../js/ui/scroll-nav.js"></script>
 <script src="../js/ai/agents/sofia.js"></script>
@@ -156,17 +162,32 @@ footer{text-align:center;padding:28px clamp(12px,3vw,28px);font-size:.72rem;colo
     return html;
   }
 
+  function pubLabel(a) {
+    if (typeof PAScanner !== 'undefined' && PAScanner.formatPubLabel) {
+      let pd = a.pubISO ? new Date(a.pubISO) : null;
+      if (!pd || isNaN(pd.getTime())) {
+        const p = (a.date || '').split('/');
+        if (p.length === 3) pd = new Date(+p[2], +p[1] - 1, +p[0]);
+      }
+      if (pd && !isNaN(pd.getTime())) return PAScanner.formatPubLabel(pd, a.pubISO);
+    }
+    return [a.date, a.timeAgo].filter(Boolean).join(' · ');
+  }
+
   function render(){
     const isQuick = currentMode === 'quick';
     const bodyHtml = formatBody(art.content);
+    const sponsored = art.sponsored ? '<span class="sponsored-badge"><i class="fas fa-star"></i> Conteúdo Patrocinado</span>' : '';
     main.innerHTML = `
-    <article class="article wrap">
+    <div class="article wrap">
+    <div class="article-layout">
+    <article class="article-main">
+      ${sponsored}
       <span class="cat">${esc(art.cat)}</span>
       <h1 class="title">${esc(art.title)}</h1>
       <div class="meta">
         <span><i class="fas fa-user-circle"></i> ${esc(art.author || 'Redação Pains Acontece')}</span>
-        <span><i class="fas fa-calendar"></i> ${esc(art.date)}</span>
-        <span><i class="fas fa-clock"></i> ${esc(art.timeAgo || '')}</span>
+        <span><i class="fas fa-calendar-alt"></i> ${esc(pubLabel(art))}</span>
         <span><i class="fas fa-eye"></i> ${Number(art.views||0).toLocaleString('pt-BR')} leituras</span>
         ${art.verified ? '<span><i class="fas fa-check-circle"></i> Verificada pela IA</span>' : ''}
       </div>
@@ -194,7 +215,10 @@ footer{text-align:center;padding:28px clamp(12px,3vw,28px);font-size:.72rem;colo
       </div>
       ${related.length ? `<div class="related"><h3>Notícias Relacionadas</h3><div class="rel-grid">${related.map(r=>`
         <a href="noticia.html?id=${r.id}" class="rel-card"><img src="${esc(r.img)}" alt=""/><div class="body"><h4>${esc(r.title)}</h4></div></a>`).join('')}</div></div>` : ''}
-    </article>`;
+    </article>
+    <aside class="article-aside" id="adArticleSidebar"></aside>
+    </div></div>`;
+    if (typeof PAAds !== 'undefined') PAAds.renderSidebar('adArticleSidebar');
     main.querySelectorAll('.mode-tab').forEach(btn => {
       btn.addEventListener('click', () => {
         currentMode = btn.dataset.mode;

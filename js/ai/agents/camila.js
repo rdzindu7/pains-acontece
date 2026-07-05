@@ -7,18 +7,31 @@ const PACamila = (function () {
     color: '#c9a227'
   };
 
+  function pubTag(item) {
+    if (item.date && item.timeAgo) return ` _${item.date} · ${item.timeAgo}_`;
+    if (item.date) return ` _${item.date}_`;
+    if (typeof PAScanner !== 'undefined' && item.pubISO) {
+      const d = new Date(item.pubISO);
+      if (!isNaN(d.getTime())) return ` _${PAScanner.formatPubLabel(d, item.pubISO)}_`;
+    }
+    return '';
+  }
+
   function formatLines(published, headlines) {
     const lines = [];
     if (published.length) {
-      lines.push('**No portal:**');
+      lines.push('**No portal (mais recentes):**');
       published.slice(0, 5).forEach((a, i) => {
-        lines.push(`${i + 1}. **${a.title}** (${a.cat})${a.verified ? ' ✓' : ''}`);
+        lines.push(`${i + 1}. **${a.title}** (${a.cat})${a.verified ? ' ✓' : ''}${pubTag(a)}`);
       });
     }
     if (headlines.length) {
-      lines.push('', '**Fontes monitoradas:**');
+      lines.push('', '**Fontes monitoradas (últimos 2 dias):**');
       headlines.slice(0, 5).forEach((h, i) => {
-        lines.push(`${i + 1}. ${h.title} — _${h.source}_`);
+        const when = h.pubDate && typeof PAScanner !== 'undefined'
+          ? PAScanner.formatPubLabel(h.pubDate, h.pubDate.toISOString?.())
+          : '';
+        lines.push(`${i + 1}. ${h.title} — _${h.source}_${when ? ' · ' + when : ''}`);
       });
     }
     return lines;
@@ -90,8 +103,8 @@ const PACamila = (function () {
     return {
       agent: PROFILE,
       reply: pub
-        ? `✓ **${pub}** matéria(s) verificada(s) publicada(s) (${scanned} analisadas por Lucas). Portal atualizado.`
-        : `Varredura concluída (${scanned} itens). Nenhuma nova matéria aprovada — portal já verificado.`,
+        ? `✓ **${pub}** matéria(s) dos últimos 2 dias publicada(s) (${scanned} analisadas por Lucas). Datas de divulgação preservadas.`
+        : `Varredura concluída (${scanned} itens, janela de 2 dias). Nenhuma matéria nova aprovada — portal já verificado.`,
       action: 'scan_done',
       verification: lucasData.verification,
       published: pub

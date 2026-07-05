@@ -54,27 +54,44 @@
     }
   }
 
-  function isTodayArticle(a) {
+  function articlePubDate(a) {
+    if (a.pubISO) {
+      const d = new Date(a.pubISO);
+      if (!isNaN(d.getTime())) return d;
+    }
+    if (a.date) {
+      const p = a.date.split('/');
+      if (p.length === 3) return new Date(+p[2], +p[1] - 1, +p[0]);
+    }
+    return null;
+  }
+
+  function isRecentArticle(a) {
     if (typeof PAScanner !== 'undefined' && PAScanner.isFreshNews) {
-      if (a.pubISO) return PAScanner.isFreshNews(new Date(a.pubISO));
-      if (a.date) {
-        const p = a.date.split('/');
-        if (p.length === 3) return PAScanner.isFreshNews(new Date(+p[2], +p[1] - 1, +p[0]));
-      }
-      return (a.timeAgo || '').includes('min') || (a.timeAgo || '').includes('hora');
+      const pd = articlePubDate(a);
+      if (pd) return PAScanner.isFreshNews(pd);
+      return (a.timeAgo || '').includes('min') || (a.timeAgo || '').includes('hora') || (a.timeAgo || '').includes('dia');
     }
     return true;
   }
 
-  function filterToday(arts) {
-    const today = arts.filter(isTodayArticle);
-    return today.length ? today : arts;
+  function filterRecent(arts) {
+    const recent = arts.filter(isRecentArticle);
+    return recent.length ? recent : arts;
+  }
+
+  function pubLabel(a) {
+    if (typeof PAScanner !== 'undefined' && PAScanner.formatPubLabel) {
+      const pd = articlePubDate(a);
+      if (pd) return PAScanner.formatPubLabel(pd, a.pubISO);
+    }
+    return a.date || a.timeAgo || '';
   }
 
   function filterForDisplay(arts) {
     const verified = (arts || []).filter(a => a.verified !== false && (a.confidence || 0) >= 55);
     if (!verified.length) return [];
-    if (isOwnerView()) return filterToday(verified);
+    if (isOwnerView()) return filterRecent(verified);
     return sortByRecent(verified);
   }
 
@@ -92,7 +109,7 @@
         <div class="xl-body">
           <div class="xl-cat">${esc(a.cat)}${a.verified ? ' <i class="fas fa-check-circle" style="font-size:.55rem;color:#2ecc2e" title="Verificado"></i>' : ''}</div>
           <h3 class="xl-title">${esc(a.title)}</h3>
-          <div class="xl-meta"><span><i class="fas fa-clock"></i> ${esc(a.timeAgo || a.date)}</span><span><i class="fas fa-eye"></i> ${Number(a.views||0).toLocaleString('pt-BR')}</span></div>
+          <div class="xl-meta"><span><i class="fas fa-calendar-alt"></i> ${esc(pubLabel(a))}</span><span><i class="fas fa-eye"></i> ${Number(a.views||0).toLocaleString('pt-BR')}</span></div>
         </div>
       </a>`;
     }
@@ -100,7 +117,7 @@
       <div class="thumb"><img src="${esc(a.img)}" alt="" loading="lazy"/><div class="thumb-overlay"></div>${quickBtn(a.id)}<span class="cat-pill">${esc(a.cat)}</span></div>
       <div class="card-body">
         <h3 class="card-title">${esc(a.title)}</h3>
-        <div class="card-foot"><span><i class="fas fa-clock"></i> ${esc(a.timeAgo || a.date)}</span><span class="views"><i class="fas fa-eye"></i> ${Number(a.views||0).toLocaleString('pt-BR')}</span></div>
+        <div class="card-foot"><span><i class="fas fa-calendar-alt"></i> ${esc(pubLabel(a))}</span><span class="views"><i class="fas fa-eye"></i> ${Number(a.views||0).toLocaleString('pt-BR')}</span></div>
       </div>
     </a>`;
   }
@@ -111,7 +128,7 @@
       <div class="inf">
         <div class="tag">${esc(a.cat)}${a.verified ? ' ✓' : ''}</div>
         <div class="ttl">${esc(a.title)}</div>
-        <div class="time"><i class="fas fa-clock"></i> ${esc(a.timeAgo || a.date)}</div>
+        <div class="time"><i class="fas fa-calendar-alt"></i> ${esc(pubLabel(a))}</div>
       </div>
     </a>`;
   }
@@ -200,7 +217,7 @@
         <p class="hero-lead">${esc(hero.lead || '')}</p>
         <div class="hero-meta">
           <span><i class="fas fa-user-circle"></i> ${esc(hero.author || 'Redação')}</span>
-          <span><i class="fas fa-calendar"></i> ${esc(hero.date)}</span>
+          <span><i class="fas fa-calendar-alt"></i> ${esc(pubLabel(hero))}</span>
           <span><i class="fas fa-eye"></i> ${Number(hero.views||0).toLocaleString('pt-BR')} leituras</span>
           ${hero.verified ? '<span><i class="fas fa-check-circle"></i> Verificado pela IA</span>' : ''}
         </div>
@@ -214,9 +231,13 @@
   }
 
   function renderTicker(arts) {
+    const items = arts.slice(0, 10);
+    if (typeof PAAds !== 'undefined') {
+      PAAds.renderTicker(items);
+      return;
+    }
     const el = document.getElementById('tickerDynamic');
     if (!el) return;
-    const items = arts.slice(0, 10);
     el.innerHTML = items.length
       ? items.map(a => `<span>${esc(a.title)}</span>`).join('')
       : '<span>Pains Acontece — IA buscando notícias em tempo real</span>';
@@ -317,6 +338,7 @@
 
     renderHero(pub);
     renderTicker(pub);
+    if (typeof PAAds !== 'undefined') PAAds.renderAll(pub);
     renderBreaking(pub);
     renderSection('ultimasGrid', pub.slice(0, 6), 'grid');
     renderSection('policiaFeatured', byCat('Polícia', 1), 'xl');
@@ -608,6 +630,10 @@
     } catch {
       renderJobs([]);
       renderAgenda([]);
+    }
+
+    if (typeof PAAds !== 'undefined') {
+      PAAds.init(allPub).catch(() => {});
     }
 
     const search = document.getElementById('siteSearch');

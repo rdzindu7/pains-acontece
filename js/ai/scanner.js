@@ -91,14 +91,22 @@ const PAScanner = (function () {
     return new Date(new Date().toLocaleString('en-US', { timeZone: TZ }));
   }
 
+  const FRESH_DAYS = 2;
+
   function startOfTodayBR() {
     const d = brNow();
     return new Date(d.getFullYear(), d.getMonth(), d.getDate());
   }
 
-  function isFreshNews(pubDate) {
+  function startOfWindowBR(days) {
+    const d = brNow();
+    const n = Math.max(1, days || FRESH_DAYS);
+    return new Date(d.getFullYear(), d.getMonth(), d.getDate() - (n - 1));
+  }
+
+  function isFreshNews(pubDate, maxDays) {
     if (!pubDate || isNaN(pubDate.getTime())) return false;
-    return pubDate >= startOfTodayBR();
+    return pubDate >= startOfWindowBR(maxDays || FRESH_DAYS);
   }
 
   function formatDate(d) {
@@ -107,11 +115,19 @@ const PAScanner = (function () {
     if (mins < 60) return `Há ${mins || 1} min`;
     const hrs = Math.floor(mins / 60);
     if (hrs < 24) return `Há ${hrs} hora${hrs > 1 ? 's' : ''}`;
-    return `Há ${Math.floor(hrs / 24)} dia(s)`;
+    const days = Math.floor(hrs / 24);
+    if (days < FRESH_DAYS) return `Há ${days} dia${days > 1 ? 's' : ''}`;
+    return `Há ${days} dias`;
   }
 
   function formatDateBR(d) {
     return d.toLocaleDateString('pt-BR', { timeZone: TZ });
+  }
+
+  function formatPubLabel(d, pubISO) {
+    const date = d || (pubISO ? new Date(pubISO) : null);
+    if (!date || isNaN(date.getTime())) return '';
+    return `${formatDateBR(date)} · ${formatDate(date)}`;
   }
 
   const imageCache = new Map();
@@ -820,7 +836,7 @@ const PAScanner = (function () {
         ...item,
         score: matchScore(item.title + ' ' + stripHtml(item.summary), keys) + (item.feedPriority || 0) * 0.05
       }))
-      .filter(i => i.score >= 0.2 || (keys.includes('pains') && norm(i.title).includes('pains')))
+      .filter(i => (i.score >= 0.2 || (keys.includes('pains') && norm(i.title).includes('pains'))) && isFreshNews(i.pubDate))
       .sort((a, b) => b.score - a.score || b.pubDate - a.pubDate)
       .slice(0, limit);
   }
@@ -898,8 +914,8 @@ const PAScanner = (function () {
 
   return {
     scanNews, scanNewsQuick, scanNewsFull, verifyText, deepVerifyPublication, quickVerifyPublication, getFeedItems, searchHeadlines, searchPublished,
-    detectCategory, pickImage, resolveItemImage, formatDate, keywords, RSS_FEEDS,
-    isFreshNews, startOfTodayBR, makeQuickLead,
+    detectCategory, pickImage, resolveItemImage, formatDate, formatDateBR, formatPubLabel, keywords, RSS_FEEDS,
+    isFreshNews, startOfTodayBR, startOfWindowBR, FRESH_DAYS, makeQuickLead,
     getDeepProgress: () => deepVerifyProgress,
     invalidateCache: () => { feedCache = null; feedCacheAt = 0; imageCache.clear(); htmlCache.clear(); ogFetchCount = 0; deepVerifyProgress = null; }
   };
