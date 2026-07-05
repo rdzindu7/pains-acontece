@@ -1,0 +1,1564 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Painel – Pains Acontece</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --g:#1d7a1d;--g2:#0d4d0d;--g3:#2ecc2e;--g4:rgba(29,122,29,.12);
+  --y:#c9a227;--y2:#f0d060;
+  --k:#080808;--k2:#0e0e0e;--k3:#161616;--k4:#1e1e1e;--k5:#252525;
+  --border:rgba(255,255,255,.06);
+  --w:#f0f0f0;--dim:#666;--muted:rgba(255,255,255,.45);
+  --red:#c0392b;--blue:#2980b9;--orange:#e67e22;
+  --ff:'Bebas Neue',sans-serif;--fb:'Inter',sans-serif;
+  --sidebar:260px;--ease:cubic-bezier(.16,1,.3,1);
+}
+html,body{height:100%;overflow:hidden}
+body{background:var(--k2);font-family:var(--fb);color:var(--w);display:flex}
+
+/* ════════════════ SIDEBAR ════════════════ */
+.sidebar{
+  width:var(--sidebar);height:100vh;
+  background:var(--k);
+  border-right:1px solid var(--border);
+  display:flex;flex-direction:column;
+  flex-shrink:0;
+  transition:transform .3s var(--ease);
+  position:relative;z-index:100;
+}
+.sb-logo{
+  padding:24px 20px 20px;
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:12px;
+}
+.sb-logo img{height:40px;filter:drop-shadow(0 0 8px rgba(29,122,29,.5))}
+.sb-logo span{font-family:var(--ff);font-size:1rem;letter-spacing:2px;color:rgba(255,255,255,.5)}
+
+.sb-nav{flex:1;overflow-y:auto;padding:12px 0;scrollbar-width:thin;scrollbar-color:var(--k5) transparent}
+.sb-section{
+  font-size:.58rem;font-weight:700;letter-spacing:2.5px;text-transform:uppercase;
+  color:rgba(255,255,255,.2);padding:14px 20px 6px;
+}
+.sb-item{
+  display:flex;align-items:center;gap:12px;
+  padding:10px 20px;cursor:pointer;
+  font-size:.8rem;font-weight:500;color:rgba(255,255,255,.5);
+  transition:background .2s,color .2s;
+  border-left:3px solid transparent;
+  position:relative;
+}
+.sb-item:hover{background:rgba(255,255,255,.04);color:var(--w)}
+.sb-item.active{
+  background:rgba(29,122,29,.12);color:var(--g3);
+  border-left-color:var(--g3);
+}
+.sb-item i{width:18px;text-align:center;font-size:.85rem;flex-shrink:0}
+.sb-badge{
+  margin-left:auto;background:var(--red);color:#fff;
+  font-size:.58rem;font-weight:700;padding:2px 7px;border-radius:20px;
+}
+.sb-badge.green{background:var(--g)}
+
+.sb-user{
+  padding:16px 20px;border-top:1px solid var(--border);
+  display:flex;align-items:center;gap:12px;
+}
+.sb-avatar{
+  width:38px;height:38px;border-radius:50%;
+  background:linear-gradient(135deg,var(--g),var(--g2));
+  display:flex;align-items:center;justify-content:center;
+  font-size:.9rem;color:#fff;font-weight:700;flex-shrink:0;
+  border:2px solid rgba(29,122,29,.4);
+}
+.sb-user-info .name{font-size:.8rem;font-weight:700;color:var(--w)}
+.sb-user-info .role{font-size:.65rem;color:var(--dim);margin-top:2px}
+.sb-logout{
+  margin-left:auto;background:none;border:none;
+  color:var(--dim);font-size:.85rem;cursor:pointer;
+  transition:color .2s;padding:4px;
+}
+.sb-logout:hover{color:var(--red)}
+
+/* ════════════════ MAIN ════════════════ */
+.main{flex:1;height:100vh;overflow-y:auto;display:flex;flex-direction:column}
+
+/* TOPBAR */
+.topbar{
+  background:rgba(8,8,8,.9);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--border);
+  padding:0 28px;height:60px;
+  display:flex;align-items:center;gap:16px;
+  position:sticky;top:0;z-index:50;flex-shrink:0;
+}
+.topbar-title{font-family:var(--ff);font-size:1.3rem;letter-spacing:2px;flex:1}
+.topbar-title span{color:var(--g3)}
+.topbar-actions{display:flex;align-items:center;gap:10px}
+.tb-btn{
+  display:flex;align-items:center;gap:8px;
+  padding:8px 16px;border-radius:3px;
+  font-size:.72rem;font-weight:700;letter-spacing:1px;text-transform:uppercase;
+  cursor:pointer;border:none;transition:all .2s;
+}
+.tb-btn.primary{background:var(--g);color:#fff;box-shadow:0 2px 12px rgba(29,122,29,.4)}
+.tb-btn.primary:hover{background:var(--g3);box-shadow:0 4px 20px rgba(29,122,29,.6)}
+.tb-btn.ghost{background:rgba(255,255,255,.05);color:var(--muted);border:1px solid var(--border)}
+.tb-btn.ghost:hover{background:rgba(255,255,255,.1);color:var(--w)}
+.notif-btn{
+  width:36px;height:36px;border-radius:50%;
+  background:rgba(255,255,255,.05);border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  color:var(--muted);font-size:.85rem;cursor:pointer;
+  transition:all .2s;position:relative;
+}
+.notif-btn:hover{background:rgba(255,255,255,.1);color:var(--w)}
+.notif-dot{
+  position:absolute;top:7px;right:7px;
+  width:7px;height:7px;border-radius:50%;
+  background:var(--red);border:1.5px solid var(--k2);
+}
+/* VIEW DO PORTAL */
+.view-site-btn{
+  display:flex;align-items:center;gap:6px;
+  font-size:.7rem;font-weight:600;color:var(--g3);
+  padding:6px 12px;border-radius:3px;
+  border:1px solid rgba(29,122,29,.3);
+  background:rgba(29,122,29,.08);
+  cursor:pointer;transition:all .2s;
+}
+.view-site-btn:hover{background:rgba(29,122,29,.18);border-color:var(--g3)}
+
+/* CONTENT AREA */
+.content{flex:1;padding:28px;overflow-y:auto}
+
+/* ════════════════ PANELS ════════════════ */
+.panel{display:none}
+.panel.active{display:block}
+</style>
+<style>
+/* ════════════════ DASHBOARD ════════════════ */
+.dash-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px}
+.stat-card{
+  background:var(--k3);border:1px solid var(--border);border-radius:6px;
+  padding:20px;position:relative;overflow:hidden;transition:border-color .3s,transform .3s;
+  cursor:default;
+}
+.stat-card:hover{border-color:rgba(29,122,29,.4);transform:translateY(-2px)}
+.stat-card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:2px;
+  background:var(--accent,var(--g));
+}
+.stat-card .ic{
+  width:40px;height:40px;border-radius:8px;
+  background:rgba(255,255,255,.05);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1rem;margin-bottom:14px;
+  color:var(--accent,var(--g3));
+}
+.stat-card .val{font-family:var(--ff);font-size:2.2rem;color:var(--w);letter-spacing:1px}
+.stat-card .lbl{font-size:.72rem;color:var(--dim);margin-top:2px}
+.stat-card .delta{
+  font-size:.68rem;font-weight:700;margin-top:8px;
+  display:flex;align-items:center;gap:4px;
+}
+.delta.up{color:#2ecc71}.delta.down{color:#e74c3c}.delta i{font-size:.6rem}
+
+/* RECENT + QUICK */
+.dash-cols{display:grid;grid-template-columns:1fr 300px;gap:16px}
+
+.box{background:var(--k3);border:1px solid var(--border);border-radius:6px;overflow:hidden}
+.box-head{
+  padding:14px 18px;border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:10px;
+}
+.box-head h3{font-family:var(--ff);font-size:1rem;letter-spacing:1.5px;flex:1}
+.box-head .see-all{font-size:.68rem;color:var(--g3);font-weight:600;cursor:pointer;transition:color .2s}
+.box-head .see-all:hover{color:var(--y)}
+
+.art-row{
+  display:flex;align-items:center;gap:14px;
+  padding:12px 18px;border-bottom:1px solid rgba(255,255,255,.03);
+  transition:background .2s;cursor:pointer;
+}
+.art-row:last-child{border:none}
+.art-row:hover{background:rgba(255,255,255,.03)}
+.art-row .thumb{width:52px;height:40px;border-radius:3px;overflow:hidden;flex-shrink:0}
+.art-row .thumb img{width:100%;height:100%;object-fit:cover}
+.art-row .info{flex:1;min-width:0}
+.art-row .title{font-size:.78rem;font-weight:600;color:var(--w);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.art-row .meta{font-size:.65rem;color:var(--dim);margin-top:2px}
+.art-row .status{flex-shrink:0}
+.pill{
+  font-size:.58rem;font-weight:800;letter-spacing:1px;text-transform:uppercase;
+  padding:3px 9px;border-radius:20px;
+}
+.pill.pub{background:rgba(29,122,29,.2);color:var(--g3);border:1px solid rgba(29,122,29,.3)}
+.pill.draft{background:rgba(201,162,39,.15);color:var(--y);border:1px solid rgba(201,162,39,.3)}
+.pill.review{background:rgba(41,128,185,.15);color:#5dade2;border:1px solid rgba(41,128,185,.3)}
+
+.quick-item{
+  display:flex;align-items:center;gap:12px;
+  padding:12px 18px;border-bottom:1px solid rgba(255,255,255,.03);
+  cursor:pointer;transition:background .2s;
+}
+.quick-item:last-child{border:none}
+.quick-item:hover{background:rgba(255,255,255,.03)}
+.quick-item .ic2{
+  width:32px;height:32px;border-radius:6px;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.78rem;flex-shrink:0;
+}
+.quick-item .ql{font-size:.78rem;font-weight:600;color:var(--w)}
+.quick-item .qs{font-size:.65rem;color:var(--dim);margin-top:1px}
+
+/* ════════════════ PUBLICAÇÕES ════════════════ */
+.pub-toolbar{
+  display:flex;align-items:center;gap:12px;
+  margin-bottom:20px;flex-wrap:wrap;
+}
+.pub-search{
+  flex:1;min-width:200px;
+  background:rgba(255,255,255,.05);
+  border:1px solid var(--border);border-radius:4px;
+  padding:9px 16px 9px 38px;
+  color:#fff;font-size:.82rem;font-family:var(--fb);outline:none;
+  position:relative;transition:border-color .3s;
+}
+.pub-search:focus{border-color:var(--g)}
+.search-ico{position:relative}
+.search-ico i{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--dim);font-size:.8rem;pointer-events:none}
+.filter-btn{
+  padding:8px 14px;background:rgba(255,255,255,.05);
+  border:1px solid var(--border);border-radius:4px;
+  font-size:.72rem;font-weight:600;color:var(--muted);cursor:pointer;
+  transition:all .2s;white-space:nowrap;
+}
+.filter-btn:hover,.filter-btn.active{background:rgba(29,122,29,.15);color:var(--g3);border-color:rgba(29,122,29,.4)}
+
+.pub-table{background:var(--k3);border:1px solid var(--border);border-radius:6px;overflow:hidden}
+.pub-thead{
+  background:rgba(255,255,255,.03);
+  display:grid;grid-template-columns:50px 1fr 140px 100px 100px 120px;
+  padding:10px 16px;gap:12px;
+  border-bottom:1px solid var(--border);
+}
+.pub-thead span{font-size:.62rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:var(--dim)}
+.pub-row{
+  display:grid;grid-template-columns:50px 1fr 140px 100px 100px 120px;
+  padding:12px 16px;gap:12px;align-items:center;
+  border-bottom:1px solid rgba(255,255,255,.03);
+  transition:background .2s;cursor:pointer;
+}
+.pub-row:last-child{border:none}
+.pub-row:hover{background:rgba(255,255,255,.03)}
+.pub-row .img-cell{width:50px;height:38px;border-radius:3px;overflow:hidden}
+.pub-row .img-cell img{width:100%;height:100%;object-fit:cover}
+.pub-row .title-cell .t{font-size:.8rem;font-weight:600;color:var(--w)}
+.pub-row .title-cell .c{font-size:.65rem;color:var(--g3);margin-top:2px}
+.pub-row .date-cell{font-size:.72rem;color:var(--dim)}
+.pub-row .views-cell{font-size:.78rem;color:var(--w);font-weight:600}
+.pub-row .act-cell{display:flex;gap:6px}
+.icon-btn{
+  width:28px;height:28px;border-radius:4px;
+  background:rgba(255,255,255,.05);border:none;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.72rem;cursor:pointer;transition:all .2s;color:var(--muted);
+}
+.icon-btn:hover.edit{background:rgba(41,128,185,.2);color:#5dade2}
+.icon-btn:hover.del{background:rgba(192,57,43,.2);color:#e74c3c}
+.icon-btn:hover.view{background:rgba(29,122,29,.2);color:var(--g3)}
+</style>
+<style>
+/* ════════════════ EDITOR DE NOTÍCIA ════════════════ */
+.editor-layout{display:grid;grid-template-columns:1fr 300px;gap:20px;align-items:start}
+.editor-main{background:var(--k3);border:1px solid var(--border);border-radius:6px;overflow:hidden}
+.editor-side{display:flex;flex-direction:column;gap:16px}
+
+.editor-toolbar{
+  padding:12px 16px;background:rgba(255,255,255,.03);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:6px;flex-wrap:wrap;
+}
+.editor-toolbar .t-btn{
+  width:30px;height:30px;border-radius:4px;
+  background:rgba(255,255,255,.05);border:none;
+  color:rgba(255,255,255,.6);font-size:.78rem;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .2s;
+}
+.editor-toolbar .t-btn:hover{background:rgba(255,255,255,.12);color:#fff}
+.editor-toolbar .sep{width:1px;height:20px;background:var(--border);margin:0 4px}
+
+.inp-field{padding:16px}
+.inp-field + .inp-field{border-top:1px solid var(--border)}
+.inp-field label{
+  font-size:.62rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
+  color:var(--dim);display:block;margin-bottom:8px;
+}
+.inp-field input,.inp-field select,.inp-field textarea{
+  width:100%;background:rgba(255,255,255,.05);
+  border:1px solid var(--border);border-radius:4px;
+  padding:10px 14px;color:#fff;font-size:.85rem;
+  font-family:var(--fb);outline:none;
+  transition:border-color .3s,background .3s;
+}
+.inp-field input::placeholder,.inp-field textarea::placeholder{color:rgba(255,255,255,.2)}
+.inp-field input:focus,.inp-field select:focus,.inp-field textarea:focus{
+  border-color:var(--g);background:rgba(255,255,255,.07);
+}
+.inp-field select option{background:#1a1a1a;color:#fff}
+.inp-field textarea{resize:vertical;min-height:320px;line-height:1.7}
+
+.side-box{background:var(--k3);border:1px solid var(--border);border-radius:6px;overflow:hidden}
+.side-box-head{
+  padding:12px 16px;background:rgba(255,255,255,.03);
+  border-bottom:1px solid var(--border);
+  font-family:var(--ff);font-size:.9rem;letter-spacing:1.5px;
+  display:flex;align-items:center;gap:8px;
+}
+.side-box-head i{color:var(--y);font-size:.8rem}
+.side-box-body{padding:16px;display:flex;flex-direction:column;gap:12px}
+
+.img-drop{
+  border:2px dashed rgba(255,255,255,.1);border-radius:4px;
+  padding:28px;text-align:center;cursor:pointer;
+  transition:border-color .3s,background .3s;
+}
+.img-drop:hover{border-color:var(--g);background:rgba(29,122,29,.08)}
+.img-drop i{font-size:2rem;color:var(--dim);margin-bottom:10px;display:block}
+.img-drop p{font-size:.75rem;color:var(--dim)}
+.img-drop span{font-size:.68rem;color:rgba(255,255,255,.2)}
+#thumbPreview{width:100%;border-radius:4px;overflow:hidden;display:none}
+#thumbPreview img{width:100%;display:block}
+
+.tag-wrap{display:flex;flex-wrap:wrap;gap:6px;margin-top:4px}
+.tag{
+  background:rgba(29,122,29,.15);border:1px solid rgba(29,122,29,.3);
+  color:var(--g3);font-size:.65rem;font-weight:700;
+  padding:3px 10px;border-radius:20px;
+  display:flex;align-items:center;gap:5px;cursor:pointer;
+  transition:background .2s;
+}
+.tag:hover{background:rgba(192,57,43,.2);color:#e74c3c}
+.tag i{font-size:.5rem}
+
+.pub-actions{display:flex;flex-direction:column;gap:8px}
+.btn-pub{
+  padding:11px;border-radius:4px;
+  font-weight:700;font-size:.72rem;letter-spacing:1.5px;text-transform:uppercase;
+  cursor:pointer;border:none;display:flex;align-items:center;justify-content:center;gap:8px;
+  transition:all .2s;
+}
+.btn-pub.green{background:var(--g);color:#fff;box-shadow:0 2px 12px rgba(29,122,29,.4)}
+.btn-pub.green:hover{background:var(--g3);box-shadow:0 4px 20px rgba(29,122,29,.6)}
+.btn-pub.outline{background:transparent;color:var(--muted);border:1px solid var(--border)}
+.btn-pub.outline:hover{border-color:var(--g);color:var(--g3)}
+.btn-pub.red-btn{background:rgba(192,57,43,.15);color:#e74c3c;border:1px solid rgba(192,57,43,.3)}
+.btn-pub.red-btn:hover{background:rgba(192,57,43,.3)}
+
+/* ════════════════ PERFIL ════════════════ */
+.profile-header{
+  background:var(--k3);border:1px solid var(--border);border-radius:6px;
+  padding:32px;display:flex;align-items:center;gap:28px;
+  margin-bottom:20px;position:relative;overflow:hidden;
+}
+.profile-header::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--g),var(--g3),var(--y));
+}
+.profile-avatar-big{
+  width:90px;height:90px;border-radius:50%;flex-shrink:0;
+  background:linear-gradient(135deg,var(--g),var(--g2));
+  display:flex;align-items:center;justify-content:center;
+  font-size:2rem;color:#fff;font-weight:700;
+  border:3px solid rgba(29,122,29,.4);
+  box-shadow:0 0 32px rgba(29,122,29,.3);
+  cursor:pointer;position:relative;transition:box-shadow .3s;
+}
+.profile-avatar-big:hover{box-shadow:0 0 48px rgba(29,122,29,.5)}
+.profile-avatar-big .edit-av{
+  position:absolute;bottom:0;right:0;
+  width:26px;height:26px;border-radius:50%;
+  background:var(--g);display:flex;align-items:center;justify-content:center;
+  font-size:.6rem;color:#fff;border:2px solid var(--k3);
+}
+.ph{flex:1}
+.ph h2{font-family:var(--ff);font-size:2rem;letter-spacing:2px;color:#fff}
+.ph .role-badge{
+  display:inline-block;background:rgba(29,122,29,.2);
+  border:1px solid rgba(29,122,29,.4);color:var(--g3);
+  font-size:.65rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
+  padding:3px 12px;border-radius:20px;margin:6px 0 10px;
+}
+.ph p{font-size:.8rem;color:var(--dim)}
+.ph-stats{display:flex;gap:24px;margin-top:14px}
+.ph-stat .v{font-family:var(--ff);font-size:1.6rem;color:var(--y)}
+.ph-stat .l{font-size:.65rem;color:var(--dim)}
+
+.profile-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.profile-sec{background:var(--k3);border:1px solid var(--border);border-radius:6px;overflow:hidden}
+.profile-sec-head{
+  padding:14px 18px;background:rgba(255,255,255,.03);
+  border-bottom:1px solid var(--border);
+  display:flex;align-items:center;gap:8px;
+}
+.profile-sec-head i{color:var(--y);font-size:.82rem}
+.profile-sec-head h3{font-family:var(--ff);font-size:1rem;letter-spacing:1.5px}
+.profile-sec-body{padding:18px;display:flex;flex-direction:column;gap:14px}
+.pf-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+/* ════════════════ TOASTS ════════════════ */
+.toast-wrap{position:fixed;bottom:24px;right:24px;z-index:9999;display:flex;flex-direction:column;gap:8px}
+.toast{
+  background:var(--k4);border:1px solid var(--border);border-radius:6px;
+  padding:14px 18px;display:flex;align-items:center;gap:12px;
+  min-width:280px;box-shadow:0 8px 32px rgba(0,0,0,.6);
+  animation:toastIn .4s var(--ease) both;
+  font-size:.8rem;
+}
+.toast.success{border-color:rgba(29,122,29,.5)}
+.toast.success i{color:var(--g3)}
+.toast.error{border-color:rgba(192,57,43,.5)}
+.toast.error i{color:#e74c3c}
+.toast.info{border-color:rgba(41,128,185,.4)}
+.toast.info i{color:#5dade2}
+@keyframes toastIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:none}}
+
+/* MODAL */
+.modal-backdrop{
+  position:fixed;inset:0;background:rgba(0,0,0,.75);
+  backdrop-filter:blur(4px);z-index:500;
+  display:none;align-items:center;justify-content:center;
+}
+.modal-backdrop.open{display:flex}
+.modal{
+  background:var(--k3);border:1px solid var(--border);border-radius:8px;
+  padding:28px;max-width:420px;width:90%;
+  box-shadow:0 32px 80px rgba(0,0,0,.8);
+  animation:cardIn .4s var(--ease) both;
+}
+@keyframes cardIn{from{opacity:0;transform:scale(.95)}to{opacity:1;transform:none}}
+.modal h3{font-family:var(--ff);font-size:1.4rem;letter-spacing:1.5px;margin-bottom:8px}
+.modal p{font-size:.82rem;color:var(--muted);margin-bottom:24px;line-height:1.6}
+.modal-actions{display:flex;gap:10px;justify-content:flex-end}
+
+/* RESPONSIVO */
+@media(max-width:900px){
+  .sidebar{position:fixed;transform:translateX(-100%)}
+  .sidebar.open{transform:none;box-shadow:4px 0 40px rgba(0,0,0,.8)}
+  .editor-layout{grid-template-columns:1fr}
+  .dash-grid{grid-template-columns:1fr 1fr}
+  .dash-cols{grid-template-columns:1fr}
+  .pub-thead,.pub-row{grid-template-columns:40px 1fr 100px 80px}
+  .pub-thead span:nth-child(5),.pub-row .date-cell{display:none}
+  .profile-grid{grid-template-columns:1fr}
+}
+@media(max-width:600px){
+  .dash-grid{grid-template-columns:1fr}
+  .profile-header{flex-direction:column;text-align:center}
+  .ph-stats{justify-content:center}
+}
+</style>
+</head>
+<body>
+
+<!-- SIDEBAR -->
+<aside class="sidebar" id="sidebar">
+  <div class="sb-logo">
+    <img src="../assets/images/logo.svg" alt="Pains Acontece"/>
+  </div>
+  <nav class="sb-nav">
+    <div class="sb-section">Principal</div>
+    <div class="sb-item active" onclick="showPanel('dashboard',this)">
+      <i class="fas fa-chart-line"></i> Dashboard
+    </div>
+    <div class="sb-item" onclick="showPanel('publicacoes',this)">
+      <i class="fas fa-newspaper"></i> Publicações
+      <span class="sb-badge green">24</span>
+    </div>
+    <div class="sb-item" onclick="showPanel('nova',this)">
+      <i class="fas fa-plus-circle"></i> Nova Notícia
+    </div>
+    <div class="sb-item" onclick="showPanel('ia',this)" id="sbIA">
+      <i class="fas fa-robot"></i> IA Scanner
+      <span class="sb-badge" id="iaBadge" style="display:none">0</span>
+    </div>
+
+    <div class="sb-section">Conteúdo</div>
+    <div class="sb-item" onclick="showPanel('categorias',this)">
+      <i class="fas fa-tags"></i> Categorias
+    </div>
+    <div class="sb-item" onclick="showPanel('midia',this)">
+      <i class="fas fa-photo-film"></i> Mídia
+    </div>
+    <div class="sb-item" onclick="showPanel('agenda',this)">
+      <i class="fas fa-calendar-alt"></i> Agenda
+    </div>
+    <div class="sb-item" onclick="showPanel('empregos_adm',this)">
+      <i class="fas fa-briefcase"></i> Empregos
+    </div>
+
+    <div class="sb-section">Configurações</div>
+    <div class="sb-item" onclick="showPanel('perfil',this)">
+      <i class="fas fa-user-circle"></i> Meu Perfil
+    </div>
+    <div class="sb-item" onclick="showPanel('config',this)">
+      <i class="fas fa-cog"></i> Configurações
+    </div>
+    <div class="sb-item" onclick="confirmLogout()">
+      <i class="fas fa-sign-out-alt"></i> Sair
+    </div>
+  </nav>
+  <div class="sb-user">
+    <div class="sb-avatar" id="sbAvatar">A</div>
+    <div class="sb-user-info">
+      <div class="name" id="sbName">Administrador</div>
+      <div class="role">Editor-Chefe</div>
+    </div>
+    <button class="sb-logout" onclick="confirmLogout()" title="Sair"><i class="fas fa-sign-out-alt"></i></button>
+  </div>
+</aside>
+
+<!-- MAIN -->
+<div class="main">
+  <!-- TOPBAR -->
+  <div class="topbar">
+    <button class="tb-btn ghost" id="menuToggle" onclick="toggleSidebar()" style="display:none">
+      <i class="fas fa-bars"></i>
+    </button>
+    <span class="topbar-title">Painel <span>Pains Acontece</span></span>
+    <div class="topbar-actions">
+      <a href="../index.html" target="_blank" class="view-site-btn">
+        <i class="fas fa-external-link-alt"></i> Ver Portal
+      </a>
+      <div class="notif-btn"><i class="fas fa-bell"></i><div class="notif-dot"></div></div>
+      <button class="tb-btn primary" onclick="showPanel('nova',document.querySelector('.sb-item:nth-child(3)'))">
+        <i class="fas fa-plus"></i> Nova Notícia
+      </button>
+    </div>
+  </div>
+
+  <!-- CONTENT -->
+  <div class="content">
+    <!-- ══ DASHBOARD ══ -->
+    <div class="panel active" id="panel-dashboard">
+      <div class="dash-grid">
+        <div class="stat-card" style="--accent:#2ecc71">
+          <div class="ic"><i class="fas fa-newspaper"></i></div>
+          <div class="val">247</div>
+          <div class="lbl">Publicações no Ar</div>
+          <div class="delta up"><i class="fas fa-arrow-up"></i> +12 este mês</div>
+        </div>
+        <div class="stat-card" style="--accent:#3498db">
+          <div class="ic"><i class="fas fa-eye"></i></div>
+          <div class="val">18.4K</div>
+          <div class="lbl">Visualizações Hoje</div>
+          <div class="delta up"><i class="fas fa-arrow-up"></i> +34% vs ontem</div>
+        </div>
+        <div class="stat-card" style="--accent:var(--y)">
+          <div class="ic"><i class="fas fa-file-alt"></i></div>
+          <div class="val">6</div>
+          <div class="lbl">Rascunhos Pendentes</div>
+          <div class="delta down"><i class="fas fa-arrow-down"></i> 2 aguardam revisão</div>
+        </div>
+        <div class="stat-card" style="--accent:#e74c3c">
+          <div class="ic"><i class="fas fa-bullhorn"></i></div>
+          <div class="val">14</div>
+          <div class="lbl">Pautas Enviadas</div>
+          <div class="delta up"><i class="fas fa-arrow-up"></i> +3 hoje</div>
+        </div>
+      </div>
+
+      <div class="dash-cols">
+        <div class="box">
+          <div class="box-head">
+            <h3>Últimas Publicações</h3>
+            <span class="see-all" onclick="showPanel('publicacoes',document.querySelectorAll('.sb-item')[1])">Ver todas →</span>
+          </div>
+          <div class="art-row" onclick="editArticle(1)">
+            <div class="thumb"><img src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=200&q=60" alt=""/></div>
+            <div class="info"><div class="title">UBS de Pains amplia atendimento com novos serviços especializados</div><div class="meta">Saúde · Há 1 hora · 523 views</div></div>
+            <div class="status"><span class="pill pub">Publicado</span></div>
+          </div>
+          <div class="art-row" onclick="editArticle(2)">
+            <div class="thumb"><img src="https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=200&q=60" alt=""/></div>
+            <div class="info"><div class="title">Festival de inverno movimenta comércio em Pains</div><div class="meta">Agenda · Há 2 horas · 891 views</div></div>
+            <div class="status"><span class="pill pub">Publicado</span></div>
+          </div>
+          <div class="art-row" onclick="editArticle(3)">
+            <div class="thumb"><img src="https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=200&q=60" alt=""/></div>
+            <div class="info"><div class="title">Sine regional abre 30 vagas para moradores de Pains</div><div class="meta">Empregos · Há 6 horas · 2.240 views</div></div>
+            <div class="status"><span class="pill pub">Publicado</span></div>
+          </div>
+          <div class="art-row" onclick="editArticle(4)">
+            <div class="thumb"><img src="https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=200&q=60" alt=""/></div>
+            <div class="info"><div class="title">Câmara vota projeto de apoio ao comércio local [RASCUNHO]</div><div class="meta">Política · Há 1 dia</div></div>
+            <div class="status"><span class="pill draft">Rascunho</span></div>
+          </div>
+          <div class="art-row" onclick="editArticle(5)">
+            <div class="thumb"><img src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=200&q=60" alt=""/></div>
+            <div class="info"><div class="title">Alerta dengue: casos sobem 40% na microrregião</div><div class="meta">Saúde · Em revisão</div></div>
+            <div class="status"><span class="pill review">Revisão</span></div>
+          </div>
+        </div>
+
+        <div style="display:flex;flex-direction:column;gap:16px">
+          <div class="box">
+            <div class="box-head"><h3>Ações Rápidas</h3></div>
+            <div class="quick-item" onclick="showPanel('nova',document.querySelectorAll('.sb-item')[2])">
+              <div class="ic2" style="background:rgba(29,122,29,.15)"><i class="fas fa-plus" style="color:var(--g3)"></i></div>
+              <div><div class="ql">Nova Notícia</div><div class="qs">Criar publicação</div></div>
+            </div>
+            <div class="quick-item" onclick="showPanel('midia',document.querySelectorAll('.sb-item')[6])">
+              <div class="ic2" style="background:rgba(41,128,185,.15)"><i class="fas fa-image" style="color:#5dade2"></i></div>
+              <div><div class="ql">Upload de Mídia</div><div class="qs">Fotos e vídeos</div></div>
+            </div>
+            <div class="quick-item" onclick="showPanel('agenda',document.querySelectorAll('.sb-item')[7])">
+              <div class="ic2" style="background:rgba(201,162,39,.15)"><i class="fas fa-calendar-plus" style="color:var(--y)"></i></div>
+              <div><div class="ql">Novo Evento</div><div class="qs">Adicionar à agenda</div></div>
+            </div>
+            <div class="quick-item" onclick="showPanel('empregos_adm',document.querySelectorAll('.sb-item')[8])">
+              <div class="ic2" style="background:rgba(155,89,182,.15)"><i class="fas fa-briefcase" style="color:#a29bfe"></i></div>
+              <div><div class="ql">Vaga de Emprego</div><div class="qs">Publicar oportunidade</div></div>
+            </div>
+            <div class="quick-item" onclick="window.open('../index.html','_blank')">
+              <div class="ic2" style="background:rgba(231,76,60,.15)"><i class="fas fa-external-link-alt" style="color:#e74c3c"></i></div>
+              <div><div class="ql">Ver Portal</div><div class="qs">Abrir o site público</div></div>
+            </div>
+          </div>
+
+          <div class="box">
+            <div class="box-head"><h3>Pautas Recentes</h3></div>
+            <div class="art-row"><div class="info"><div class="title">Buraco na Rua das Flores há 3 meses</div><div class="meta">João Silva · Há 2h</div></div><span class="pill draft">Nova</span></div>
+            <div class="art-row"><div class="info"><div class="title">Falta de médico no PSF do Bairro João XXIII</div><div class="meta">Maria Costa · Ontem</div></div><span class="pill draft">Nova</span></div>
+            <div class="art-row"><div class="info"><div class="title">Evento de música na praça central</div><div class="meta">Redação · 2 dias</div></div><span class="pill review">Lida</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- ══ IA SCANNER ══ -->
+    <div class="panel" id="panel-ia">
+      <div style="display:flex;align-items:center;gap:16px;margin-bottom:24px;flex-wrap:wrap">
+        <div style="flex:1;min-width:200px">
+          <h3 style="font-family:var(--ff);font-size:1.6rem;letter-spacing:2px;margin-bottom:4px">
+            <i class="fas fa-robot" style="color:var(--g3)"></i> IA de Notícias
+          </h3>
+          <p style="font-size:.78rem;color:var(--dim)">Varredura automática sobre Pains e região — cada notícia precisa da sua aprovação antes de publicar.</p>
+        </div>
+        <button class="tb-btn primary" onclick="runScanNow()" id="btnScan">
+          <i class="fas fa-sync-alt"></i> Buscar Agora
+        </button>
+      </div>
+      <div class="dash-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:24px">
+        <div class="stat-card" style="--accent:var(--g3)">
+          <div class="ic"><i class="fas fa-hourglass-half"></i></div>
+          <div class="val" id="iaPendingCount">0</div>
+          <div class="lbl">Aguardando Aprovação</div>
+        </div>
+        <div class="stat-card" style="--accent:#3498db">
+          <div class="ic"><i class="fas fa-clock"></i></div>
+          <div class="val" id="iaInterval">20</div>
+          <div class="lbl">Minutos entre Buscas</div>
+        </div>
+        <div class="stat-card" style="--accent:var(--y)">
+          <div class="ic"><i class="fas fa-search"></i></div>
+          <div class="val" style="font-size:1rem" id="iaLastScan">—</div>
+          <div class="lbl">Última Varredura</div>
+        </div>
+      </div>
+      <div class="box">
+        <div class="box-head">
+          <h3>Notícias Encontradas pela IA</h3>
+          <span style="font-size:.68rem;color:var(--dim)">Aprove ou rejeite cada matéria</span>
+        </div>
+        <div id="pendingList">
+          <div style="padding:40px;text-align:center;color:var(--dim);font-size:.82rem">
+            <i class="fas fa-robot" style="font-size:2rem;margin-bottom:12px;display:block;opacity:.3"></i>
+            Nenhuma notícia pendente. A IA busca automaticamente a cada 20 minutos.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ PUBLICAÇÕES ══ -->
+    <div class="panel" id="panel-publicacoes">
+      <div class="pub-toolbar">
+        <div class="search-ico" style="flex:1;min-width:200px;position:relative">
+          <i class="fas fa-search"></i>
+          <input class="pub-search" style="width:100%" type="text" placeholder="Buscar publicações…" oninput="filterPubs(this.value)"/>
+        </div>
+        <button class="filter-btn active" onclick="filterCat('todos',this)">Todos</button>
+        <button class="filter-btn" onclick="filterCat('pub',this)">Publicados</button>
+        <button class="filter-btn" onclick="filterCat('draft',this)">Rascunhos</button>
+        <button class="filter-btn" onclick="filterCat('review',this)">Revisão</button>
+        <button class="tb-btn primary" onclick="showPanel('nova',document.querySelectorAll('.sb-item')[2])">
+          <i class="fas fa-plus"></i> Nova
+        </button>
+      </div>
+      <div class="pub-table">
+        <div class="pub-thead">
+          <span></span>
+          <span>Título / Categoria</span>
+          <span>Data</span>
+          <span>Visualiz.</span>
+          <span>Status</span>
+          <span>Ações</span>
+        </div>
+        <div id="pubList">
+          <!-- rows injetados via JS -->
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ NOVA NOTÍCIA ══ -->
+    <div class="panel" id="panel-nova">
+      <div class="editor-layout">
+        <div class="editor-main">
+          <div class="inp-field">
+            <label>Título da Notícia</label>
+            <input type="text" id="artTitle" placeholder="Digite o título completo da notícia…"/>
+          </div>
+          <div class="inp-field">
+            <label>Subtítulo / Lead</label>
+            <input type="text" id="artLead" placeholder="Resumo da notícia (aparece abaixo do título)"/>
+          </div>
+          <div class="inp-field" style="padding-bottom:0">
+            <label>Conteúdo</label>
+          </div>
+          <div class="editor-toolbar">
+            <button class="t-btn" onclick="fmt('bold')" title="Negrito"><i class="fas fa-bold"></i></button>
+            <button class="t-btn" onclick="fmt('italic')" title="Itálico"><i class="fas fa-italic"></i></button>
+            <button class="t-btn" onclick="fmt('underline')" title="Sublinhado"><i class="fas fa-underline"></i></button>
+            <div class="sep"></div>
+            <button class="t-btn" onclick="fmt('justifyLeft')" title="Esquerda"><i class="fas fa-align-left"></i></button>
+            <button class="t-btn" onclick="fmt('justifyCenter')" title="Centro"><i class="fas fa-align-center"></i></button>
+            <button class="t-btn" onclick="fmt('justifyFull')" title="Justificar"><i class="fas fa-align-justify"></i></button>
+            <div class="sep"></div>
+            <button class="t-btn" onclick="fmt('insertUnorderedList')" title="Lista"><i class="fas fa-list-ul"></i></button>
+            <button class="t-btn" onclick="fmt('insertOrderedList')" title="Lista num."><i class="fas fa-list-ol"></i></button>
+            <div class="sep"></div>
+            <button class="t-btn" onclick="insertLink()" title="Link"><i class="fas fa-link"></i></button>
+            <button class="t-btn" onclick="fmt('removeFormat')" title="Limpar"><i class="fas fa-eraser"></i></button>
+          </div>
+          <div class="inp-field">
+            <div id="artContent" contenteditable="true"
+              style="min-height:320px;outline:none;font-size:.88rem;line-height:1.8;color:rgba(255,255,255,.85);padding:4px 0"
+              data-placeholder="Escreva o conteúdo completo da notícia aqui…"></div>
+          </div>
+        </div>
+
+        <div class="editor-side">
+          <!-- PUBLICAR -->
+          <div class="side-box">
+            <div class="side-box-head"><i class="fas fa-paper-plane"></i>Publicar</div>
+            <div class="side-box-body">
+              <div class="inp-field" style="padding:0">
+                <label>Status</label>
+                <select id="artStatus">
+                  <option value="pub">Publicar Agora</option>
+                  <option value="draft">Salvar Rascunho</option>
+                  <option value="review">Enviar para Revisão</option>
+                  <option value="scheduled">Agendar</option>
+                </select>
+              </div>
+              <div class="inp-field" style="padding:0" id="schedField" style="display:none">
+                <label>Data/Hora de Publicação</label>
+                <input type="datetime-local" id="artDate"/>
+              </div>
+              <div class="pub-actions">
+                <button class="btn-pub green" onclick="previewBeforePublish()"><i class="fas fa-eye"></i> Ver Preview</button>
+                <button class="btn-pub green" onclick="publishArticle()"><i class="fas fa-paper-plane"></i> Publicar Direto</button>
+                <button class="btn-pub outline" onclick="saveDraft()"><i class="fas fa-save"></i> Salvar Rascunho</button>
+                <button class="btn-pub outline" onclick="openAIChat()" style="border-color:rgba(29,122,29,.3);color:var(--g3)"><i class="fas fa-robot"></i> Abrir IA</button>
+                <button class="btn-pub red-btn" onclick="clearEditor()"><i class="fas fa-trash"></i> Descartar</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- CATEGORIA -->
+          <div class="side-box">
+            <div class="side-box-head"><i class="fas fa-tag"></i>Categoria</div>
+            <div class="side-box-body">
+              <select id="artCat" class="inp-field" style="padding:10px 14px;width:100%;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:4px;color:#fff;font-family:var(--fb);outline:none">
+                <option>Últimas Notícias</option>
+                <option>Pains</option>
+                <option>Região</option>
+                <option>Brasil / Mundo</option>
+                <option>Polícia</option>
+                <option>Política</option>
+                <option>Saúde</option>
+                <option>Educação</option>
+                <option>Agenda</option>
+                <option>Empregos</option>
+                <option>Gastronomia</option>
+                <option>Esportes</option>
+              </select>
+            </div>
+          </div>
+
+          <!-- IMAGEM DESTAQUE -->
+          <div class="side-box">
+            <div class="side-box-head"><i class="fas fa-image"></i>Imagem Destaque</div>
+            <div class="side-box-body">
+              <div id="thumbPreview"></div>
+              <div class="img-drop" onclick="document.getElementById('thumbInput').click()">
+                <i class="fas fa-cloud-upload-alt"></i>
+                <p>Clique ou arraste a imagem</p>
+                <span>JPG, PNG · Máx. 5MB</span>
+              </div>
+              <input type="file" id="thumbInput" accept="image/*" style="display:none" onchange="previewThumb(this)"/>
+            </div>
+          </div>
+
+          <!-- TAGS -->
+          <div class="side-box">
+            <div class="side-box-head"><i class="fas fa-hashtag"></i>Tags</div>
+            <div class="side-box-body">
+              <input type="text" id="tagInput" style="width:100%;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:4px;padding:9px 14px;color:#fff;font-family:var(--fb);outline:none;font-size:.82rem" placeholder="Digite e pressione Enter…" onkeydown="addTag(event)"/>
+              <div class="tag-wrap" id="tagWrap"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- ══ PERFIL ══ -->
+    <div class="panel" id="panel-perfil">
+      <div class="profile-header">
+        <div class="profile-avatar-big" id="bigAvatar">
+          A
+          <div class="edit-av"><i class="fas fa-camera"></i></div>
+        </div>
+        <div class="ph">
+          <h2 id="phName">Administrador</h2>
+          <span class="role-badge">Editor-Chefe · Pains Acontece</span>
+          <p id="phEmail">admin@painsacontece.com.br</p>
+          <div class="ph-stats">
+            <div class="ph-stat"><div class="v">247</div><div class="l">Publicações</div></div>
+            <div class="ph-stat"><div class="v">18.4K</div><div class="l">Views hoje</div></div>
+            <div class="ph-stat"><div class="v">4.2M</div><div class="l">Views total</div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="profile-grid">
+        <div class="profile-sec">
+          <div class="profile-sec-head"><i class="fas fa-user"></i><h3>Dados Pessoais</h3></div>
+          <div class="profile-sec-body">
+            <div class="pf-row">
+              <div class="inp-field" style="padding:0">
+                <label>Nome Completo</label>
+                <input type="text" id="pfName" value="Administrador Pains Acontece"/>
+              </div>
+              <div class="inp-field" style="padding:0">
+                <label>Apelido / Byline</label>
+                <input type="text" id="pfByline" value="Redação Pains Acontece"/>
+              </div>
+            </div>
+            <div class="inp-field" style="padding:0">
+              <label>E-mail</label>
+              <input type="email" id="pfEmail" value="admin@painsacontece.com.br"/>
+            </div>
+            <div class="pf-row">
+              <div class="inp-field" style="padding:0">
+                <label>WhatsApp</label>
+                <input type="tel" id="pfPhone" placeholder="(37) 9 ????-????"/>
+              </div>
+              <div class="inp-field" style="padding:0">
+                <label>Cargo</label>
+                <input type="text" id="pfRole" value="Editor-Chefe"/>
+              </div>
+            </div>
+            <div class="inp-field" style="padding:0">
+              <label>Bio / Sobre</label>
+              <textarea id="pfBio" style="min-height:80px" placeholder="Uma breve descrição sobre você…">Portal de notícias hiperlocal de Pains e região — Sudoeste Mineiro.</textarea>
+            </div>
+            <button class="btn-pub green" onclick="saveProfile()"><i class="fas fa-save"></i> Salvar Dados</button>
+          </div>
+        </div>
+
+        <div class="profile-sec">
+          <div class="profile-sec-head"><i class="fas fa-lock"></i><h3>Alterar Senha</h3></div>
+          <div class="profile-sec-body">
+            <div class="inp-field" style="padding:0">
+              <label>Senha Atual</label>
+              <input type="password" placeholder="••••••••"/>
+            </div>
+            <div class="inp-field" style="padding:0">
+              <label>Nova Senha</label>
+              <input type="password" id="newPass" placeholder="Mínimo 8 caracteres"/>
+            </div>
+            <div class="inp-field" style="padding:0">
+              <label>Confirmar Nova Senha</label>
+              <input type="password" id="confPass" placeholder="Repita a nova senha"/>
+            </div>
+            <button class="btn-pub outline" onclick="changePassword()"><i class="fas fa-key"></i> Alterar Senha</button>
+          </div>
+
+          <div class="profile-sec-head" style="margin-top:1px"><i class="fas fa-globe"></i><h3>Portal</h3></div>
+          <div class="profile-sec-body">
+            <div class="inp-field" style="padding:0">
+              <label>Nome do Portal</label>
+              <input type="text" value="Pains Acontece"/>
+            </div>
+            <div class="inp-field" style="padding:0">
+              <label>Slogan</label>
+              <input type="text" value="Notícias, serviços e o que importa em Pains e região"/>
+            </div>
+            <div class="inp-field" style="padding:0">
+              <label>WhatsApp do Portal</label>
+              <input type="tel" placeholder="(37) 9 ????-????"/>
+            </div>
+            <div class="inp-field" style="padding:0">
+              <label>Instagram</label>
+              <input type="text" placeholder="@painsacontece"/>
+            </div>
+            <button class="btn-pub green" onclick="showToast('Configurações do portal salvas!','success')"><i class="fas fa-save"></i> Salvar Portal</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ CATEGORIAS ══ -->
+    <div class="panel" id="panel-categorias">
+      <div style="max-width:600px">
+        <div class="box">
+          <div class="box-head"><h3>Gerenciar Categorias</h3><button class="tb-btn primary" style="font-size:.65rem;padding:6px 12px" onclick="addCategory()"><i class="fas fa-plus"></i> Nova</button></div>
+          <div id="catList">
+            <div class="art-row"><div class="info"><div class="title">Últimas Notícias</div><div class="meta">47 artigos</div></div><div style="display:flex;gap:6px"><button class="icon-btn edit" onclick="showToast('Editar categoria','info')"><i class="fas fa-edit"></i></button><button class="icon-btn del" onclick="showToast('Categoria excluída','error')"><i class="fas fa-trash"></i></button></div></div>
+            <div class="art-row"><div class="info"><div class="title">Pains</div><div class="meta">38 artigos</div></div><div style="display:flex;gap:6px"><button class="icon-btn edit"><i class="fas fa-edit"></i></button><button class="icon-btn del"><i class="fas fa-trash"></i></button></div></div>
+            <div class="art-row"><div class="info"><div class="title">Polícia</div><div class="meta">32 artigos</div></div><div style="display:flex;gap:6px"><button class="icon-btn edit"><i class="fas fa-edit"></i></button><button class="icon-btn del"><i class="fas fa-trash"></i></button></div></div>
+            <div class="art-row"><div class="info"><div class="title">Política</div><div class="meta">28 artigos</div></div><div style="display:flex;gap:6px"><button class="icon-btn edit"><i class="fas fa-edit"></i></button><button class="icon-btn del"><i class="fas fa-trash"></i></button></div></div>
+            <div class="art-row"><div class="info"><div class="title">Saúde</div><div class="meta">24 artigos</div></div><div style="display:flex;gap:6px"><button class="icon-btn edit"><i class="fas fa-edit"></i></button><button class="icon-btn del"><i class="fas fa-trash"></i></button></div></div>
+            <div class="art-row"><div class="info"><div class="title">Região</div><div class="meta">22 artigos</div></div><div style="display:flex;gap:6px"><button class="icon-btn edit"><i class="fas fa-edit"></i></button><button class="icon-btn del"><i class="fas fa-trash"></i></button></div></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ MÍDIA ══ -->
+    <div class="panel" id="panel-midia">
+      <div style="margin-bottom:20px;display:flex;gap:12px;align-items:center">
+        <h3 style="font-family:var(--ff);font-size:1.4rem;letter-spacing:2px;flex:1">Biblioteca de Mídia</h3>
+        <button class="tb-btn primary" onclick="document.getElementById('mediaInput').click()"><i class="fas fa-upload"></i> Upload</button>
+        <input type="file" id="mediaInput" multiple accept="image/*,video/*" style="display:none" onchange="handleMediaUpload(this)"/>
+      </div>
+      <div id="mediaGrid" style="display:grid;grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:10px">
+        <!-- gerado via JS -->
+      </div>
+    </div>
+
+    <!-- ══ AGENDA ADMIN ══ -->
+    <div class="panel" id="panel-agenda">
+      <div style="max-width:700px">
+        <div style="margin-bottom:20px;display:flex;gap:12px;align-items:center">
+          <h3 style="font-family:var(--ff);font-size:1.4rem;letter-spacing:2px;flex:1">Agenda de Eventos</h3>
+          <button class="tb-btn primary" onclick="showAddEvent()"><i class="fas fa-plus"></i> Novo Evento</button>
+        </div>
+        <div class="box" id="eventList">
+          <div class="art-row"><div class="info"><div class="title">Sessão Ordinária da Câmara Municipal</div><div class="meta">05 Jul · 18h · Câmara de Pains</div></div><div style="display:flex;gap:6px"><button class="icon-btn edit"><i class="fas fa-edit"></i></button><button class="icon-btn del"><i class="fas fa-trash"></i></button></div></div>
+          <div class="art-row"><div class="info"><div class="title">Mutirão de Saúde – Exames Gratuitos</div><div class="meta">07 Jul · 08h · UBS Central</div></div><div style="display:flex;gap:6px"><button class="icon-btn edit"><i class="fas fa-edit"></i></button><button class="icon-btn del"><i class="fas fa-trash"></i></button></div></div>
+          <div class="art-row"><div class="info"><div class="title">Festival Gastronômico de Inverno</div><div class="meta">12 Jul · 17h · Praça Central</div></div><div style="display:flex;gap:6px"><button class="icon-btn edit"><i class="fas fa-edit"></i></button><button class="icon-btn del"><i class="fas fa-trash"></i></button></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ EMPREGOS ADMIN ══ -->
+    <div class="panel" id="panel-empregos_adm">
+      <div style="max-width:700px">
+        <div style="margin-bottom:20px;display:flex;gap:12px;align-items:center">
+          <h3 style="font-family:var(--ff);font-size:1.4rem;letter-spacing:2px;flex:1">Vagas de Emprego</h3>
+          <button class="tb-btn primary" onclick="showAddJob()"><i class="fas fa-plus"></i> Nova Vaga</button>
+        </div>
+        <div class="box" id="jobList">
+          <div class="art-row"><div class="info"><div class="title">Auxiliar Administrativo</div><div class="meta">CLT · Comércio Local · Ativa</div></div><div style="display:flex;gap:6px"><span class="pill pub">Ativa</span><button class="icon-btn del" style="margin-left:6px"><i class="fas fa-trash"></i></button></div></div>
+          <div class="art-row"><div class="info"><div class="title">Operador de Máquinas</div><div class="meta">CLT · Ind. Regional · Ativa</div></div><div style="display:flex;gap:6px"><span class="pill pub">Ativa</span><button class="icon-btn del" style="margin-left:6px"><i class="fas fa-trash"></i></button></div></div>
+          <div class="art-row"><div class="info"><div class="title">Técnico em Enfermagem</div><div class="meta">CLT · Santa Casa · Ativa</div></div><div style="display:flex;gap:6px"><span class="pill pub">Ativa</span><button class="icon-btn del" style="margin-left:6px"><i class="fas fa-trash"></i></button></div></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ══ CONFIGURAÇÕES ══ -->
+    <div class="panel" id="panel-config">
+      <div style="max-width:700px;display:flex;flex-direction:column;gap:16px">
+        <div class="profile-sec">
+          <div class="profile-sec-head"><i class="fab fa-github"></i><h3>Publicar no GitHub Pages</h3></div>
+          <div class="profile-sec-body">
+            <p style="font-size:.8rem;color:var(--dim);line-height:1.6;margin-bottom:14px">
+              O site roda 100% no GitHub, sem servidor. As edições ficam salvas no seu navegador até você exportar o JSON e enviar para o repositório.
+            </p>
+            <ol style="font-size:.75rem;color:var(--muted);line-height:1.8;margin-bottom:16px;padding-left:18px">
+              <li>Edite e publique notícias no painel</li>
+              <li>Clique em <strong>Exportar JSON</strong> abaixo</li>
+              <li>No GitHub, substitua o arquivo <code>data/articles.json</code></li>
+              <li>Faça commit — o site atualiza em ~1 minuto</li>
+            </ol>
+            <div style="display:flex;gap:10px;flex-wrap:wrap">
+              <button class="btn-pub green" onclick="exportGitHub()"><i class="fas fa-download"></i> Exportar JSON</button>
+              <button class="btn-pub outline" onclick="document.getElementById('importJson').click()"><i class="fas fa-upload"></i> Importar JSON</button>
+              <input type="file" id="importJson" accept=".json" style="display:none" onchange="importGitHub(this)"/>
+            </div>
+          </div>
+        </div>
+        <div class="profile-sec">
+          <div class="profile-sec-head"><i class="fas fa-sliders-h"></i><h3>Configurações Gerais</h3></div>
+          <div class="profile-sec-body">
+            <div class="inp-field" style="padding:0"><label>Artigos por Página</label><input type="number" value="10" min="5" max="50"/></div>
+            <div class="inp-field" style="padding:0"><label>Modo de Moderação</label><select style="width:100%;background:rgba(255,255,255,.05);border:1px solid var(--border);border-radius:4px;padding:10px 14px;color:#fff;font-family:var(--fb);outline:none"><option>Revisar antes de publicar</option><option>Publicar automaticamente</option></select></div>
+            <button class="btn-pub green" onclick="showToast('Configurações salvas!','success')"><i class="fas fa-save"></i> Salvar</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div><!-- /content -->
+</div><!-- /main -->
+
+<!-- TOAST CONTAINER -->
+<div class="toast-wrap" id="toastWrap"></div>
+
+<!-- MODAL CONFIRMAR LOGOUT -->
+<div class="modal-backdrop" id="logoutModal">
+  <div class="modal">
+    <h3>Sair do Painel</h3>
+    <p>Deseja realmente sair do painel administrativo do Pains Acontece?</p>
+    <div class="modal-actions">
+      <button class="btn-pub outline" style="padding:10px 20px" onclick="closeModal('logoutModal')">Cancelar</button>
+      <button class="btn-pub red-btn" style="padding:10px 20px" onclick="doLogout()"><i class="fas fa-sign-out-alt"></i> Sair</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL APROVAÇÃO IA -->
+<div class="modal-backdrop" id="approveModal">
+  <div class="modal" style="max-width:520px">
+    <h3><i class="fas fa-robot" style="color:var(--g3)"></i> Nova Notícia Encontrada</h3>
+    <p style="margin-bottom:12px;color:var(--dim);font-size:.82rem">A IA encontrou uma notícia impactante. Deseja <strong>publicar</strong> no portal?</p>
+    <div id="approveModalBody" style="background:var(--k4);border-radius:6px;padding:16px;margin-bottom:16px;border:1px solid var(--border)"></div>
+    <div class="modal-actions">
+      <button class="btn-pub outline" style="padding:10px 20px" onclick="rejectFromModal()"><i class="fas fa-times"></i> Não Publicar</button>
+      <button class="btn-pub green" style="padding:10px 20px" onclick="approveFromModal()"><i class="fas fa-check"></i> Sim, Publicar</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL PREVIEW PUBLICAÇÃO -->
+<div class="modal-backdrop" id="previewModal">
+  <div class="modal" style="max-width:720px;max-height:90vh;overflow-y:auto;padding:0">
+    <div style="padding:20px 24px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;position:sticky;top:0;background:var(--k3);z-index:1">
+      <h3 style="flex:1"><i class="fas fa-eye" style="color:var(--g3)"></i> Preview da Publicação</h3>
+      <button class="tb-btn ghost" onclick="closeModal('previewModal')" style="padding:6px 12px"><i class="fas fa-times"></i></button>
+    </div>
+    <div id="previewModalBody" style="padding:20px 24px"></div>
+    <div style="padding:16px 24px;border-top:1px solid var(--border);display:flex;gap:10px;justify-content:flex-end;position:sticky;bottom:0;background:var(--k3)">
+      <button class="btn-pub outline" style="padding:10px 20px" onclick="closeModal('previewModal')"><i class="fas fa-edit"></i> Voltar e Editar</button>
+      <button class="btn-pub green" style="padding:10px 20px" onclick="confirmPublish()"><i class="fas fa-paper-plane"></i> Confirmar Publicação</button>
+    </div>
+  </div>
+</div>
+
+<!-- MODAL DELETE -->
+<div class="modal-backdrop" id="deleteModal">
+  <div class="modal">
+    <h3>Excluir Publicação</h3>
+    <p>Esta ação é irreversível. Tem certeza que deseja excluir esta publicação?</p>
+    <div class="modal-actions">
+      <button class="btn-pub outline" style="padding:10px 20px" onclick="closeModal('deleteModal')">Cancelar</button>
+      <button class="btn-pub red-btn" style="padding:10px 20px" onclick="confirmDelete()"><i class="fas fa-trash"></i> Excluir</button>
+    </div>
+  </div>
+</div>
+<script src="../js/ai/scanner.js"></script>
+<script src="../js/ai/engine.js"></script>
+<script src="../js/core/api.js"></script>
+<script src="../js/core/store.js"></script>
+<script src="../js/ai/assistant.js"></script>
+<script>
+/* ════ AUTH GUARD ════ */
+(function(){
+  if (!sessionStorage.getItem('pa_logged')) {
+    window.location.href = 'login.html';
+  }
+  const u = sessionStorage.getItem('pa_user') || 'admin@painsacontece.com.br';
+  const name = u.split('@')[0].charAt(0).toUpperCase() + u.split('@')[0].slice(1);
+  document.getElementById('sbName').textContent = name;
+  document.getElementById('sbAvatar').textContent = name.charAt(0).toUpperCase();
+  document.getElementById('bigAvatar').textContent = name.charAt(0).toUpperCase();
+  document.getElementById('phName').textContent = name.charAt(0).toUpperCase() + name.slice(1);
+  document.getElementById('phEmail').textContent = u;
+})();
+
+/* ════ NAVIGATION ════ */
+function showPanel(id, el) {
+  document.querySelectorAll('.panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.sb-item').forEach(i => i.classList.remove('active'));
+  const panel = document.getElementById('panel-' + id);
+  if (panel) panel.classList.add('active');
+  if (el) el.classList.add('active');
+  // close sidebar on mobile
+  if (window.innerWidth < 900) document.getElementById('sidebar').classList.remove('open');
+  // special inits
+  if (id === 'publicacoes') renderPubs();
+  if (id === 'midia') renderMedia();
+  if (id === 'nova') initEditor();
+  if (id === 'ia') renderPending();
+  document.querySelector('.main').scrollTop = 0;
+}
+
+/* ════ SIDEBAR TOGGLE ════ */
+function toggleSidebar() {
+  document.getElementById('sidebar').classList.toggle('open');
+}
+if (window.innerWidth < 900) {
+  document.getElementById('menuToggle').style.display = 'flex';
+}
+window.addEventListener('resize', () => {
+  document.getElementById('menuToggle').style.display = window.innerWidth < 900 ? 'flex' : 'none';
+});
+
+/* ════ MODAL ════ */
+function closeModal(id) { document.getElementById(id).classList.remove('open'); }
+function confirmLogout() { document.getElementById('logoutModal').classList.add('open'); }
+function doLogout() { sessionStorage.clear(); window.location.href = 'login.html'; }
+
+/* ════ TOAST ════ */
+function showToast(msg, type = 'success', dur = 3500) {
+  const icons = { success:'fas fa-check-circle', error:'fas fa-exclamation-circle', info:'fas fa-info-circle' };
+  const wrap = document.getElementById('toastWrap');
+  const t = document.createElement('div');
+  t.className = `toast ${type}`;
+  t.innerHTML = `<i class="${icons[type]}"></i><span>${msg}</span>`;
+  wrap.appendChild(t);
+  setTimeout(() => { t.style.opacity='0'; t.style.transform='translateX(20px)'; t.style.transition='all .3s'; setTimeout(()=>t.remove(),300); }, dur);
+}
+
+/* ════ IA SCANNER ════ */
+let modalPendingId = null;
+let knownPendingIds = new Set();
+let iaPollTimer = null;
+
+async function renderPending() {
+  const list = document.getElementById('pendingList');
+  try {
+    const items = await PAAPI.getPending();
+    document.getElementById('iaPendingCount').textContent = items.length;
+    const badge = document.getElementById('iaBadge');
+    if (items.length > 0) { badge.style.display = ''; badge.textContent = items.length; }
+    else badge.style.display = 'none';
+
+    if (!items.length) {
+      list.innerHTML = `<div style="padding:40px;text-align:center;color:var(--dim);font-size:.82rem">
+        <i class="fas fa-robot" style="font-size:2rem;margin-bottom:12px;display:block;opacity:.3"></i>
+        Nenhuma notícia pendente. Clique em "Buscar Agora" ou aguarde a próxima varredura automática.</div>`;
+      return;
+    }
+
+    list.innerHTML = items.map(p => `
+      <div class="art-row" style="align-items:flex-start;padding:18px">
+        <div class="thumb" style="width:80px;height:60px"><img src="${p.img||''}" alt=""/></div>
+        <div class="info" style="flex:1">
+          <div class="title" style="white-space:normal;line-height:1.4">${p.title}</div>
+          <div class="meta">${p.cat} · ${p.source||'Web'} · <strong style="color:${p.verified?'var(--g3)':'var(--y)'}">${p.verified?'✓ Verificado':'⚠ Revisar'}</strong> (${p.confidence||0}%)</div>
+          <div style="font-size:.72rem;color:var(--dim);margin-top:6px;line-height:1.5">${(p.lead||'').substring(0,180)}${(p.lead||'').length>180?'…':''}</div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:8px;flex-shrink:0">
+          <button class="btn-pub green" style="padding:8px 14px;font-size:.65rem" onclick="approvePending('${p.id}')"><i class="fas fa-check"></i> Publicar</button>
+          <button class="btn-pub red-btn" style="padding:8px 14px;font-size:.65rem" onclick="rejectPending('${p.id}')"><i class="fas fa-times"></i> Rejeitar</button>
+        </div>
+      </div>`).join('');
+  } catch(e) {
+    list.innerHTML = `<div style="padding:32px;text-align:center;color:var(--dim)">Erro ao carregar pendentes. Recarregue a página.</div>`;
+  }
+}
+
+async function updateScannerStatus() {
+  try {
+    const s = await PAAPI.scannerStatus();
+    document.getElementById('iaPendingCount').textContent = s.pending;
+    document.getElementById('iaInterval').textContent = s.interval_minutes;
+    if (s.last_scan) {
+      const d = new Date(s.last_scan);
+      document.getElementById('iaLastScan').textContent = d.toLocaleTimeString('pt-BR', {hour:'2-digit',minute:'2-digit'});
+    }
+    const badge = document.getElementById('iaBadge');
+    if (s.pending > 0) { badge.style.display = ''; badge.textContent = s.pending; }
+    else badge.style.display = 'none';
+  } catch {}
+}
+
+async function runScanNow() {
+  const btn = document.getElementById('btnScan');
+  btn.disabled = true;
+  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Buscando…';
+  try {
+    const res = await PAAPI.runScanner();
+    showToast(`Varredura concluída — ${res.found} nova(s) notícia(s) encontrada(s)!`, res.found ? 'success' : 'info');
+    await renderPending();
+    await updateScannerStatus();
+    if (res.found > 0) showPanel('ia', document.getElementById('sbIA'));
+  } catch {
+    showToast('Erro na varredura. Verifique sua conexão com a internet.', 'error');
+  }
+  btn.disabled = false;
+  btn.innerHTML = '<i class="fas fa-sync-alt"></i> Buscar Agora';
+}
+
+async function approvePending(id) {
+  try {
+    await PAAPI.approvePending(id);
+    showToast('Notícia publicada no portal!', 'success');
+    await PAStore.init();
+    await renderPending();
+    await updateScannerStatus();
+    renderPubs();
+  } catch { showToast('Erro ao publicar.', 'error'); }
+}
+
+async function rejectPending(id) {
+  try {
+    await PAAPI.rejectPending(id);
+    showToast('Notícia descartada.', 'info');
+    await renderPending();
+    await updateScannerStatus();
+  } catch { showToast('Erro ao rejeitar.', 'error'); }
+}
+
+function showApproveModal(item) {
+  modalPendingId = item.id;
+  document.getElementById('approveModalBody').innerHTML = `
+    <div style="font-weight:700;font-size:.9rem;margin-bottom:8px">${item.title}</div>
+    <div style="font-size:.75rem;color:var(--dim);margin-bottom:8px">${item.cat} · ${item.source||'Web'} · <strong style="color:${item.verified?'var(--g3)':'var(--y)'}">${item.verified?'Verificado':'Revisar'}</strong> (${item.confidence||0}%)</div>
+    <div style="font-size:.78rem;line-height:1.6">${item.lead||''}</div>`;
+  document.getElementById('approveModal').classList.add('open');
+}
+
+function approveFromModal() {
+  if (modalPendingId) approvePending(modalPendingId);
+  closeModal('approveModal');
+  modalPendingId = null;
+}
+
+function rejectFromModal() {
+  if (modalPendingId) rejectPending(modalPendingId);
+  closeModal('approveModal');
+  modalPendingId = null;
+}
+
+async function pollPending() {
+  try {
+    const items = await PAAPI.getPending();
+    await updateScannerStatus();
+    for (const item of items) {
+      if (!knownPendingIds.has(item.id)) {
+        knownPendingIds.add(item.id);
+        showApproveModal(item);
+        showToast('IA encontrou uma notícia — aguardando sua aprovação!', 'info', 6000);
+        break;
+      }
+    }
+    items.forEach(i => knownPendingIds.add(i.id));
+    const panel = document.getElementById('panel-ia');
+    if (panel && panel.classList.contains('active')) renderPending();
+  } catch {}
+}
+
+/* ════ PUBLICAÇÕES DATA ════ */
+async function refreshStore() { await PAStore.init(); }
+function getArticles() { return PAStore.articlesForAdmin(); }
+
+const STATUS_LABELS = { pub:'Publicado', draft:'Rascunho', review:'Revisão' };
+const STATUS_CLASS  = { pub:'pub', draft:'draft', review:'review' };
+let currentDeleteId = null;
+let currentFilter = 'todos';
+let currentSearch = '';
+let editingId = null;
+
+function renderPubs() {
+  const list = document.getElementById('pubList');
+  const data = getArticles().filter(a => {
+    const matchCat = currentFilter === 'todos' || a.status === currentFilter;
+    const matchSearch = a.title.toLowerCase().includes(currentSearch.toLowerCase()) || a.cat.toLowerCase().includes(currentSearch.toLowerCase());
+    return matchCat && matchSearch;
+  });
+  list.innerHTML = data.length ? data.map(a => `
+    <div class="pub-row" onclick="editArticle(${a.id})">
+      <div class="img-cell"><img src="${a.img}" alt=""/></div>
+      <div class="title-cell"><div class="t">${a.title}</div><div class="c">${a.cat}</div></div>
+      <div class="date-cell">${a.date}</div>
+      <div class="views-cell">${a.views}</div>
+      <div><span class="pill ${STATUS_CLASS[a.status]}">${STATUS_LABELS[a.status]}</span></div>
+      <div class="act-cell" onclick="event.stopPropagation()">
+        <button class="icon-btn view" onclick="window.open('noticia.html?id=${a.id}','_blank')" title="Ver no site"><i class="fas fa-eye"></i></button>
+        <button class="icon-btn edit" onclick="editArticle(${a.id})" title="Editar"><i class="fas fa-edit"></i></button>
+        <button class="icon-btn del" onclick="openDelete(${a.id})" title="Excluir"><i class="fas fa-trash"></i></button>
+      </div>
+    </div>`).join('') : `<div style="padding:32px;text-align:center;color:var(--dim);font-size:.82rem">Nenhuma publicação encontrada.</div>`;
+}
+
+function filterCat(cat, el) {
+  currentFilter = cat;
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  el.classList.add('active');
+  renderPubs();
+}
+
+function filterPubs(val) { currentSearch = val; renderPubs(); }
+
+function editArticle(id) {
+  const el = document.querySelectorAll('.sb-item')[2];
+  showPanel('nova', el);
+  const a = PAStore.getArticle(id);
+  if (!a) return;
+  editingId = id;
+  document.getElementById('artTitle').value = a.title;
+  document.getElementById('artLead').value = a.lead || '';
+  document.getElementById('artContent').innerHTML = a.content || `<p>Conteúdo da notícia: <strong>${a.title}</strong></p><p>Edite o texto aqui…</p>`;
+  const catSel = document.getElementById('artCat');
+  if (catSel) catSel.value = a.cat;
+  const statusSel = document.getElementById('artStatus');
+  if (statusSel) statusSel.value = a.status;
+  showToast(`Editando: ${a.title.substring(0,40)}…`, 'info');
+}
+
+function openDelete(id) { currentDeleteId = id; document.getElementById('deleteModal').classList.add('open'); }
+async function confirmDelete() {
+  await PAStore.deleteArticle(currentDeleteId);
+  closeModal('deleteModal');
+  showToast('Publicação excluída com sucesso.', 'error');
+  renderPubs();
+}
+
+/* ════ EDITOR ════ */
+function initEditor() {
+  const content = document.getElementById('artContent');
+  if (!content.textContent.trim()) content.innerHTML = '';
+}
+function fmt(cmd) { document.execCommand(cmd, false, null); document.getElementById('artContent').focus(); }
+function insertLink() {
+  const url = prompt('URL do link:');
+  if (url) document.execCommand('createLink', false, url);
+}
+
+function openAIChat() {
+  showPanel('nova', document.querySelectorAll('.sb-item')[2]);
+  if (typeof PAIA !== 'undefined') PAIA.toggle();
+}
+
+function previewBeforePublish() {
+  const title = document.getElementById('artTitle').value.trim();
+  if (!title) { showToast('Adicione um título antes do preview.', 'error'); return; }
+  if (typeof PAIA !== 'undefined') PAIA.showPreview();
+  else showToast('Preview disponível após carregar a IA.', 'info');
+}
+
+async function confirmPublish() {
+  closeModal('previewModal');
+  await publishArticle(true);
+}
+
+async function publishArticle(skipPreview) {
+  const title = document.getElementById('artTitle').value.trim();
+  if (!title) { showToast('Adicione um título antes de publicar.', 'error'); return; }
+  if (!skipPreview && document.getElementById('artStatus')?.value === 'pub') {
+    previewBeforePublish();
+    return;
+  }
+  const payload = {
+    title,
+    lead: document.getElementById('artLead').value.trim(),
+    content: document.getElementById('artContent').innerHTML,
+    cat: document.getElementById('artCat').value,
+    status: document.getElementById('artStatus')?.value === 'draft' ? 'draft' : (document.getElementById('artStatus')?.value === 'review' ? 'review' : 'pub'),
+    img: 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=600&q=80',
+    timeAgo: 'Agora'
+  };
+  if (editingId) {
+    await PAStore.updateArticle(editingId, payload);
+    showToast('Notícia atualizada com sucesso!', 'success');
+  } else {
+    await PAStore.addArticle(payload);
+    showToast('Notícia publicada com sucesso!', 'success');
+  }
+  editingId = null;
+  clearEditor();
+  showPanel('publicacoes', document.querySelectorAll('.sb-item')[1]);
+}
+
+function saveDraft() {
+  const title = document.getElementById('artTitle').value.trim() || 'Rascunho sem título';
+  showToast(`Rascunho "${title.substring(0,30)}…" salvo.`, 'info');
+}
+
+function clearEditor() {
+  editingId = null;
+  document.getElementById('artTitle').value = '';
+  document.getElementById('artLead').value = '';
+  document.getElementById('artContent').innerHTML = '';
+  document.getElementById('tagWrap').innerHTML = '';
+  document.getElementById('thumbPreview').style.display = 'none';
+  document.getElementById('thumbPreview').innerHTML = '';
+}
+
+/* ════ THUMB PREVIEW ════ */
+function previewThumb(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = e => {
+    const prev = document.getElementById('thumbPreview');
+    prev.style.display = 'block';
+    prev.innerHTML = `<img src="${e.target.result}" alt="Preview" style="border-radius:4px;margin-bottom:8px"/>`;
+  };
+  reader.readAsDataURL(file);
+}
+
+/* ════ TAGS ════ */
+function addTag(e) {
+  if (e.key !== 'Enter') return;
+  e.preventDefault();
+  const val = e.target.value.trim();
+  if (!val) return;
+  const wrap = document.getElementById('tagWrap');
+  const tag = document.createElement('span');
+  tag.className = 'tag';
+  tag.innerHTML = `${val} <i class="fas fa-times"></i>`;
+  tag.onclick = () => tag.remove();
+  wrap.appendChild(tag);
+  e.target.value = '';
+}
+
+/* ════ MEDIA ════ */
+const DEMO_IMGS = [
+  'https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=200&q=60',
+  'https://images.unsplash.com/photo-1540575467063-178a50c2df87?w=200&q=60',
+  'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=200&q=60',
+  'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=200&q=60',
+  'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=200&q=60',
+  'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=200&q=60',
+];
+function renderMedia() {
+  const grid = document.getElementById('mediaGrid');
+  grid.innerHTML = DEMO_IMGS.map(src => `
+    <div style="aspect-ratio:1;border-radius:4px;overflow:hidden;border:1px solid var(--border);cursor:pointer;transition:transform .2s,border-color .2s;position:relative"
+         onmouseover="this.style.transform='scale(1.03)';this.style.borderColor='var(--g)'"
+         onmouseout="this.style.transform='';this.style.borderColor='var(--border)'">
+      <img src="${src}" style="width:100%;height:100%;object-fit:cover" alt=""/>
+      <div style="position:absolute;inset:0;background:rgba(0,0,0,0);transition:background .2s;display:flex;align-items:center;justify-content:center;gap:8px;opacity:0"
+           onmouseover="this.style.background='rgba(0,0,0,.5)';this.style.opacity=1"
+           onmouseout="this.style.background='';this.style.opacity=0">
+        <button class="icon-btn view" style="width:34px;height:34px" onclick="showToast('Imagem copiada!','success')"><i class="fas fa-copy"></i></button>
+        <button class="icon-btn del" style="width:34px;height:34px" onclick="this.closest('div[style]').remove();showToast('Imagem excluída','error')"><i class="fas fa-trash"></i></button>
+      </div>
+    </div>`).join('');
+}
+
+function handleMediaUpload(input) {
+  const grid = document.getElementById('mediaGrid');
+  Array.from(input.files).forEach(f => {
+    const reader = new FileReader();
+    reader.onload = e => {
+      const div = document.createElement('div');
+      div.style.cssText = 'aspect-ratio:1;border-radius:4px;overflow:hidden;border:1px solid var(--g);cursor:pointer;transition:transform .2s';
+      div.innerHTML = `<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover"/>`;
+      grid.prepend(div);
+      showToast(`"${f.name}" enviado!`, 'success');
+    };
+    reader.readAsDataURL(f);
+  });
+}
+
+/* ════ PROFILE ════ */
+function saveProfile() {
+  const name = document.getElementById('pfName').value;
+  document.getElementById('phName').textContent = name;
+  document.getElementById('sbName').textContent = name.split(' ')[0];
+  document.getElementById('sbAvatar').textContent = name.charAt(0);
+  document.getElementById('bigAvatar').textContent = name.charAt(0);
+  showToast('Perfil atualizado com sucesso!', 'success');
+}
+function changePassword() {
+  const np = document.getElementById('newPass').value;
+  const cp = document.getElementById('confPass').value;
+  if (!np || !cp) { showToast('Preencha todos os campos de senha.', 'error'); return; }
+  if (np !== cp) { showToast('As senhas não coincidem.', 'error'); return; }
+  if (np.length < 8) { showToast('A senha deve ter no mínimo 8 caracteres.', 'error'); return; }
+  showToast('Senha alterada com sucesso!', 'success');
+  document.getElementById('newPass').value = '';
+  document.getElementById('confPass').value = '';
+}
+
+/* ════ OUTROS ════ */
+function addCategory() {
+  const name = prompt('Nome da nova categoria:');
+  if (!name) return;
+  const list = document.getElementById('catList');
+  const div = document.createElement('div');
+  div.className = 'art-row';
+  div.innerHTML = `<div class="info"><div class="title">${name}</div><div class="meta">0 artigos</div></div><div style="display:flex;gap:6px"><button class="icon-btn edit"><i class="fas fa-edit"></i></button><button class="icon-btn del" onclick="this.closest('.art-row').remove();showToast('Categoria excluída','error')"><i class="fas fa-trash"></i></button></div>`;
+  list.appendChild(div);
+  showToast(`Categoria "${name}" criada!`, 'success');
+}
+function showAddEvent() { showToast('Formulário de evento em breve…', 'info'); }
+function showAddJob() { showToast('Formulário de vaga em breve…', 'info'); }
+
+async function exportGitHub() {
+  try {
+    const data = await PAAPI.exportForGitHub();
+    const blob = new Blob([JSON.stringify(data.articles, null, 2)], { type: 'application/json' });
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(blob);
+    a.download = 'articles.json';
+    a.click();
+    showToast('JSON exportado! Substitua data/articles.json no GitHub.', 'success', 5000);
+  } catch { showToast('Erro ao exportar.', 'error'); }
+}
+
+async function importGitHub(input) {
+  const file = input.files[0];
+  if (!file) return;
+  try {
+    await PAAPI.importFromFile(file);
+    await PAStore.init();
+    renderPubs();
+    showToast('JSON importado com sucesso!', 'success');
+  } catch { showToast('Arquivo JSON inválido.', 'error'); }
+  input.value = '';
+}
+
+/* ════ CONTENTEDITABLE PLACEHOLDER ════ */
+const artContent = document.getElementById('artContent');
+artContent.addEventListener('focus', function() { if (this.innerHTML === '') this.innerHTML = ''; });
+artContent.addEventListener('input', function() {
+  const placeholder = this.getAttribute('data-placeholder');
+  this.style.color = this.textContent ? 'rgba(255,255,255,.85)' : 'rgba(255,255,255,.2)';
+});
+
+/* STATUS SELECT AGENDAR */
+const artStatusEl = document.getElementById('artStatus');
+if (artStatusEl) {
+  artStatusEl.addEventListener('change', function() {
+    const sf = document.getElementById('schedField');
+    if (sf) sf.style.display = this.value === 'scheduled' ? 'block' : 'none';
+  });
+}
+
+(async function initAdmin() {
+  await PAStore.init();
+  renderPubs();
+  await updateScannerStatus();
+  try {
+    const items = await PAAPI.getPending();
+    items.forEach(i => knownPendingIds.add(i.id));
+  } catch {}
+  iaPollTimer = setInterval(pollPending, 30000);
+  pollPending();
+})();
+</script>
+</body>
+</html>

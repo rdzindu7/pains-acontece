@@ -1,0 +1,5 @@
+[
+  { "id": 1, "title": "Auxiliar Administrativo", "type": "CLT", "company": "Comércio Local", "active": true },
+  { "id": 2, "title": "Operador de Máquinas", "type": "CLT", "company": "Ind. Regional", "active": true },
+  { "id": 3, "title": "Técnico em Enfermagem", "type": "CLT", "company": "Santa Casa", "active": true }
+]

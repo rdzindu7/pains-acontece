@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Notícia – Pains Acontece</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,700;0,900;1,700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --g:#1d7a1d;--g2:#0d4d0d;--g3:#2ecc2e;
+  --y:#c9a227;--y2:#f0d060;
+  --k:#080808;--k2:#111;--k3:#1a1a1a;
+  --w:#f2f2f2;--dim:#555;--muted:rgba(255,255,255,.45);
+  --ff-display:'Bebas Neue',sans-serif;
+  --ff-serif:'Playfair Display',serif;
+  --ff-body:'Inter',sans-serif;
+}
+body{background:var(--k);color:var(--w);font-family:var(--ff-body);line-height:1.7}
+a{text-decoration:none;color:inherit}
+img{display:block;max-width:100%}
+.wrap{max-width:900px;margin:0 auto;padding:0 28px}
+.top-bar{background:var(--k2);border-bottom:1px solid rgba(29,122,29,.25);padding:14px 0;position:sticky;top:0;z-index:100;backdrop-filter:blur(12px)}
+.top-inner{max-width:900px;margin:0 auto;padding:0 28px;display:flex;align-items:center;gap:16px}
+.top-inner img{height:40px}
+.back{font-size:.78rem;color:var(--g3);display:flex;align-items:center;gap:8px;margin-left:auto;transition:color .2s}
+.back:hover{color:var(--y)}
+.article{padding:48px 0 80px}
+.cat{display:inline-block;background:rgba(29,122,29,.2);color:var(--g3);font-size:.65rem;font-weight:800;letter-spacing:2px;text-transform:uppercase;padding:5px 12px;border-radius:2px;margin-bottom:16px}
+.title{font-family:var(--ff-serif);font-size:clamp(1.8rem,4vw,2.8rem);line-height:1.2;margin-bottom:16px}
+.lead{font-size:1.1rem;color:var(--muted);margin-bottom:24px;line-height:1.6}
+.meta{display:flex;flex-wrap:wrap;gap:20px;font-size:.78rem;color:var(--dim);margin-bottom:32px;padding-bottom:24px;border-bottom:1px solid rgba(255,255,255,.06)}
+.meta span{display:flex;align-items:center;gap:6px}
+.hero-img{border-radius:6px;overflow:hidden;margin-bottom:36px;border:1px solid rgba(255,255,255,.06)}
+.hero-img img{width:100%;max-height:480px;object-fit:cover}
+.content{font-size:1rem;color:rgba(255,255,255,.85)}
+.content p{margin-bottom:18px}
+.content strong{color:#fff}
+.share{margin-top:48px;padding-top:28px;border-top:1px solid rgba(255,255,255,.06)}
+.share h4{font-family:var(--ff-display);letter-spacing:2px;color:var(--y);margin-bottom:14px;font-size:.95rem}
+.share-btns{display:flex;gap:10px;flex-wrap:wrap}
+.share-btns a{width:40px;height:40px;border-radius:50%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);display:flex;align-items:center;justify-content:center;transition:all .2s}
+.share-btns a:hover{background:var(--g);border-color:var(--g);transform:scale(1.1)}
+.related{margin-top:60px}
+.related h3{font-family:var(--ff-display);font-size:1.4rem;letter-spacing:2px;margin-bottom:20px;color:var(--y)}
+.rel-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:16px}
+.rel-card{background:var(--k3);border:1px solid rgba(255,255,255,.06);border-radius:4px;overflow:hidden;transition:border-color .3s,transform .3s}
+.rel-card:hover{border-color:rgba(29,122,29,.4);transform:translateY(-3px)}
+.rel-card img{width:100%;height:140px;object-fit:cover}
+.rel-card .body{padding:14px}
+.rel-card h4{font-size:.82rem;font-weight:600;line-height:1.4}
+.not-found{text-align:center;padding:120px 28px}
+.not-found h1{font-family:var(--ff-display);font-size:2rem;margin-bottom:12px}
+.not-found a{color:var(--g3);margin-top:20px;display:inline-block}
+footer{text-align:center;padding:28px;font-size:.72rem;color:#444;border-top:1px solid rgba(255,255,255,.04)}
+</style>
+</head>
+<body>
+<div class="top-bar">
+  <div class="top-inner">
+    <a href="../index.html"><img src="../assets/images/logo.svg" alt="Pains Acontece"/></a>
+    <a href="../index.html" class="back"><i class="fas fa-arrow-left"></i> Voltar ao portal</a>
+  </div>
+</div>
+<main id="main"></main>
+<footer>© 2026 Pains Acontece — Todos os direitos reservados.</footer>
+<script src="../js/ai/scanner.js"></script>
+<script src="../js/ai/engine.js"></script>
+<script src="../js/core/api.js"></script>
+<script src="../js/core/store.js"></script>
+<script>
+(async function(){
+  const params = new URLSearchParams(location.search);
+  const id = params.get('id');
+  const main = document.getElementById('main');
+
+  function esc(s){const d=document.createElement('div');d.textContent=s||'';return d.innerHTML}
+
+  if(!id){
+    main.innerHTML='<div class="not-found"><h1>Notícia não encontrada</h1><p>Selecione uma matéria no portal.</p><a href="../index.html">Ir para a home</a></div>';
+    return;
+  }
+
+  await PAStore.init();
+  const art = PAStore.getArticle(id);
+  if(!art || art.status !== 'pub'){
+    main.innerHTML='<div class="not-found"><h1>Notícia não encontrada</h1><p>Esta matéria não está disponível ou foi removida.</p><a href="../index.html">Ir para a home</a></div>';
+    return;
+  }
+
+  await PAStore.incrementViews(id);
+  document.title = art.title + ' – Pains Acontece';
+
+  const related = PAStore.getArticles('pub').filter(a => a.id !== art.id && a.cat === art.cat).slice(0,3);
+
+  main.innerHTML = `
+    <article class="article wrap">
+      <span class="cat">${esc(art.cat)}</span>
+      <h1 class="title">${esc(art.title)}</h1>
+      ${art.lead ? `<p class="lead">${esc(art.lead)}</p>` : ''}
+      <div class="meta">
+        <span><i class="fas fa-user-circle"></i> ${esc(art.author || 'Redação Pains Acontece')}</span>
+        <span><i class="fas fa-calendar"></i> ${esc(art.date)}</span>
+        <span><i class="fas fa-clock"></i> ${esc(art.timeAgo || '')}</span>
+        <span><i class="fas fa-eye"></i> ${Number(art.views||0).toLocaleString('pt-BR')} leituras</span>
+      </div>
+      <div class="hero-img"><img src="${esc(art.img)}" alt="${esc(art.title)}"/></div>
+      <div class="content">${art.content || '<p>Conteúdo em breve.</p>'}</div>
+      <div class="share">
+        <h4>Compartilhar</h4>
+        <div class="share-btns">
+          <a href="https://wa.me/?text=${encodeURIComponent(art.title + ' - Pains Acontece')}" target="_blank" rel="noopener" aria-label="WhatsApp"><i class="fab fa-whatsapp"></i></a>
+          <a href="https://www.facebook.com/sharer/sharer.php?u=${encodeURIComponent(location.href)}" target="_blank" rel="noopener" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
+          <a href="#" onclick="navigator.clipboard.writeText(location.href);alert('Link copiado!');return false" aria-label="Copiar link"><i class="fas fa-link"></i></a>
+        </div>
+      </div>
+      ${related.length ? `
+      <div class="related">
+        <h3>Notícias Relacionadas</h3>
+        <div class="rel-grid">
+          ${related.map(r => `
+            <a href="noticia.html?id=${r.id}" class="rel-card">
+              <img src="${esc(r.img)}" alt=""/>
+              <div class="body"><h4>${esc(r.title)}</h4></div>
+            </a>`).join('')}
+        </div>
+      </div>` : ''}
+    </article>`;
+})();
+</script>
+</body>
+</html>

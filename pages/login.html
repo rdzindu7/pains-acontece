@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Login – Pains Acontece</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --g:#1d7a1d;--g2:#0d4d0d;--g3:#2ecc2e;
+  --y:#c9a227;--y2:#f0d060;
+  --k:#080808;--k2:#111;--k3:#1a1a1a;
+  --w:#f2f2f2;--red:#b52a2a;
+  --ff:'Bebas Neue',sans-serif;--fb:'Inter',sans-serif;
+  --ease:cubic-bezier(.16,1,.3,1);
+}
+html,body{height:100%}
+body{
+  background:var(--k);font-family:var(--fb);
+  display:flex;align-items:center;justify-content:center;
+  overflow:hidden;position:relative;
+}
+/* BG CINEMATIC */
+.bg{
+  position:fixed;inset:0;
+  background:radial-gradient(ellipse 80% 80% at 20% 50%,rgba(13,77,13,.25) 0%,transparent 60%),
+             radial-gradient(ellipse 60% 60% at 80% 50%,rgba(201,162,39,.08) 0%,transparent 60%),
+             #080808;
+}
+.bg-img{
+  position:fixed;inset:-10%;
+  background:url('https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=1600&q=70') center/cover;
+  opacity:.06;
+  animation:bgZoom 20s ease-in-out infinite alternate;
+}
+@keyframes bgZoom{from{transform:scale(1.05)}to{transform:scale(1.15) translate(-2%,-1%)}}
+.scan{
+  position:fixed;inset:0;pointer-events:none;
+  background:repeating-linear-gradient(0deg,transparent 0,transparent 3px,rgba(0,0,0,.06) 3px,rgba(0,0,0,.06) 4px);
+}
+/* PARTICLES */
+.particles{position:fixed;inset:0;pointer-events:none;overflow:hidden}
+.particle{
+  position:absolute;border-radius:50%;
+  background:var(--g3);opacity:0;
+  animation:floatUp linear infinite;
+}
+@keyframes floatUp{
+  0%{transform:translateY(100vh) scale(0);opacity:0}
+  10%{opacity:.4}
+  90%{opacity:.1}
+  100%{transform:translateY(-10vh) scale(1.5);opacity:0}
+}
+
+/* CARD */
+.card{
+  position:relative;z-index:10;
+  width:100%;max-width:420px;
+  background:rgba(255,255,255,.03);
+  backdrop-filter:blur(24px) saturate(180%);
+  -webkit-backdrop-filter:blur(24px) saturate(180%);
+  border:1px solid rgba(255,255,255,.07);
+  border-radius:8px;
+  padding:48px 40px 40px;
+  box-shadow:0 32px 80px rgba(0,0,0,.8),0 0 0 1px rgba(29,122,29,.15);
+  animation:cardIn .8s var(--ease) both;
+}
+@keyframes cardIn{from{opacity:0;transform:translateY(32px) scale(.96)}to{opacity:1;transform:none}}
+
+.card-logo{text-align:center;margin-bottom:32px}
+.card-logo img{height:56px;filter:drop-shadow(0 0 16px rgba(29,122,29,.6));margin:0 auto}
+
+.card-title{
+  font-family:var(--ff);font-size:1.8rem;letter-spacing:2px;
+  color:#fff;text-align:center;margin-bottom:6px;
+}
+.card-sub{font-size:.78rem;color:rgba(255,255,255,.4);text-align:center;margin-bottom:32px}
+
+.field{margin-bottom:16px;position:relative}
+.field label{
+  display:block;font-size:.65rem;font-weight:700;
+  letter-spacing:1.5px;text-transform:uppercase;
+  color:rgba(255,255,255,.4);margin-bottom:7px;
+}
+.field .inp-wrap{position:relative}
+.field .inp-wrap i{
+  position:absolute;left:15px;top:50%;transform:translateY(-50%);
+  color:rgba(255,255,255,.25);font-size:.82rem;transition:color .3s;
+  pointer-events:none;
+}
+.field input{
+  width:100%;
+  background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.08);
+  border-radius:4px;padding:13px 16px 13px 42px;
+  color:#fff;font-size:.88rem;font-family:var(--fb);outline:none;
+  transition:border-color .3s,box-shadow .3s,background .3s;
+}
+.field input::placeholder{color:rgba(255,255,255,.2)}
+.field input:focus{
+  border-color:var(--g);background:rgba(255,255,255,.08);
+  box-shadow:0 0 0 3px rgba(29,122,29,.2);
+}
+.field input:focus + i,
+.field .inp-wrap:focus-within i{color:var(--g3)}
+.toggle-pw{
+  position:absolute;right:14px;top:50%;transform:translateY(-50%);
+  background:none;border:none;color:rgba(255,255,255,.25);
+  font-size:.82rem;cursor:pointer;transition:color .2s;
+}
+.toggle-pw:hover{color:var(--y)}
+
+.remember{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:24px;
+}
+.chk-wrap{display:flex;align-items:center;gap:8px;cursor:pointer}
+.chk-wrap input[type=checkbox]{
+  width:16px;height:16px;accent-color:var(--g);cursor:pointer
+}
+.chk-wrap span{font-size:.75rem;color:rgba(255,255,255,.4)}
+.forgot{font-size:.72rem;color:var(--g3);transition:color .2s}
+.forgot:hover{color:var(--y)}
+
+.btn-login{
+  width:100%;background:linear-gradient(135deg,var(--g) 0%,var(--g2) 100%);
+  color:#fff;border:none;border-radius:4px;
+  padding:15px;font-weight:800;font-size:.82rem;
+  letter-spacing:2px;text-transform:uppercase;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  transition:transform .3s var(--ease),box-shadow .3s;
+  box-shadow:0 4px 20px rgba(29,122,29,.4);
+  position:relative;overflow:hidden;
+}
+.btn-login::after{
+  content:'';position:absolute;left:-100%;top:0;bottom:0;width:60%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,.12),transparent);
+  transition:left .5s;
+}
+.btn-login:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(29,122,29,.6)}
+.btn-login:hover::after{left:150%}
+.btn-login:disabled{opacity:.6;cursor:not-allowed;transform:none}
+
+.error-msg{
+  background:rgba(181,42,42,.15);border:1px solid rgba(181,42,42,.3);
+  color:#ff8080;font-size:.75rem;padding:10px 14px;border-radius:4px;
+  margin-bottom:16px;display:none;align-items:center;gap:8px;
+}
+.error-msg.show{display:flex}
+
+.back-link{
+  text-align:center;margin-top:24px;
+  font-size:.75rem;color:rgba(255,255,255,.3);
+}
+.back-link a{color:var(--g3);transition:color .2s}
+.back-link a:hover{color:var(--y)}
+
+/* LOADING SPINNER */
+.spinner{
+  width:18px;height:18px;border:2px solid rgba(255,255,255,.3);
+  border-top-color:#fff;border-radius:50%;
+  animation:spin .7s linear infinite;display:none;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+</style>
+</head>
+<body>
+<div class="bg"></div>
+<div class="bg-img"></div>
+<div class="scan"></div>
+<div class="particles" id="particles"></div>
+
+<div class="card">
+  <div class="card-logo">
+    <img src="../assets/images/logo.svg" alt="Pains Acontece"/>
+  </div>
+  <h1 class="card-title">Área Restrita</h1>
+  <p class="card-sub">Painel de administração · Pains Acontece</p>
+
+  <div class="error-msg" id="errorMsg">
+    <i class="fas fa-exclamation-circle"></i>
+    <span id="errorText">Usuário ou senha incorretos.</span>
+  </div>
+
+  <form id="loginForm" onsubmit="doLogin(event)">
+    <div class="field">
+      <label>Usuário</label>
+      <div class="inp-wrap">
+        <input type="text" id="user" placeholder="seu@email.com" autocomplete="username" required/>
+        <i class="fas fa-user"></i>
+      </div>
+    </div>
+    <div class="field">
+      <label>Senha</label>
+      <div class="inp-wrap" style="position:relative">
+        <input type="password" id="pass" placeholder="••••••••" autocomplete="current-password" required/>
+        <i class="fas fa-lock"></i>
+        <button type="button" class="toggle-pw" onclick="togglePw()" id="eyeBtn">
+          <i class="fas fa-eye" id="eyeIcon"></i>
+        </button>
+      </div>
+    </div>
+    <div class="remember">
+      <label class="chk-wrap">
+        <input type="checkbox" id="remember"/>
+        <span>Lembrar acesso</span>
+      </label>
+      <a href="#" class="forgot">Esqueci a senha</a>
+    </div>
+    <button type="submit" class="btn-login" id="btnLogin">
+      <div class="spinner" id="spinner"></div>
+      <i class="fas fa-sign-in-alt" id="btnIcon"></i>
+      <span id="btnText">Entrar no Painel</span>
+    </button>
+  </form>
+
+  <div class="back-link">
+    <a href="../index.html"><i class="fas fa-arrow-left"></i> Voltar ao portal</a>
+  </div>
+</div>
+
+<script src="../js/ai/scanner.js"></script>
+<script src="../js/ai/engine.js"></script>
+<script src="../js/core/api.js"></script>
+<script>
+const CREDENTIALS = { user: 'admin@painsacontece.com.br', pass: 'Pains@2026' };
+
+async function doLogin(e) {
+  e.preventDefault();
+  const u = document.getElementById('user').value.trim();
+  const p = document.getElementById('pass').value;
+  const btn = document.getElementById('btnLogin');
+  const spinner = document.getElementById('spinner');
+  const icon = document.getElementById('btnIcon');
+  const txt = document.getElementById('btnText');
+  const err = document.getElementById('errorMsg');
+
+  err.classList.remove('show');
+  btn.disabled = true;
+  spinner.style.display = 'block';
+  icon.style.display = 'none';
+  txt.textContent = 'Verificando…';
+
+  let ok = false;
+  try {
+    const res = await PAAPI.login(u, p);
+    if (res.ok) {
+      sessionStorage.setItem('pa_logged', '1');
+      sessionStorage.setItem('pa_user', u);
+      sessionStorage.setItem('pa_token', res.token);
+      ok = true;
+    }
+  } catch {}
+
+  if (ok) {
+    txt.textContent = 'Bem-vindo!';
+    spinner.style.display = 'none';
+    icon.style.display = '';
+    icon.className = 'fas fa-check';
+    btn.style.background = 'linear-gradient(135deg,#0a6b4a,#054030)';
+    setTimeout(() => { window.location.href = 'admin.html'; }, 700);
+  } else {
+    spinner.style.display = 'none';
+    icon.style.display = '';
+    icon.className = 'fas fa-sign-in-alt';
+    txt.textContent = 'Entrar no Painel';
+    btn.disabled = false;
+    document.getElementById('errorText').textContent = 'Usuário ou senha incorretos. Tente novamente.';
+    err.classList.add('show');
+    document.getElementById('pass').value = '';
+    document.getElementById('pass').focus();
+  }
+}
+
+function togglePw() {
+  const inp = document.getElementById('pass');
+  const ico = document.getElementById('eyeIcon');
+  if (inp.type === 'password') { inp.type = 'text'; ico.className = 'fas fa-eye-slash'; }
+  else { inp.type = 'password'; ico.className = 'fas fa-eye'; }
+}
+
+/* PARTICLES */
+const pc = document.getElementById('particles');
+for (let i = 0; i < 18; i++) {
+  const p = document.createElement('div');
+  p.className = 'particle';
+  const s = Math.random() * 4 + 2;
+  p.style.cssText = `
+    width:${s}px;height:${s}px;
+    left:${Math.random()*100}%;
+    animation-duration:${Math.random()*12+8}s;
+    animation-delay:${Math.random()*10}s;
+    opacity:.3;
+  `;
+  pc.appendChild(p);
+}
+</script>
+</body>
+</html>
