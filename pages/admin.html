@@ -2185,14 +2185,15 @@ body.pa-owner .owner-only.btn-pub{display:flex!important}
 <script src="../js/ai/agents/camila.js"></script>
 <script src="../js/ai/orchestrator.js"></script>
 <script src="../js/ai/engine.js"></script>
-<script src="../js/core/purge.js?v=20260705v28"></script>
+<script src="../js/core/purge.js?v=20260705v29"></script>
+<script src="../js/core/auto-sync.js?v=20260705v29"></script>
 <script src="../js/core/auto-reload.js?v=20260705v21"></script>
 <script src="../js/core/pains-media.js?v=20260705v44"></script>
 <script src="../js/core/article-images.js?v=20260705v46"></script>
 <script src="../js/core/views-tracker.js?v=20260705v40"></script>
 <script src="../js/ai/agents/tiago.js?v=20260705v26"></script>
 <script src="../js/ai/bus-assistant.js?v=20260705v26"></script>
-<script src="../js/core/api.js?v=20260705v45"></script>
+<script src="../js/core/api.js?v=20260705v49"></script>
 <script src="../js/ui/directory.js?v=20260705v23"></script>
 <script src="../js/ui/ads.js?v=20260705v21"></script>
 <script src="../js/ui/corner-notify.js"></script>
@@ -2827,7 +2828,7 @@ async function confirmDeleteAll() {
     PAStore.clearArticles();
     if (typeof PAAutoReload !== 'undefined') PAAutoReload.signalUpdate();
     closeModal('deleteAllModal');
-    showToast(`${total} publicação${total > 1 ? 'ões removidas' : ' removida'}. Exporte o JSON vazio no GitHub para atualizar o site online.`, 'success', 7000);
+    showToast(`${total} publicação${total > 1 ? 'ões removidas' : ' removida'}. O site online atualiza automaticamente em instantes.`, 'success', 7000);
     renderPubs();
     renderDashboard();
     if (typeof window.PAHomeRefresh === 'function') window.PAHomeRefresh();
@@ -2933,7 +2934,6 @@ async function publishArticle(skipPreview) {
     PAStore.syncLocalCache?.();
     if (payload.status === 'pub') {
       autoSyncSiteNotice();
-      try { await exportGitHub(true); } catch {}
     }
     renderDashboard();
     renderPubs();
@@ -3984,7 +3984,7 @@ async function testSupabase() {
 
 function autoSyncSiteNotice() {
   if (typeof PAAutoReload !== 'undefined') PAAutoReload.signalUpdate();
-  showToast('Publicado! As abas abertas do portal atualizam sozinhas.', 'success', 5000);
+  showToast('Publicado! O site atualiza automaticamente no GitHub.', 'success', 5000);
 }
 
 async function exportGitHub(silent) {

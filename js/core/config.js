@@ -16,6 +16,13 @@ const PAConfig = {
   supabaseAnonKey: 'sb_publishable_Kkznz1j873N8ztepzRDCcQ__eXd6MXS',
   ownerEmail: 'admin@painsacontece.com.br',
   siteUrl: 'https://rdzindu7.github.io/pains-acontece',
+  githubSync: {
+    owner: 'rdzindu7',
+    repo: 'pains-acontece',
+    branch: 'main',
+    path: 'data/articles.json',
+    token: ''
+  },
   verifiedPlan: {
     name: 'Selo Verificado Pains Acontece',
     price: 29.9,

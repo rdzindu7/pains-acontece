@@ -2,8 +2,10 @@ name: Sync Articles
 
 on:
   schedule:
-    - cron: '*/30 * * * *'
+    - cron: '*/5 * * * *'
   workflow_dispatch:
+  repository_dispatch:
+    types: [sync-now]
   push:
     branches: [main]
     paths:

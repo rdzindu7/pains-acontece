@@ -233,6 +233,7 @@ const PAAPI = (function () {
 
   function articleToRow(data) {
     const row = {};
+    if (data.id !== undefined) row.id = data.id;
     if (data.title !== undefined) row.title = data.title;
     if (data.lead !== undefined) row.lead = data.lead;
     if (data.content !== undefined) row.content = data.content;
@@ -328,16 +329,31 @@ const PAAPI = (function () {
     return sessionStorage.getItem('pa_auth_mode') === 'local';
   }
 
+  async function hasCloudSession() {
+    if (!supabaseConfigured() || isLocalAuth()) return false;
+    try {
+      const session = await PASupabase.getSession();
+      return !!session?.access_token;
+    } catch {
+      return false;
+    }
+  }
+
+  function scheduleAutoSync() {
+    if (typeof PAAutoSync !== 'undefined' && isAdminSession()) {
+      PAAutoSync.schedule();
+    }
+  }
+
   async function getBackend() {
     if (!supabaseConfigured() || isLocalAuth()) return local;
-    if (sessionStorage.getItem('pa_auth_mode') === 'cloud') {
-      if (await isCloudReady()) return remote;
-      sessionStorage.setItem('pa_auth_mode', 'local');
-      return local;
+    if (await hasCloudSession()) {
+      sessionStorage.setItem('pa_auth_mode', 'cloud');
+      return remote;
     }
-    /* Visitante sem login: JSON local (rápido e completo). Nuvem só com sessão admin. */
-    if (!sessionStorage.getItem('pa_auth_mode')) return local;
-    if (await isCloudReady()) return remote;
+    if (sessionStorage.getItem('pa_auth_mode') === 'cloud') {
+      sessionStorage.removeItem('pa_auth_mode');
+    }
     return local;
   }
 
@@ -988,19 +1004,15 @@ const PAAPI = (function () {
   /* ── Backend Supabase ── */
   const remote = {
     async login(user, pass) {
-      try {
-        const { data, error } = await sb().auth.signInWithPassword({ email: user, password: pass });
-        if (!error && data?.session) {
-          sessionStorage.setItem('pa_auth_mode', 'cloud');
-          const role = resolveRole(data.user.email);
-          sessionStorage.setItem('pa_role', role);
-          cloudOk = null;
-          return { ok: true, token: data.session.access_token, user: data.user.email, mode: 'cloud', role };
-        }
-      } catch {}
-      const fallback = staticAdminLogin(user, pass);
-      if (fallback) return fallback;
-      throw new Error('Credenciais inválidas');
+      const { data, error } = await sb().auth.signInWithPassword({ email: user, password: pass });
+      if (error || !data?.session) {
+        throw new Error(error?.message || 'Credenciais inválidas');
+      }
+      sessionStorage.setItem('pa_auth_mode', 'cloud');
+      const role = resolveRole(data.user.email);
+      sessionStorage.setItem('pa_role', role);
+      cloudOk = null;
+      return { ok: true, token: data.session.access_token, user: data.user.email, mode: 'cloud', role };
     },
 
     async logout() {
@@ -1036,6 +1048,7 @@ const PAAPI = (function () {
 
     async addArticle(data) {
       const enriched = await withArticleImages({
+        id: data.id || Date.now(),
         views: 0,
         date: new Date().toLocaleDateString('pt-BR'),
         timeAgo: 'Agora',
@@ -1045,11 +1058,10 @@ const PAAPI = (function () {
       try {
         const { data: inserted, error } = await sb().from('articles').insert(row).select().single();
         if (!error && inserted) return rowToArticle(inserted);
-        if (error) console.warn('Supabase insert falhou, usando armazenamento local:', error.message);
+        if (error) console.warn('Supabase insert falhou, salvando localmente:', error.message);
       } catch (e) {
-        console.warn('Supabase indisponível, usando armazenamento local:', e);
+        console.warn('Supabase indisponível, salvando localmente:', e);
       }
-      sessionStorage.setItem('pa_auth_mode', 'local');
       return local.addArticle(enriched);
     },
 
@@ -1199,7 +1211,12 @@ const PAAPI = (function () {
     },
 
     async exportForGitHub() {
-      const articles = await this.getArticles();
+      let articles = await this.getArticles();
+      const state = getState();
+      if (state.deleted?.length) {
+        const hidden = new Set(state.deleted.map(String));
+        articles = articles.filter(a => !hidden.has(String(a.id)));
+      }
       return { articles, exported_at: new Date().toISOString(), source: 'supabase' };
     },
 
@@ -1245,14 +1262,30 @@ const PAAPI = (function () {
     fetchArticleFromJson,
     getArticlePublic,
     getArticlesPublic,
-    addArticle: async (d) => (await getBackend()).addArticle(d),
-    updateArticle: async (id, d) => (await getBackend()).updateArticle(id, d),
-    deleteArticle: async (id) => (await getBackend()).deleteArticle(id),
+    addArticle: async (d) => {
+      const r = await (await getBackend()).addArticle(d);
+      scheduleAutoSync();
+      return r;
+    },
+    updateArticle: async (id, d) => {
+      const r = await (await getBackend()).updateArticle(id, d);
+      scheduleAutoSync();
+      return r;
+    },
+    deleteArticle: async (id) => {
+      const r = await (await getBackend()).deleteArticle(id);
+      scheduleAutoSync();
+      return r;
+    },
     incrementViews: async (id) => (await getBackend()).incrementViews(id),
     getPending: async () => (await getBackend()).getPending(),
     scannerStatus: async () => (await getBackend()).scannerStatus(),
     runScanner: async () => (await getBackend()).runScanner(),
-    approvePending: async (id) => (await getBackend()).approvePending(id),
+    approvePending: async (id) => {
+      const r = await (await getBackend()).approvePending(id);
+      scheduleAutoSync();
+      return r;
+    },
     rejectPending: async (id) => (await getBackend()).rejectPending(id),
     resetScanner: async () => {
       const b = await getBackend();
@@ -1261,8 +1294,11 @@ const PAAPI = (function () {
     },
     purgeAllPublications: async () => {
       const b = await getBackend();
-      if (b.purgeAllPublications) return b.purgeAllPublications();
-      return local.purgeAllPublications();
+      const r = b.purgeAllPublications
+        ? await b.purgeAllPublications()
+        : await local.purgeAllPublications();
+      scheduleAutoSync();
+      return r;
     },
     aiChat: (msg, ctx) => PAEngine.chat(msg, ctx),
     aiOrganize: (text, hints) => PAEngine.organizeNews(text, hints),
