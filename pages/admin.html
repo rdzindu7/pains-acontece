@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
 <link rel="icon" type="image/jpeg" href="../assets/images/favicon.jpg"/>
 <link rel="apple-touch-icon" href="../assets/images/favicon.jpg"/>
 <title>Painel – Pains Acontece</title>
@@ -466,6 +466,13 @@ body{background:var(--k2);font-family:var(--fb);color:var(--w);display:flex}
   .dash-grid{grid-template-columns:1fr}
   .profile-header{flex-direction:column;text-align:center}
   .ph-stats{justify-content:center}
+  .pub-thead,.pub-row{grid-template-columns:36px 1fr 70px}
+  .pub-thead span:nth-child(4),.pub-row .views-cell{display:none}
+  .topbar{padding:0 12px}
+  .content{padding:16px 12px}
+}
+@media(max-width:380px){
+  .tb-btn span{display:none}
 }
 </style>
 </head>

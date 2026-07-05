@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
 <meta charset="UTF-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
 <link rel="icon" type="image/jpeg" href="../assets/images/favicon.jpg"/>
 <link rel="apple-touch-icon" href="../assets/images/favicon.jpg"/>
 <title>Notícia – Pains Acontece</title>
@@ -21,12 +21,13 @@
   --ff-serif:'Playfair Display',serif;
   --ff-body:'Inter',sans-serif;
 }
-body{background:var(--k);color:var(--w);font-family:var(--ff-body);line-height:1.7}
+html{overflow-x:hidden;-webkit-text-size-adjust:100%;text-size-adjust:100%}
+body{background:var(--k);color:var(--w);font-family:var(--ff-body);line-height:1.7;overflow-x:hidden;min-height:100dvh;padding-left:env(safe-area-inset-left);padding-right:env(safe-area-inset-right)}
 a{text-decoration:none;color:inherit}
 img{display:block;max-width:100%}
-.wrap{max-width:900px;margin:0 auto;padding:0 28px}
-.top-bar{background:var(--k2);border-bottom:1px solid rgba(29,122,29,.25);padding:14px 0;position:sticky;top:0;z-index:100;backdrop-filter:blur(12px)}
-.top-inner{max-width:900px;margin:0 auto;padding:0 28px;display:flex;align-items:center;gap:16px}
+.wrap{max-width:min(900px,100%);margin:0 auto;padding:0 clamp(12px,3vw,28px);width:100%}
+.top-bar{background:var(--k2);border-bottom:1px solid rgba(29,122,29,.25);padding:14px 0;position:sticky;top:0;z-index:100;backdrop-filter:blur(12px);padding-top:calc(14px + env(safe-area-inset-top))}
+.top-inner{max-width:min(900px,100%);margin:0 auto;padding:0 clamp(12px,3vw,28px);display:flex;align-items:center;gap:12px;flex-wrap:wrap}
 .top-inner img{height:40px}
 .back{font-size:.78rem;color:var(--g3);display:flex;align-items:center;gap:8px;margin-left:auto;transition:color .2s}
 .back:hover{color:var(--y)}
@@ -57,7 +58,13 @@ img{display:block;max-width:100%}
 .not-found{text-align:center;padding:120px 28px}
 .not-found h1{font-family:var(--ff-display);font-size:2rem;margin-bottom:12px}
 .not-found a{color:var(--g3);margin-top:20px;display:inline-block}
-footer{text-align:center;padding:28px;font-size:.72rem;color:#444;border-top:1px solid rgba(255,255,255,.04)}
+footer{text-align:center;padding:28px clamp(12px,3vw,28px);font-size:.72rem;color:#444;border-top:1px solid rgba(255,255,255,.04)}
+@media(max-width:600px){
+  .article{padding:32px 0 60px}
+  .meta{gap:12px}
+  .rel-grid{grid-template-columns:1fr}
+  .back{font-size:.72rem}
+}
 </style>
 </head>
 <body>
