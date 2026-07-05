@@ -8,7 +8,7 @@
 <title>Pains Acontece – Notícias, serviços e o que importa em Pains e região</title>
 <meta name="description" content="Portal de notícias hiperlocal de Pains e região."/>
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
-<meta name="pa-build" content="2026.07.05-v9"/>
+<meta name="pa-build" content="2026.07.05-v10"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,700;0,900;1,700&display=swap" rel="stylesheet"/>
@@ -478,6 +478,15 @@ body.cat-filter-mode .category-view { display: block; }
   transition: opacity .7s var(--ease), transform .7s var(--ease);
 }
 .reveal.visible { opacity: 1; transform: translateY(0); }
+#ultimasGrid .ncard,
+#ultimasGrid .ncard-xl,
+#categoryGrid .ncard,
+#categoryFeatured .ncard-xl {
+  min-height: 120px;
+}
+@media (prefers-reduced-motion: reduce) {
+  .reveal { opacity: 1; transform: none; }
+}
 .reveal-delay-1 { transition-delay: .1s; }
 .reveal-delay-2 { transition-delay: .2s; }
 .reveal-delay-3 { transition-delay: .3s; }

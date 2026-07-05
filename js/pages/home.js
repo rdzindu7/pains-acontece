@@ -1,7 +1,7 @@
 (function () {
   const NAV_MAP = {
     home:        { type: 'all' },
-    ultimas:     { type: 'scroll', target: '#ultimas' },
+    ultimas:     { type: 'news', title: 'Últimas Notícias', filter: 'homeall' },
     pains:       { type: 'news', title: 'Pains', cats: ['Pains'] },
     regiao:      { type: 'news', title: 'Região', cats: ['Região'] },
     brasil:      { type: 'news', title: 'Brasil', filter: 'brasil' },
@@ -124,15 +124,38 @@
     return arts.filter(a => cats.includes(a.cat));
   }
 
+  function sortByRecent(arts) {
+    return [...(arts || [])].sort((a, b) => {
+      const da = a.pubISO ? new Date(a.pubISO).getTime() : 0;
+      const db = b.pubISO ? new Date(b.pubISO).getTime() : 0;
+      if (db !== da) return db - da;
+      return (Number(b.id) || 0) - (Number(a.id) || 0);
+    });
+  }
+
   function filterByScope(arts, scope) {
-    if (!scope || typeof PAArticleScope === 'undefined') return arts;
-    if (scope === 'mundo') return PAArticleScope.forMundo(arts);
-    if (scope === 'brasil') return PAArticleScope.forBrasil(arts);
+    if (!scope) return arts;
+    if (scope === 'homeall') return sortByRecent(forHomePage(arts));
+    if (typeof PAArticleScope === 'undefined') return arts;
+    if (scope === 'mundo') return sortByRecent(PAArticleScope.forMundo(arts));
+    if (scope === 'brasil') return sortByRecent(PAArticleScope.forBrasil(arts));
     return arts;
   }
 
   function forHomePage(arts) {
     return typeof PAArticleScope !== 'undefined' ? PAArticleScope.forHome(arts) : arts;
+  }
+
+  function revealVisibleNow(rootSelector) {
+    const root = rootSelector ? document.querySelector(rootSelector) : document;
+    const nodes = root
+      ? root.querySelectorAll('.reveal:not(.visible)')
+      : document.querySelectorAll('.reveal:not(.visible)');
+    const vh = window.innerHeight || document.documentElement.clientHeight;
+    nodes.forEach(el => {
+      const r = el.getBoundingClientRect();
+      if (r.top < vh + 80 && r.bottom > -40) el.classList.add('visible');
+    });
   }
 
   function renderHero(arts) {
@@ -243,6 +266,8 @@
     gridEl.innerHTML = rest.length
       ? rest.map(a => card(a)).join('')
       : `<div style="grid-column:1/-1;color:var(--dim);font-size:.8rem;padding:8px 0">Esta é a única notícia nesta categoria.</div>`;
+    observeReveals();
+    requestAnimationFrame(() => revealVisibleNow('#categoryView'));
   }
 
   function renderJobs(jobs) {
@@ -291,7 +316,7 @@
     if (!byCat('Polícia', 1).length) {
       const pf = document.getElementById('policiaFeatured');
       const pl = document.getElementById('policiaList');
-      if (pf) pf.innerHTML = emptyMsg;
+      if (pf) pf.innerHTML = emptyMsgHtml();
       if (pl) pl.innerHTML = '';
     }
     renderSection('politicaList', byCat('Política', 5), 'list');
@@ -299,13 +324,27 @@
     renderSection('brasilList', byCat('Brasil', 10), 'list');
     renderSection('regiaoGrid', byCat('Região', 6), 'grid');
     observeReveals();
+    requestAnimationFrame(() => {
+      revealVisibleNow('#ultimas');
+      revealVisibleNow('.hero');
+    });
   }
 
+  let revealObserver = null;
+
   function observeReveals() {
-    const obs = new IntersectionObserver(entries => {
-      entries.forEach(e => { if (e.isIntersecting) e.target.classList.add('visible'); });
-    }, { threshold: 0.08, rootMargin: '0px 0px -40px 0px' });
-    document.querySelectorAll('.reveal:not(.visible)').forEach(el => obs.observe(el));
+    revealVisibleNow();
+    if (!revealObserver) {
+      revealObserver = new IntersectionObserver(entries => {
+        entries.forEach(e => {
+          if (e.isIntersecting) {
+            e.target.classList.add('visible');
+            revealObserver.unobserve(e.target);
+          }
+        });
+      }, { threshold: 0.05, rootMargin: '0px 0px -20px 0px' });
+    }
+    document.querySelectorAll('.reveal:not(.visible)').forEach(el => revealObserver.observe(el));
   }
 
   function setupPhoneSearch() {
@@ -372,8 +411,11 @@
       document.body.classList.add('cat-filter-mode');
       const filtered = cfg.filter
         ? filterByScope(allPub, cfg.filter)
-        : filterByCats(allPub, cfg.cats);
-      renderCategoryView(filtered, cfg.title);
+        : sortByRecent(filterByCats(allPub, cfg.cats));
+      const title = (typeof PATranslate !== 'undefined' && navKey === 'ultimas')
+        ? PATranslate.t('sec.ultimas')
+        : cfg.title;
+      renderCategoryView(filtered, title);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }
   }
