@@ -6,7 +6,7 @@
 <link rel="icon" type="image/jpeg" href="../assets/images/favicon.jpg"/>
 <link rel="apple-touch-icon" href="../assets/images/favicon.jpg"/>
 <title>Notícia – Pains Acontece</title>
-<meta name="pa-build" content="2026.07.05-v28"/>
+<meta name="pa-build" content="2026.07.05-v29"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,700;0,900;1,700&display=swap" rel="stylesheet"/>
@@ -55,6 +55,7 @@ body::before{content:'';position:fixed;inset:0;
   z-index:200;box-shadow:0 0 16px var(--accent-glow),0 2px 8px rgba(0,0,0,.4);transition:width .1s}
 @keyframes progressShine{0%{background-position:0% 50%}100%{background-position:200% 50%}}
 
+#main{position:relative;z-index:2;min-height:50vh}
 .wrap{max-width:min(900px,100%);margin:0 auto;padding:0 var(--pad-x);width:100%;position:relative;z-index:2}
 .top-bar{background:rgba(8,8,8,.82);border-bottom:1px solid rgba(29,122,29,.22);
   padding:12px 0;position:sticky;top:0;z-index:100;backdrop-filter:blur(20px) saturate(160%);
@@ -70,7 +71,13 @@ body::before{content:'';position:fixed;inset:0;
 .art-skeleton{padding:0 0 80px;animation:skFadeIn .4s var(--ease)}
 @keyframes skFadeIn{from{opacity:0}to{opacity:1}}
 .sk-hero{height:min(58vh,420px);background:linear-gradient(110deg,var(--k3) 25%,var(--k4) 50%,var(--k3) 75%);
-  background-size:200% 100%;animation:skShimmer 1.4s ease infinite;margin-bottom:32px;border-radius:0 0 16px 16px}
+  background-size:200% 100%;animation:skShimmer 1.4s ease infinite;margin-bottom:32px;border-radius:0 0 16px 16px;position:relative}
+.sk-hero::after{content:'Carregando matéria…';position:absolute;inset:0;display:flex;align-items:center;justify-content:center;
+  font-size:.82rem;color:rgba(255,255,255,.35);letter-spacing:1px}
+.art-load-err{text-align:center;padding:100px var(--pad-x);position:relative;z-index:2}
+.art-load-err h2{font-family:var(--ff-display);font-size:1.6rem;margin-bottom:10px;color:var(--y)}
+.art-load-err p{color:var(--dim);margin-bottom:20px;font-size:.9rem}
+.art-load-err a{color:var(--g3);display:inline-flex;align-items:center;gap:8px}
 .sk-line{height:14px;border-radius:6px;background:linear-gradient(110deg,var(--k3) 25%,var(--k4) 50%,var(--k3) 75%);
   background-size:200% 100%;animation:skShimmer 1.4s ease infinite;margin-bottom:12px}
 .sk-line.w80{width:80%}.sk-line.w60{width:60%}.sk-line.w40{width:40%}
@@ -84,6 +91,7 @@ body::before{content:'';position:fixed;inset:0;
 .art-hero-cinema{position:relative;margin:0 0 0;overflow:hidden;min-height:min(62vh,520px);display:flex;align-items:flex-end}
 .art-hero-cinema .hero-media{position:absolute;inset:0;z-index:0}
 .art-hero-cinema .hero-media img,.art-hero-cinema .hero-media video{width:100%;height:100%;object-fit:cover;animation:heroZoom 20s ease-in-out infinite alternate}
+.art-hero-cinema .hero-no-img{width:100%;height:100%;background:linear-gradient(135deg,var(--k3),var(--k2))}
 @keyframes heroZoom{from{transform:scale(1)}to{transform:scale(1.08)}}
 .art-hero-cinema .hero-veil{position:absolute;inset:0;z-index:1;
   background:linear-gradient(180deg,rgba(8,8,8,.15) 0%,rgba(8,8,8,.55) 45%,rgba(8,8,8,.92) 78%,var(--k) 100%)}
@@ -101,10 +109,12 @@ body::before{content:'';position:fixed;inset:0;
   border:1px solid rgba(46,204,46,.35);backdrop-filter:blur(8px);
   box-shadow:0 4px 20px rgba(0,0,0,.3);transition:transform .3s var(--ease),box-shadow .3s}
 .cat:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(29,122,29,.25)}
-.hero-title{font-family:var(--ff-serif);font-size:clamp(2rem,5.5vw,3.4rem);line-height:1.1;margin-bottom:0;
-  text-shadow:0 2px 40px rgba(0,0,0,.8),0 1px 3px rgba(0,0,0,.9);
-  background:linear-gradient(135deg,#fff 0%,rgba(255,255,255,.88) 100%);
-  -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.hero-title{font-family:var(--ff-serif);font-size:clamp(2rem,5.5vw,3.4rem);line-height:1.1;margin-bottom:0;color:#fff;
+  text-shadow:0 2px 40px rgba(0,0,0,.8),0 1px 3px rgba(0,0,0,.9)}
+@supports (-webkit-background-clip:text){
+  .hero-title{background:linear-gradient(135deg,#fff 0%,rgba(255,255,255,.88) 100%);
+    -webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;color:transparent}
+}
 
 .art-header{padding-top:32px}
 .lead{font-size:1.14rem;color:rgba(255,255,255,.7);margin-bottom:28px;line-height:1.7;
@@ -274,7 +284,9 @@ body::before{content:'';position:fixed;inset:0;
 
 /* Reveal */
 .reveal{opacity:0;transform:translateY(22px);transition:opacity .7s var(--ease),transform .7s var(--ease)}
-.reveal.visible{opacity:1;transform:translateY(0)}
+.reveal.visible,.reveal.no-animate{opacity:1;transform:translateY(0)}
+.art-header .reveal,.mode-tabs,.mode-panels .quick-box,.share{opacity:1;transform:none}
+.art-header .reveal{transition:opacity .5s var(--ease),transform .5s var(--ease)}
 .reveal-delay-1{transition-delay:.08s}.reveal-delay-2{transition-delay:.16s}
 .reveal-delay-3{transition-delay:.24s}.reveal-delay-4{transition-delay:.32s}
 
@@ -347,9 +359,9 @@ body.cat-pains{--accent:#1d7a1d;--accent-glow:rgba(29,122,29,.35)}
 <script src="../js/core/supabase-client.js"></script>
 <script src="../js/ui/article-format.js"></script>
 <script src="../js/ai/scanner.js"></script>
-<script src="../js/core/purge.js?v=20260705v28"></script>
-<script src="../js/core/api.js?v=20260705v28"></script>
-<script src="../js/ui/ads.js?v=20260705v28"></script>
+<script src="../js/core/purge.js?v=20260705v29"></script>
+<script src="../js/core/api.js?v=20260705v29"></script>
+<script src="../js/ui/ads.js?v=20260705v29"></script>
 <script src="../js/core/store.js"></script>
 <script src="../js/ui/scroll-nav.js"></script>
 <script src="../js/ai/agents/sofia.js"></script>
@@ -357,10 +369,10 @@ body.cat-pains{--accent:#1d7a1d;--accent-glow:rgba(29,122,29,.35)}
 <script src="../js/ai/agents/camila.js"></script>
 <script src="../js/ai/orchestrator.js"></script>
 <script src="../js/ai/public-assistant.js"></script>
-<script src="../js/ui/dialog.js?v=20260705v28"></script>
-<script src="../js/core/social.js?v=20260705v28"></script>
-<script src="../js/ui/social-widget.js?v=20260705v28"></script>
-<script src="../js/ui/user-nav.js?v=20260705v28"></script>
+<script src="../js/ui/dialog.js?v=20260705v29"></script>
+<script src="../js/core/social.js?v=20260705v29"></script>
+<script src="../js/ui/social-widget.js?v=20260705v29"></script>
+<script src="../js/ui/user-nav.js?v=20260705v29"></script>
 <script>
 (async function(){
   const params = new URLSearchParams(location.search);
@@ -403,25 +415,35 @@ body.cat-pains{--accent:#1d7a1d;--accent-glow:rgba(29,122,29,.35)}
   }
 
   function initReveal(root){
-    const els=(root||document).querySelectorAll('.reveal:not(.visible)');
+    const scope=root||document;
+    const els=scope.querySelectorAll('.reveal:not(.visible)');
     els.forEach(el=>{
       const r=el.getBoundingClientRect();
-      if(r.top<window.innerHeight*.92)el.classList.add('visible');
+      if(r.top<window.innerHeight*.95)el.classList.add('visible');
     });
     if(!revealObserver){
       revealObserver=new IntersectionObserver(entries=>{
         entries.forEach(e=>{
           if(e.isIntersecting){e.target.classList.add('visible');revealObserver.unobserve(e.target)}
         });
-      },{threshold:.08,rootMargin:'0px 0px -40px 0px'});
+      },{threshold:.05,rootMargin:'0px 0px -20px 0px'});
     }
-    (root||document).querySelectorAll('.reveal:not(.visible)').forEach(el=>revealObserver.observe(el));
+    scope.querySelectorAll('.reveal:not(.visible)').forEach(el=>revealObserver.observe(el));
+    requestAnimationFrame(()=>{
+      scope.querySelectorAll('.reveal:not(.visible)').forEach(el=>el.classList.add('visible'));
+    });
+  }
+
+  function showLoadError(msg){
+    main.innerHTML=`<div class="art-load-err"><h2>Não foi possível abrir a matéria</h2><p>${esc(msg||'Erro ao carregar. Tente novamente.')}</p>
+      <a href="../index.html"><i class="fas fa-arrow-left"></i> Voltar ao portal</a></div>`;
   }
 
   function enhanceBody(html){
-    if(!html)return '<p class="reveal">Conteúdo em breve.</p>';
+    if(!html)return '<p class="reveal visible">Conteúdo em breve.</p>';
+    const str=typeof html==='string'?html:String(html||'');
     let i=0;
-    return html
+    return str
       .replace(/<p>/g,'<p class="reveal">')
       .replace(/<h3 class="art-subhead"/g,()=>`<h3 id="sec-${i++}" class="art-subhead reveal"`)
       .replace(/<blockquote/g,'<blockquote class="art-pullquote reveal"');
@@ -443,17 +465,38 @@ body.cat-pains{--accent:#1d7a1d;--accent-glow:rgba(29,122,29,.35)}
   initParticles();
   initCursorGlow();
 
-  await PAStore.init();
-  const art=PAStore.getArticle(id);
+  let art;
+  try{
+    await PAStore.init();
+    art=PAStore.getArticle(id);
+    if(!art){
+      try{
+        art=await PAAPI.getArticle(id);
+        if(art&&art.status==='pub'){
+          const cached=JSON.parse(localStorage.getItem('pa_articles_cache_v2')||'[]');
+          if(!cached.find(a=>String(a.id)===String(id)))cached.unshift(art);
+          localStorage.setItem('pa_articles_cache_v2',JSON.stringify(cached));
+        }
+      }catch{}
+    }
+  }catch(err){
+    console.error('[noticia] init',err);
+    try{
+      const cached=JSON.parse(localStorage.getItem('pa_articles_cache_v2')||'[]');
+      art=cached.find(a=>String(a.id)===String(id));
+    }catch{}
+    if(!art){showLoadError('Falha na conexão. Verifique sua internet e tente de novo.');return;}
+  }
+
   if(!art||art.status!=='pub'){
     main.innerHTML='<div class="not-found"><h1>Notícia não encontrada</h1><p>Esta matéria não está disponível ou foi removida.</p><a href="../index.html">Ir para a home</a></div>';
     return;
   }
 
-  await PAStore.incrementViews(id);
   document.title=art.title+' – Pains Acontece';
   window.PACurrentArticle=art;
   if(typeof PAPublicIA!=='undefined')PAPublicIA.init();
+  PAStore.incrementViews(id).catch(()=>{});
 
   const related=PAStore.getArticles('pub').filter(a=>a.id!==art.id&&a.cat===art.cat).slice(0,3);
   let quickText=art.quickLead||art.lead||art.title;
@@ -546,14 +589,17 @@ body.cat-pains{--accent:#1d7a1d;--accent-glow:rgba(29,122,29,.35)}
   }
 
   function render(){
-    const bodyRaw=formatBody(art.content);
+    try{
+    const bodyRaw=formatBody(art.content||'');
     const bodyHtml=enhanceBody(bodyRaw);
     const toc=extractTOC(bodyHtml);
     const author=art.author||'Redação Pains Acontece';
     const sponsored=art.sponsored?'<span class="sponsored-badge reveal"><i class="fas fa-star"></i> Conteúdo Patrocinado</span>':'';
     const heroMedia=art.video
-      ?`<video src="${esc(art.video)}" controls playsinline poster="${esc(art.img)}"></video>`
-      :`<img src="${esc(art.img)}" alt="${esc(art.title)}"/>`;
+      ?`<video src="${esc(art.video)}" controls playsinline poster="${esc(art.img||'')}"></video>`
+      :art.img
+        ?`<img src="${esc(art.img)}" alt="${esc(art.title)}" onerror="this.style.display='none'"/>`
+        :`<div class="hero-no-img" aria-hidden="true"></div>`;
 
     const tocHtml=toc.length?`<div class="aside-card reveal"><h5><i class="fas fa-list-ul"></i> Nesta matéria</h5>
       <ul class="aside-toc">${toc.map(t=>`<li><a href="#${esc(t.id)}">${esc(t.text)}</a></li>`).join('')}</ul></div>`:'';
@@ -637,7 +683,7 @@ body.cat-pains{--accent:#1d7a1d;--accent-glow:rgba(29,122,29,.35)}
     </aside>
     </div></div></div>`;
 
-    if(typeof PAAds!=='undefined')PAAds.renderSidebar('adArticleSidebar');
+    try{if(typeof PAAds!=='undefined')PAAds.renderSidebar('adArticleSidebar')}catch(e){console.warn('[noticia] ads',e)}
     main.querySelectorAll('.mode-tab').forEach(btn=>{
       btn.addEventListener('click',()=>switchMode(btn.dataset.mode));
     });
@@ -658,14 +704,20 @@ body.cat-pains{--accent:#1d7a1d;--accent-glow:rgba(29,122,29,.35)}
     document.getElementById('fabTop')?.addEventListener('click',()=>{
       window.scrollTo({top:0,behavior:'smooth'});
     });
-    const socialMount=document.getElementById('paSocialMount');
-    if(socialMount&&typeof PASocialWidget!=='undefined')PASocialWidget.mount(socialMount,id);
+    try{
+      const socialMount=document.getElementById('paSocialMount');
+      if(socialMount&&typeof PASocialWidget!=='undefined')PASocialWidget.mount(socialMount,id);
+    }catch(e){console.warn('[noticia] social',e)}
     bindProgress();
     bindTOC();
-    requestAnimationFrame(()=>initReveal(main));
+    initReveal(main);
+    }catch(err){
+      console.error('[noticia] render',err);
+      showLoadError('Erro ao montar a página desta matéria.');
+    }
   }
 
-  PAUserNav.init('#paUserNav');
+  try{PAUserNav.init('#paUserNav')}catch(e){console.warn('[noticia] nav',e)}
   render();
 })();
 </script>

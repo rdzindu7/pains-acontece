@@ -885,9 +885,13 @@ const PAAPI = (function () {
     },
 
     async incrementViews(id) {
-      const { data, error } = await sb().rpc('increment_article_views', { article_id: Number(id) });
-      if (error) throw error;
-      return { views: data ?? 0 };
+      try {
+        const { data, error } = await sb().rpc('increment_article_views', { article_id: Number(id) });
+        if (error) return local.incrementViews(id);
+        return { views: data ?? 0 };
+      } catch {
+        return local.incrementViews(id);
+      }
     },
 
     async getPending() {

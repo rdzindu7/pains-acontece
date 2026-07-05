@@ -54,10 +54,12 @@ const PAStore = (function () {
   }
 
   async function incrementViews(id) {
-    const res = await PAAPI.incrementViews(id);
-    const art = getArticle(id);
-    if (art) art.views = res.views;
-    localStorage.setItem(LS_KEY, JSON.stringify(articles));
+    try {
+      const res = await PAAPI.incrementViews(id);
+      const art = getArticle(id);
+      if (art && res) art.views = res.views;
+      localStorage.setItem(LS_KEY, JSON.stringify(articles));
+    } catch {}
   }
 
   return { init, getArticles, getArticle, articlesForAdmin, addArticle, updateArticle, deleteArticle, incrementViews };
