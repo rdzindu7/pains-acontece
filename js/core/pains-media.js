@@ -5,34 +5,34 @@ const PAPainsMedia = (function () {
     return p.includes('/pages/') ? '../assets/images/' : 'assets/images/';
   })();
 
-  const LOCAL = {
-    logo: ROOT + 'pains-acontece-logo.png',
-    igreja: ROOT + 'pains-igreja.jpg',
-    pedreiras: ROOT + 'pains-pedreiras.jpg',
-    paisagem: ROOT + 'pains-paisagem.jpg',
-    favicon: ROOT + 'favicon.jpg'
-  };
-
   const WIKI = {
     igreja: 'https://upload.wikimedia.org/wikipedia/commons/thumb/8/8e/Igreja_Nossa_Senhora_do_Ros%C3%A1rio_-_Pains_MG.jpg/1280px-Igreja_Nossa_Senhora_do_Ros%C3%A1rio_-_Pains_MG.jpg',
     pedreiras: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/4f/Pedreiras_de_Pains_-_MG.JPG/1280px-Pedreiras_de_Pains_-_MG.JPG'
   };
 
+  const LOCAL = {
+    logo: ROOT + 'pains-acontece-logo.png',
+    favicon: ROOT + 'favicon.jpg',
+    igreja: WIKI.igreja,
+    pedreiras: WIKI.pedreiras,
+    paisagem: WIKI.pedreiras
+  };
+
   const BY_CAT = {
-    'Pains': LOCAL.igreja,
-    'Região': LOCAL.pedreiras,
-    'Polícia': LOCAL.pedreiras,
-    'Política': LOCAL.igreja,
-    'Saúde': LOCAL.paisagem,
-    'Agenda': LOCAL.igreja,
-    'Empregos': LOCAL.pedreiras,
+    'Pains': WIKI.igreja,
+    'Região': WIKI.pedreiras,
+    'Polícia': WIKI.pedreiras,
+    'Política': WIKI.igreja,
+    'Saúde': WIKI.pedreiras,
+    'Agenda': WIKI.igreja,
+    'Empregos': WIKI.pedreiras,
     'Brasil': WIKI.igreja,
     'Brasil / Mundo': WIKI.pedreiras,
     'Mundo': WIKI.pedreiras
   };
 
-  const HERO_BG = LOCAL.igreja;
-  const AUTH_BG = LOCAL.pedreiras;
+  const HERO_BG = WIKI.igreja;
+  const AUTH_BG = WIKI.pedreiras;
 
   function pick(cat) {
     return BY_CAT[cat] || LOCAL.igreja;

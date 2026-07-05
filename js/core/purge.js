@@ -3,7 +3,7 @@
  * A cada deploy/atualização: incremente VER (ex.: v18 → v19) para recarregar abas abertas.
  */
 const PAContentPurge = (function () {
-  const VER = '2026.07.05-v23';
+  const VER = '2026.07.05-v24';
 
   function run() {
     if (localStorage.getItem('pa_content_purge') === VER) return false;

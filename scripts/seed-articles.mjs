@@ -2,7 +2,7 @@
  * Popula data/articles.json com notícias verificadas via RSS.
  * Uso: node scripts/seed-articles.mjs
  */
-import { writeFileSync } from 'fs';
+import { readFileSync, writeFileSync } from 'fs';
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
 
@@ -35,14 +35,9 @@ const CAT_KEYWORDS = {
   'Brasil / Mundo': ['brasil', 'mundo', 'nacional', 'internacional']
 };
 
-const IMGS = {
-  'Polícia': 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?w=800&q=80',
-  'Política': 'https://images.unsplash.com/photo-1529107386315-e1a2ed48a620?w=800&q=80',
-  'Saúde': 'https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=800&q=80',
-  'Pains': 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&q=80',
-  'Região': 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=800&q=80',
-  'Brasil / Mundo': 'https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?w=800&q=80'
-};
+const PHOTO_BASE = JSON.parse(readFileSync(join(__dirname, '..', 'data', 'photo-base.json'), 'utf8'));
+const WIKI_FALLBACK = PHOTO_BASE['Brasil / Mundo'];
+const IMGS = { ...PHOTO_BASE };
 
 function norm(s) {
   return (s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
@@ -200,7 +195,7 @@ async function resolveItemImage(item, cat) {
     const og = await fetchOgImage(articleUrl);
     if (og) return og;
   }
-  return IMGS[cat] || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&q=80';
+  return IMGS[cat] || IMGS['Brasil / Mundo'] || WIKI_FALLBACK;
 }
 
 function makeLead(title, summary) {
