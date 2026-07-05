@@ -13,5 +13,5 @@
  */
 const PAConfig = {
   supabaseUrl: 'https://blcomwofpyorypqjdhfb.supabase.co',
-  supabaseAnonKey: ''
+  supabaseAnonKey: 'sb_publishable_Kkznz1j873N8ztepzRDCcQ__eXd6MXS'
 };
