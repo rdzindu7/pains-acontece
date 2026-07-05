@@ -1886,7 +1886,7 @@ body.pa-owner .owner-only.btn-pub{display:flex!important}
 <script src="../js/ai/orchestrator.js"></script>
 <script src="../js/ai/engine.js"></script>
 <script src="../js/core/purge.js?v=20260705v21"></script>
-<script src="../js/core/api.js?v=20260705v21"></script>
+<script src="../js/core/api.js?v=20260705v22"></script>
 <script src="../js/ui/ads.js?v=20260705v21"></script>
 <script src="../js/ui/corner-notify.js"></script>
 <script src="../js/core/store.js"></script>
@@ -2189,9 +2189,11 @@ async function runScanNow() {
 }
 
 async function approvePending(id) {
+  const pid = pendingPreviewId || id;
   try {
-    await PAAPI.approvePending(id);
+    await PAAPI.approvePending(pid);
     pendingPreviewId = null;
+    closeModal('previewModal');
     showToast('Notícia publicada no portal!', 'success');
     await PAStore.init();
     await renderPending();
@@ -2200,12 +2202,21 @@ async function approvePending(id) {
     renderPubs();
   } catch (err) {
     if (err?.message === 'duplicate') {
+      pendingPreviewId = null;
+      closeModal('previewModal');
       showToast('Esta notícia já foi publicada — duplicata removida.', 'info');
       await renderPending();
       await updateScannerStatus();
       return;
     }
-    showToast('Erro ao publicar.', 'error');
+    if (err?.message === 'Não encontrado') {
+      pendingPreviewId = null;
+      showToast('Notícia não encontrada — atualize a lista e tente de novo.', 'info');
+      await renderPending();
+      return;
+    }
+    console.error('approvePending:', err);
+    showToast('Erro ao publicar: ' + (err?.message || 'falha desconhecida'), 'error');
   }
 }
 
@@ -2502,13 +2513,23 @@ function previewBeforePublish() {
 }
 
 async function confirmPublishFromPreview() {
-  if (pendingPreviewId) {
+  const btn = document.getElementById('btnConfirmPreview');
+  if (btn) { btn.disabled = true; btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Publicando…'; }
+  try {
+    if (pendingPreviewId) {
+      await approvePending(pendingPreviewId);
+      return;
+    }
     closeModal('previewModal');
-    await approvePending(pendingPreviewId);
-    return;
+    await publishArticle(true);
+  } finally {
+    if (btn) {
+      btn.disabled = false;
+      btn.innerHTML = pendingPreviewId
+        ? '<i class="fas fa-check"></i> Aprovar e Publicar'
+        : '<i class="fas fa-paper-plane"></i> Confirmar Publicação';
+    }
   }
-  closeModal('previewModal');
-  await publishArticle(true);
 }
 
 async function publishArticle(skipPreview) {
@@ -2524,18 +2545,25 @@ async function publishArticle(skipPreview) {
     video: artVideoData || '',
     timeAgo: 'Agora'
   };
-  if (editingId) {
-    await PAStore.updateArticle(editingId, payload);
-    showToast('Notícia atualizada com sucesso!', 'success');
-  } else {
-    await PAStore.addArticle(payload);
-    showToast('Notícia publicada com sucesso!', 'success');
+  try {
+    if (editingId) {
+      await PAStore.updateArticle(editingId, payload);
+      showToast('Notícia atualizada com sucesso!', 'success');
+    } else {
+      await PAStore.addArticle(payload);
+      showToast('Notícia publicada com sucesso!', 'success');
+    }
+    editingId = null;
+    closeModal('previewModal');
+    clearEditor();
+    await PAStore.init();
+    renderDashboard();
+    renderPubs();
+    showPanel('publicacoes', document.querySelectorAll('.sb-item')[1]);
+  } catch (err) {
+    console.error('publishArticle:', err);
+    showToast('Erro ao publicar: ' + (err?.message || 'verifique conexão e tente de novo'), 'error');
   }
-  editingId = null;
-  clearEditor();
-  renderDashboard();
-  renderPubs();
-  showPanel('publicacoes', document.querySelectorAll('.sb-item')[1]);
 }
 
 function saveDraft() {

@@ -400,30 +400,33 @@ const PAAPI = (function () {
 
     async approvePending(id) {
       const state = getState();
-      const idx = state.pending.findIndex(p => p.id === id);
-      if (idx < 0) throw new Error('Não encontrado');
-      const p = state.pending[idx];
-      const baseArts = await fetchJson('articles.json');
+      const sid = String(id);
+      const p = (state.pending || []).find(x => String(x.id) === sid);
+      if (!p) throw new Error('Não encontrado');
+      const baseArts = await fetchJson('articles.json').catch(() => []);
       const mergedArts = mergeArticles(baseArts, state.articles);
       if (isDuplicateArticle(p, buildExistingKeys(mergedArts, []))) {
-        state.pending.splice(idx, 1);
-        saveAdminState(state);
+        const fresh = getState();
+        fresh.pending = (fresh.pending || []).filter(x => String(x.id) !== sid);
+        saveAdminState(fresh);
         throw new Error('duplicate');
       }
-      state.pending.splice(idx, 1);
       const art = await this.addArticle({
         title: p.title, lead: p.lead, content: p.content, cat: p.cat, status: 'pub',
         img: p.img, author: p.author || 'IA Pains Acontece', verified: p.verified, confidence: p.confidence,
         world: p.world || p.cat === 'Mundo', source_url: p.source_url,
         pubISO: p.pubISO, date: p.date, timeAgo: p.timeAgo, source: p.source
       });
-      saveAdminState(state);
+      const fresh = getState();
+      fresh.pending = (fresh.pending || []).filter(x => String(x.id) !== sid);
+      saveAdminState(fresh);
       return art;
     },
 
     rejectPending(id) {
       const state = getState();
-      state.pending = state.pending.filter(p => p.id !== id);
+      const sid = String(id);
+      state.pending = (state.pending || []).filter(p => String(p.id) !== sid);
       saveAdminState(state);
       return Promise.resolve({ ok: true });
     },
@@ -650,9 +653,15 @@ const PAAPI = (function () {
         timeAgo: 'Agora',
         ...data
       });
-      const { data: inserted, error } = await sb().from('articles').insert(row).select().single();
-      if (error) throw error;
-      return rowToArticle(inserted);
+      try {
+        const { data: inserted, error } = await sb().from('articles').insert(row).select().single();
+        if (!error && inserted) return rowToArticle(inserted);
+        if (error) console.warn('Supabase insert falhou, usando armazenamento local:', error.message);
+      } catch (e) {
+        console.warn('Supabase indisponível, usando armazenamento local:', e);
+      }
+      sessionStorage.setItem('pa_auth_mode', 'local');
+      return local.addArticle(data);
     },
 
     async updateArticle(id, data) {
