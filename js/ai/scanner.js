@@ -93,12 +93,22 @@ const PAScanner = (function () {
 
   function stripHtml(raw) {
     if (!raw) return '';
-    return raw
+    let t = raw
       .replace(/<!\[CDATA\[/g, '').replace(/\]\]>/g, '')
-      .replace(/<[^>]+>/g, ' ')
       .replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&')
-      .replace(/&nbsp;/g, ' ').replace(/&quot;/g, '"')
-      .replace(/\s+/g, ' ').trim();
+      .replace(/&nbsp;/g, ' ').replace(/&quot;/g, '"');
+    t = t.replace(/<a[^>]*>(.*?)<\/a>/gi, '$1');
+    t = t.replace(/<font[^>]*>(.*?)<\/font>/gi, ' $1');
+    t = t.replace(/<[^>]+>/g, ' ');
+    return t.replace(/\s+/g, ' ').trim();
+  }
+
+  function makeLead(title, summary) {
+    const clean = stripHtml(summary);
+    if (!clean || clean.length < 30 || /news\.google\.com\/rss/i.test(clean)) {
+      return `${title}. Informação verificada pela redação do Pains Acontece com base em fontes públicas.`;
+    }
+    return clean.length > 220 ? clean.slice(0, 217) + '…' : clean;
   }
 
   function buildContent(title, summary, source, link) {
@@ -154,7 +164,7 @@ const PAScanner = (function () {
       const cat = detectCategory(item.title, item.summary, item.region, item.world);
       items.push({
         title: item.title,
-        lead: stripHtml(item.summary).slice(0, 220),
+        lead: makeLead(item.title, item.summary),
         content: buildContent(item.title, item.summary, item.source, item.link),
         cat, img: pickImage(cat), author: 'IA Pains Acontece',
         date: item.pubDate.toLocaleDateString('pt-BR'),

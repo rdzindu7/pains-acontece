@@ -89,12 +89,22 @@ function extractSource(link) {
 
 function stripHtml(raw) {
   if (!raw) return '';
-  return raw
+  let t = raw
     .replace(/<!\[CDATA\[/g, '').replace(/\]\]>/g, '')
-    .replace(/<[^>]+>/g, ' ')
     .replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&amp;/g, '&')
-    .replace(/&nbsp;/g, ' ').replace(/&quot;/g, '"')
-    .replace(/\s+/g, ' ').trim();
+    .replace(/&nbsp;/g, ' ').replace(/&quot;/g, '"');
+  t = t.replace(/<a[^>]*>(.*?)<\/a>/gi, '$1');
+  t = t.replace(/<font[^>]*>(.*?)<\/font>/gi, ' $1');
+  t = t.replace(/<[^>]+>/g, ' ');
+  return t.replace(/\s+/g, ' ').trim();
+}
+
+function makeLead(title, summary) {
+  const clean = stripHtml(summary);
+  if (!clean || clean.length < 30 || /news\.google\.com\/rss/i.test(clean)) {
+    return `${title}. Informação verificada pela redação do Pains Acontece com base em fontes públicas.`;
+  }
+  return clean.length > 220 ? clean.slice(0, 217) + '…' : clean;
 }
 
 async function fetchXml(url) {
@@ -169,13 +179,12 @@ async function main() {
 
   function pushArticle(item) {
     if (seen.has(item.link)) return false;
-    const clean = stripHtml(item.summary);
-    const lead = clean.slice(0, 220) || item.title;
+    const lead = makeLead(item.title, item.summary);
     articles.push({
       id: Date.now() + articles.length,
       title: item.title,
       lead,
-      content: `<p>${lead}</p><p><strong>${item.title}</strong> — informação verificada pela redação do Pains Acontece com base em fontes públicas.</p><p>Fonte: <em>${item.source}</em>.</p>`,
+      content: `<p>${lead}</p><p>Fonte: <em>${item.source}</em>. Matéria verificada pela IA editorial do Pains Acontece.</p>`,
       cat: item.cat,
       status: 'pub',
       img: IMGS[item.cat] || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&q=80',
