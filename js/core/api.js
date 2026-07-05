@@ -114,6 +114,7 @@ const PAAPI = (function () {
   }
 
   function applyDeletedFilter(list) {
+    if (!isAdminSession()) return list;
     const hidden = getDeletedSet();
     if (!hidden.size) return list;
     return list.filter(a => !hidden.has(String(a.id)));

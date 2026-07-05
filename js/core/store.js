@@ -59,6 +59,11 @@ const PAStore = (function () {
       const local = loadFromLocalSources();
       if (local.length) articles = local;
     }
+    if (!articles.length && typeof PAAPI !== 'undefined' && PAAPI.fetchArticlesFromJson) {
+      try {
+        articles = await withTimeout(PAAPI.fetchArticlesFromJson(), 6000);
+      } catch {}
+    }
     localStorage.setItem(LS_KEY, JSON.stringify(articles));
     if (typeof PAViewsTracker !== 'undefined') articles = PAViewsTracker.mergeArticles(articles);
     return articles;

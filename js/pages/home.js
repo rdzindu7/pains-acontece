@@ -613,6 +613,18 @@
     executeBackgroundSearch(false);
   }
 
+  async function fetchPubFromJson() {
+    try {
+      const url = new URL('data/articles.json', new URL('./', location.href)).href;
+      const res = await fetch(url + '?_=' + Date.now(), { cache: 'no-store' });
+      if (!res.ok) return [];
+      const data = await res.json();
+      return Array.isArray(data) ? data.filter(a => a.status === 'pub') : [];
+    } catch {
+      return [];
+    }
+  }
+
   async function init() {
     let raw = [];
     try {
@@ -624,6 +636,7 @@
         raw = JSON.parse(localStorage.getItem('pa_articles_cache_v2') || '[]').filter(a => a.status === 'pub');
       } catch {}
     }
+    if (!raw.length) raw = await fetchPubFromJson();
 
     applyArticles(raw, filterForDisplay(raw));
 
