@@ -8,7 +8,7 @@
 <title>Pains Acontece – Notícias, serviços e o que importa em Pains e região</title>
 <meta name="description" content="Portal de notícias hiperlocal de Pains e região."/>
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
-<meta name="pa-build" content="2026.07.05-v12"/>
+<meta name="pa-build" content="2026.07.05-v13"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,700;0,900;1,700&display=swap" rel="stylesheet"/>
@@ -268,7 +268,16 @@ body.cat-filter-mode .category-view { display: block; }
   font-size: .75rem; color: var(--dim); margin-top: 4px;
 }
 .category-view .cat-featured { margin-bottom: 28px; }
-.hamburger { display: none !important; }
+.hamburger {
+  display: none; align-items: center; justify-content: center;
+  width: 40px; height: 40px; border: none; background: rgba(0,0,0,.25);
+  color: #fff; font-size: 1rem; cursor: pointer; flex-shrink: 0;
+  -webkit-tap-highlight-color: transparent;
+}
+.hero.hero-compact { min-height: auto; align-items: flex-start; }
+.hero.hero-compact .hero-scroll { display: none; }
+.hero.hero-compact .hero-content { padding-top: 28px; padding-bottom: 28px; }
+.hero.hero-compact .hero-reel::before { opacity: .07; }
 /* ═══════════════════════════════════════════
    HERO CINEMATOGRÁFICO
 ═══════════════════════════════════════════ */
@@ -1176,40 +1185,75 @@ body.cat-filter-mode .category-view { display: block; }
 }
 
 @media (max-width: 900px) {
-  .main-nav { top: 0; position: relative; }
+  .main-nav { top: 0; position: sticky; z-index: 900; }
   .nav-inner {
     display: flex; flex-direction: row; align-items: stretch;
     position: static; max-height: none;
-    padding: 0 var(--pad-x);
+    padding: 0 8px 0 var(--pad-x);
     box-shadow: none; border-top: none;
+    overflow-x: auto; -webkit-overflow-scrolling: touch;
+    scroll-snap-type: x proximity;
+    mask-image: linear-gradient(to right, transparent, #000 10px, #000 calc(100% - 28px), transparent);
+    -webkit-mask-image: linear-gradient(to right, transparent, #000 10px, #000 calc(100% - 28px), transparent);
   }
-  .nav-item a { padding: 0 11px; min-height: 40px; font-size: .62rem; }
-  .nav-item.nav-pauta a { padding: 0 14px; }
-  .search-wrap { order: 3; flex: 1 1 100%; max-width: 100%; }
+  .nav-item { scroll-snap-align: start; }
+  .nav-item a { padding: 0 10px; min-height: 40px; font-size: .6rem; letter-spacing: .8px; }
+  .nav-item.nav-pauta a { padding: 0 12px; }
+  .header-inner { flex-wrap: wrap; min-height: auto; padding-top: 10px; padding-bottom: 10px; gap: 8px; }
+  .search-wrap { order: 10; flex: 1 1 100%; max-width: 100%; margin-top: 2px; }
   .sec-head { flex-wrap: wrap; gap: 10px; }
   .sec-head .view-all { margin-left: auto; }
   body.cat-filter-mode .category-view { padding-top: clamp(72px, 12vw, 100px); }
 }
 
 @media (max-width: 768px) {
-  .logo img { height: 40px; }
-  .hero { min-height: auto; }
-  .hero-title { font-size: clamp(1.75rem, 7vw, 2.2rem); }
-  .breaking-items { overflow-x: auto; -webkit-overflow-scrolling: touch; }
-  .breaking-items .breaking-item { flex-shrink: 0; }
+  .logo img { height: 38px; }
+  .hero { min-height: auto; align-items: flex-start; }
+  .hero-content { padding: 28px var(--pad-x) 32px; }
+  .hero-scroll { display: none; }
+  .hero-title { font-size: clamp(1.65rem, 7vw, 2.1rem); }
+  .hero-lead { font-size: .88rem; margin-bottom: 18px; }
+  .hero-eyebrow { margin-bottom: 14px; }
+  .hero-eyebrow .label { letter-spacing: 2px; }
+  .breaking-inner { padding: 0; }
+  .breaking-tag { padding: 10px 14px; padding-right: 24px; font-size: .55rem; letter-spacing: 2px; }
+  .breaking-items { overflow-x: auto; -webkit-overflow-scrolling: touch; padding: 0 12px; gap: 12px; }
+  .breaking-items .breaking-item { flex-shrink: 0; max-width: 72vw; overflow: hidden; text-overflow: ellipsis; }
+  .section { padding: clamp(28px, 5vw, 48px) 0; }
+  .sec-head { margin-bottom: 22px; }
+  .sec-head h2 { font-size: clamp(1.35rem, 5.5vw, 1.75rem); }
+  #ultimasGrid .ncard, #ultimasGrid .ncard-xl,
+  #categoryGrid .ncard, #categoryFeatured .ncard-xl,
+  .feat-2col .ncard, .feat-2col .ncard-xl {
+    opacity: 1 !important; transform: none !important;
+  }
   .ncard-xl .xl-title { font-size: clamp(1.1rem, 4.5vw, 1.35rem); }
   .ncard-xl .xl-body { padding: 20px 16px; }
   .pauta-form .row2 { grid-template-columns: 1fr; }
   .foot-bottom { justify-content: center; text-align: center; }
-  .social-band-inner { justify-content: flex-start; }
+  .social-band-inner { justify-content: flex-start; flex-wrap: wrap; gap: 8px; }
+  .social-band { padding: 16px var(--pad-x); }
+  .ticker { height: 30px; }
+  .ticker-lbl { padding: 0 10px; font-size: .54rem; letter-spacing: 1.5px; min-width: 68px; }
+  .ticker-items span { font-size: .66rem; }
+  .ticker::after { width: 48px; }
+  .header-right .h-social.fb,
+  .header-right .h-social.yt { display: none; }
+  .lang-btn { padding: 6px 8px; font-size: .62rem; }
+  .h-admin-btn span { display: none; }
+  .h-admin-btn { padding: 8px 10px; margin-left: 0; }
 }
 
 @media (max-width: 480px) {
-  .header-right .h-social { width: 32px; height: 32px; font-size: .75rem; }
-  .h-admin-btn { padding: 8px 10px; font-size: .62rem; }
-  .ticker-lbl { padding: 0 12px; font-size: .58rem; letter-spacing: 2px; }
-  .breaking-tag { padding: 10px 14px; font-size: .55rem; }
-  .sec-head h2 { font-size: clamp(1.25rem, 6vw, 1.6rem); }
+  .header-right .h-social { width: 30px; height: 30px; font-size: .72rem; }
+  .header-right .h-social.tk { display: none; }
+  .h-admin-btn { padding: 7px 9px; font-size: .62rem; }
+  .ticker-lbl { padding: 0 8px; font-size: .52rem; letter-spacing: 1.2px; min-width: 62px; }
+  .breaking-tag { padding: 9px 12px; font-size: .52rem; }
+  .sec-head h2 { font-size: clamp(1.2rem, 6vw, 1.5rem); }
+  .nav-item a { padding: 0 8px; font-size: .58rem; }
+  .btn-hero { width: 100%; justify-content: center; padding: 12px 20px; }
+  .grid-3 { grid-template-columns: 1fr; }
 }
 
 @media (max-width: 360px) {
@@ -1778,7 +1822,7 @@ document.querySelectorAll('.ncard, .ncard-xl, .srv-card').forEach(card => {
 <script src="js/ai/agents/camila.js"></script>
 <script src="js/ai/orchestrator.js"></script>
 <script src="js/ai/engine.js"></script>
-<script src="js/core/api.js?v=20260705v10"></script>
+<script src="js/core/api.js?v=20260705v13"></script>
 <script src="js/ui/corner-notify.js"></script>
 <script src="js/ui/i18n.js"></script>
 <script src="js/ai/agents/rafaela.js"></script>

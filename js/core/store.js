@@ -3,7 +3,18 @@ const PAStore = (function () {
   let articles = [];
 
   async function init() {
-    articles = await PAAPI.getArticles();
+    try {
+      articles = await PAAPI.getArticles();
+    } catch (err) {
+      try {
+        const cached = JSON.parse(localStorage.getItem(LS_KEY) || '[]');
+        if (cached.length) {
+          articles = cached;
+          return articles;
+        }
+      } catch {}
+      throw err;
+    }
     localStorage.setItem(LS_KEY, JSON.stringify(articles));
     return articles;
   }

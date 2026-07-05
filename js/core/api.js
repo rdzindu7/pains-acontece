@@ -485,11 +485,15 @@ const PAAPI = (function () {
     },
 
     async getArticles(status) {
-      let q = sb().from('articles').select('*').order('id', { ascending: false });
-      if (status) q = q.eq('status', status);
-      const { data, error } = await q;
-      if (error) throw error;
-      return (data || []).map(rowToArticle);
+      let remoteList = [];
+      try {
+        let q = sb().from('articles').select('*').order('id', { ascending: false });
+        if (status) q = q.eq('status', status);
+        const { data, error } = await q;
+        if (!error) remoteList = (data || []).map(rowToArticle);
+      } catch {}
+      if (remoteList.length) return remoteList;
+      return local.getArticles(status);
     },
 
     async getArticle(id) {

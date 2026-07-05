@@ -71,6 +71,13 @@
     return today.length ? today : arts;
   }
 
+  function filterForDisplay(arts) {
+    const verified = (arts || []).filter(a => a.verified !== false && (a.confidence || 0) >= 55);
+    if (!verified.length) return [];
+    if (isOwnerView()) return filterToday(verified);
+    return sortByRecent(verified);
+  }
+
   function quickBtn(id) {
     return `<span class="quick-btn" onclick="event.preventDefault();event.stopPropagation();location.href='pages/noticia.html?id=${id}&mode=quick'"><i class="fas fa-bolt"></i> Rápida</span>`;
   }
@@ -162,6 +169,7 @@
     const el = document.getElementById('heroDynamic');
     if (!el) return;
     const hero = arts[0];
+    document.querySelector('.hero')?.classList.toggle('hero-compact', !hero);
     if (!hero) {
       const iaBtn = isOwnerView()
         ? '<button type="button" class="btn-hero" onclick="PAPublicIA.runSearch()">Buscar agora <i class="fas fa-rss arr"></i></button>'
@@ -333,6 +341,11 @@
   let revealObserver = null;
 
   function observeReveals() {
+    if (window.innerWidth <= 768) {
+      document.querySelectorAll(
+        '#ultimasGrid .reveal, #categoryGrid .reveal, #categoryFeatured .reveal, .feat-2col .reveal, .section .reveal'
+      ).forEach(el => el.classList.add('visible'));
+    }
     revealVisibleNow();
     if (!revealObserver) {
       revealObserver = new IntersectionObserver(entries => {
@@ -450,7 +463,8 @@
   window.applyNav = applyNav;
 
   function applyArticles(raw, gated) {
-    allPub = filterToday(gated?.length ? gated : raw.filter(a => a.verified !== false && (a.confidence || 0) >= 55));
+    const pool = gated?.length ? gated : raw;
+    allPub = filterForDisplay(pool);
     if (currentNav === 'home') renderHome();
     else applyNav(currentNav);
   }
@@ -566,10 +580,18 @@
   }
 
   async function init() {
-    await PAStore.init();
-    const raw = PAStore.getArticles('pub');
+    let raw = [];
+    try {
+      await PAStore.init();
+      raw = PAStore.getArticles('pub');
+    } catch {
+      showToast('Carregando notícias do cache local…', 'error');
+      try {
+        raw = JSON.parse(localStorage.getItem('pa_articles_cache_v2') || '[]').filter(a => a.status === 'pub');
+      } catch {}
+    }
 
-    applyArticles(raw, raw.filter(a => a.verified !== false && (a.confidence || 0) >= 55));
+    applyArticles(raw, filterForDisplay(raw));
 
     setupNav();
     setupPhoneSearch();
