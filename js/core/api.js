@@ -103,17 +103,23 @@ const PAAPI = (function () {
     return !!(sessionStorage.getItem('pa_auth_mode') || sessionStorage.getItem('pa_token'));
   }
 
+  function isPublicSitePage() {
+    return !/\/pages\/admin\.html/i.test(location.pathname);
+  }
+
   function getDeletedSet() {
     const state = getState();
     return new Set((state.deleted || []).map(String));
   }
 
   function isArticleDeleted(id) {
+    if (isPublicSitePage()) return false;
     if (!isAdminSession()) return false;
     return getDeletedSet().has(String(id));
   }
 
   function applyDeletedFilter(list) {
+    if (isPublicSitePage()) return list;
     if (!isAdminSession()) return list;
     const hidden = getDeletedSet();
     if (!hidden.size) return list;
