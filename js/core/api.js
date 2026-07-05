@@ -270,7 +270,7 @@ const PAAPI = (function () {
 
     async runScanner() {
       const state = getState();
-      const { items, seenUrls } = await PAScanner.scanNews(state.scanner.seen_urls || []);
+      const { items, seenUrls } = await PAScanner.scanNewsQuick(state.scanner.seen_urls || []);
       const existing = new Set([
         ...(await fetchJson('articles.json')).map(a => a.title.toLowerCase()),
         ...state.articles?.map(a => a.title.toLowerCase()) || [],
@@ -437,7 +437,7 @@ const PAAPI = (function () {
     async runScanner() {
       const { data: scannerRow } = await sb().from('scanner_state').select('*').eq('id', 1).maybeSingle();
       const seenUrls = scannerRow?.seen_urls || [];
-      const { items, seenUrls: newSeen } = await PAScanner.scanNews(seenUrls);
+      const { items, seenUrls: newSeen } = await PAScanner.scanNewsQuick(seenUrls);
 
       const [{ data: articles }, { data: pending }] = await Promise.all([
         sb().from('articles').select('title'),

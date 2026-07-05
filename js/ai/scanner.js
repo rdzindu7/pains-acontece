@@ -106,6 +106,9 @@ const PAScanner = (function () {
   const FETCH_TIMEOUT = 7000;
   const DEEP_VERIFY_MAX = 12;
   const DEEP_VERIFY_CONCURRENCY = 4;
+  const QUICK_VERIFY_MAX = 8;
+  const QUICK_VERIFY_CONCURRENCY = 6;
+  const SCAN_QUICK_TIMEOUT = 55000;
 
   function pickImage(cat) {
     const imgs = {
@@ -358,6 +361,62 @@ const PAScanner = (function () {
     return html;
   }
 
+  function quickVerifyPublication(item, allFeeds, cat) {
+    const keys = keywords(item.title + ' ' + stripHtml(item.summary));
+    const articleUrl = extractArticleUrl(item.summary, item.link);
+    const trusted = isTrusted(articleUrl) || isTrusted(item.link);
+
+    const corroborations = allFeeds
+      .filter(f => f.link !== item.link)
+      .map(f => ({
+        title: f.title, link: f.link, source: f.source || extractSource(f.link),
+        score: matchScore(f.title + ' ' + stripHtml(f.summary), keys),
+        overlap: titleOverlap(item.title, f.title)
+      }))
+      .filter(f => f.score >= 0.25 || f.overlap >= 0.3)
+      .sort((a, b) => b.score + b.overlap - (a.score + a.overlap))
+      .slice(0, 6);
+
+    let confidence = 42;
+    if (corroborations.length >= 1) confidence += 16;
+    if (corroborations.length >= 2) confidence += 10;
+    if (trusted) confidence += 18;
+    if (item.image || extractImagesFromHtml(item.summary)) confidence += 8;
+    confidence = Math.min(92, confidence);
+
+    const approved = confidence >= 52 && (corroborations.length >= 1 || trusted);
+    const sources = [
+      { title: item.title, url: articleUrl || item.link, source: item.source || extractSource(item.link) },
+      ...corroborations.map(c => ({ title: c.title, url: c.link, source: c.source }))
+    ];
+    const audit = {
+      corroborations: corroborations.length,
+      pageValidated: false,
+      trusted,
+      feedsScanned: allFeeds.length,
+      checkedAt: new Date().toISOString(),
+      quick: true
+    };
+    const img = normalizeImageUrl(item.image) || extractImagesFromHtml(item.summary) || pickImage(cat);
+    const lead = makeLead(item.title, item.summary);
+    const quickLead = makeQuickLead(item.title, stripHtml(item.summary), []);
+    const pageMeta = { excerpt: stripHtml(item.summary), paragraphs: [], images: [] };
+
+    return {
+      approved,
+      verified: approved && confidence >= 60,
+      confidence,
+      lead,
+      quickLead,
+      content: buildDeepContent(item, pageMeta, sources, confidence, audit, img),
+      img,
+      sources,
+      source_url: articleUrl || item.link,
+      deepVerified: true,
+      audit
+    };
+  }
+
   async function deepVerifyPublication(item, allFeeds, cat) {
     const keys = keywords(item.title + ' ' + stripHtml(item.summary));
     const articleUrl = extractArticleUrl(item.summary, item.link);
@@ -525,6 +584,58 @@ const PAScanner = (function () {
     }
   }
 
+  async function processItemsQuick(all, seen, limit) {
+    const sorted = [...all].sort((a, b) => {
+      const imgScore = i => (i.image ? 3 : 0);
+      return imgScore(b) - imgScore(a) || (b.feedPriority || 0) - (a.feedPriority || 0) || b.pubDate - a.pubDate;
+    });
+    const batch = [];
+    for (const item of sorted) {
+      if (seen.has(item.link)) continue;
+      if (!isFreshNews(item.pubDate)) continue;
+      const cat = detectCategory(item.title, item.summary, item.region, item.world);
+      batch.push({ item, cat });
+      seen.add(item.link);
+      if (limit && batch.length >= limit) break;
+      if (batch.length >= QUICK_VERIFY_MAX) break;
+    }
+
+    const total = batch.length;
+    let done = 0;
+    const verified = await mapPool(batch, QUICK_VERIFY_CONCURRENCY, async ({ item, cat }) => {
+      const deep = quickVerifyPublication(item, all, cat);
+      done++;
+      setDeepProgress(done, total, item.title);
+      if (!deep.approved) return null;
+      return {
+        title: item.title,
+        lead: deep.lead,
+        quickLead: deep.quickLead,
+        content: deep.content,
+        cat, img: deep.img, author: 'IA Pains Acontece',
+        date: formatDateBR(item.pubDate),
+        pubISO: item.pubDate.toISOString(),
+        timeAgo: formatDate(item.pubDate),
+        source: item.source, source_url: deep.source_url, region: item.region,
+        verified: deep.verified, confidence: deep.confidence,
+        deepVerified: true, audit: deep.audit, sources: deep.sources,
+        status: 'pending'
+      };
+    });
+
+    const items = verified.filter(Boolean);
+    setDeepProgress(total, total, 'Concluído');
+    items.sort((a, b) => b.confidence - a.confidence);
+    return items;
+  }
+
+  function withTimeout(promise, ms) {
+    return Promise.race([
+      promise,
+      new Promise((_, reject) => setTimeout(() => reject(new Error('scan_timeout')), ms))
+    ]);
+  }
+
   async function processItems(all, seen, limit) {
     const sorted = [...all].sort((a, b) => {
       const imgScore = i => (i.image ? 3 : 0);
@@ -625,6 +736,29 @@ const PAScanner = (function () {
     return { items, seenUrls: [...seen] };
   }
 
+  async function getFeedItemsQuick() {
+    if (feedCache && Date.now() - feedCacheAt < CACHE_TTL) return feedCache;
+    const priorityFeeds = RSS_FEEDS.filter(f => (f.priority || 0) >= 2);
+    const mapFeed = async cfg => {
+      const items = await fetchFeed(cfg);
+      return items.map(i => ({ ...i, feedPriority: cfg.priority || 0, world: !!cfg.world }));
+    };
+    const results = await Promise.all(priorityFeeds.map(mapFeed));
+    feedCache = results.flat();
+    feedCacheAt = Date.now();
+    return feedCache;
+  }
+
+  async function scanNewsQuick(seenUrls = []) {
+    return withTimeout((async () => {
+      ogFetchCount = OG_FETCH_MAX;
+      const all = await getFeedItemsQuick();
+      const seen = new Set(seenUrls);
+      const items = await processItemsQuick(all, seen, QUICK_VERIFY_MAX);
+      return { items, seenUrls: [...seen], quick: true };
+    })(), SCAN_QUICK_TIMEOUT);
+  }
+
   async function scanNewsFull(seenUrls = []) {
     ogFetchCount = 0;
     imageCache.clear();
@@ -721,7 +855,7 @@ const PAScanner = (function () {
   }
 
   return {
-    scanNews, scanNewsFull, verifyText, deepVerifyPublication, getFeedItems, searchHeadlines, searchPublished,
+    scanNews, scanNewsQuick, scanNewsFull, verifyText, deepVerifyPublication, quickVerifyPublication, getFeedItems, searchHeadlines, searchPublished,
     detectCategory, pickImage, resolveItemImage, formatDate, keywords, RSS_FEEDS,
     isFreshNews, startOfTodayBR, makeQuickLead,
     getDeepProgress: () => deepVerifyProgress,

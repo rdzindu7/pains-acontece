@@ -685,6 +685,9 @@ body{background:var(--k2);font-family:var(--fb);color:var(--w);display:flex}
           <i class="fas fa-sync-alt"></i> Buscar Agora
         </button>
       </div>
+      <div id="iaScanStatus" style="display:none;font-size:.72rem;color:var(--g3);margin:-16px 0 20px;padding:10px 14px;background:rgba(29,122,29,.08);border:1px solid rgba(29,122,29,.2);border-radius:4px">
+        <i class="fas fa-satellite-dish"></i> <span id="iaScanStatusText">Lucas Ferreira buscando fontes…</span>
+      </div>
       <div class="dash-grid" style="grid-template-columns:repeat(3,1fr);margin-bottom:24px">
         <div class="stat-card" style="--accent:var(--g3)">
           <div class="ic"><i class="fas fa-hourglass-half"></i></div>
@@ -1208,6 +1211,21 @@ function showToast(msg, type = 'success', dur = 3500) {
 let modalPendingId = null;
 let knownPendingIds = new Set();
 let iaPollTimer = null;
+let iaScanning = false;
+
+function setScanUI(active, text) {
+  const btn = document.getElementById('btnScan');
+  const bar = document.getElementById('iaScanStatus');
+  const txt = document.getElementById('iaScanStatusText');
+  if (btn) {
+    btn.disabled = !!active;
+    btn.innerHTML = active
+      ? `<i class="fas fa-spinner fa-spin"></i> ${text || 'Buscando…'}`
+      : '<i class="fas fa-sync-alt"></i> Buscar Agora';
+  }
+  if (bar) bar.style.display = active ? 'block' : 'none';
+  if (txt && text) txt.textContent = text;
+}
 
 async function renderPending() {
   const list = document.getElementById('pendingList');
@@ -1259,20 +1277,40 @@ async function updateScannerStatus() {
 }
 
 async function runScanNow() {
-  const btn = document.getElementById('btnScan');
-  btn.disabled = true;
-  btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Buscando…';
+  if (iaScanning) return;
+  iaScanning = true;
+  setScanUI(true, 'Buscando…');
+
+  const onProgress = (e) => {
+    const d = e.detail;
+    if (!d || !iaScanning) return;
+    setScanUI(true, `Lucas: verificando ${d.current}/${d.total}…`);
+  };
+  window.addEventListener('pa-deep-verify', onProgress);
+
   try {
+    setScanUI(true, 'Lucas Ferreira: conectando feeds…');
     const res = await PAAPI.runScanner();
-    showToast(`Varredura concluída — ${res.found} nova(s) notícia(s) encontrada(s)!`, res.found ? 'success' : 'info');
+    setScanUI(true, 'Camila Rocha: organizando resultados…');
+    showToast(
+      res.found
+        ? `Varredura concluída — ${res.found} nova(s) notícia(s) para aprovação!`
+        : 'Varredura concluída — nenhuma notícia nova hoje (já verificadas ou sem matérias frescas).',
+      res.found ? 'success' : 'info'
+    );
     await renderPending();
     await updateScannerStatus();
     if (res.found > 0) showPanel('ia', document.getElementById('sbIA'));
-  } catch {
-    showToast('Erro na varredura. Verifique sua conexão com a internet.', 'error');
+  } catch (err) {
+    const msg = err?.message === 'scan_timeout'
+      ? 'Busca excedeu o tempo limite (55s). Tente novamente — os feeds podem estar lentos.'
+      : 'Erro na varredura. Verifique sua conexão.';
+    showToast(msg, 'error');
+  } finally {
+    window.removeEventListener('pa-deep-verify', onProgress);
+    setScanUI(false);
+    iaScanning = false;
   }
-  btn.disabled = false;
-  btn.innerHTML = '<i class="fas fa-sync-alt"></i> Buscar Agora';
 }
 
 async function approvePending(id) {
@@ -1779,6 +1817,8 @@ if (artStatusEl) {
     const items = await PAAPI.getPending();
     items.forEach(i => knownPendingIds.add(i.id));
   } catch {}
+  setScanUI(false);
+  iaScanning = false;
   iaPollTimer = setInterval(pollPending, 30000);
   pollPending();
 })();
