@@ -7,8 +7,12 @@ const PASupabase = (function () {
     return !!(url && key && !url.includes('SUA_URL') && !key.includes('SUA_CHAVE'));
   }
 
+  function libReady() {
+    return typeof supabase !== 'undefined';
+  }
+
   function init() {
-    if (!isConfigured() || typeof supabase === 'undefined') return null;
+    if (!isConfigured() || !libReady()) return null;
     if (!client) {
       client = supabase.createClient(PAConfig.supabaseUrl.trim(), PAConfig.supabaseAnonKey.trim(), {
         auth: { persistSession: true, autoRefreshToken: true, detectSessionInUrl: true }
@@ -59,5 +63,16 @@ const PASupabase = (function () {
     return () => data?.subscription?.unsubscribe?.();
   }
 
-  return { isConfigured, init, getClient, signOut, getSession, signInWithGoogle, handleAuthCallback, onAuthStateChange };
+  async function ensureReady(ms) {
+    if (!isConfigured()) return null;
+    if (libReady()) return getClient();
+    const deadline = Date.now() + (ms || 8000);
+    while (Date.now() < deadline) {
+      await new Promise(r => setTimeout(r, 50));
+      if (libReady()) return init();
+    }
+    return null;
+  }
+
+  return { isConfigured, libReady, init, getClient, ensureReady, signOut, getSession, signInWithGoogle, handleAuthCallback, onAuthStateChange };
 })();

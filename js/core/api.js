@@ -311,7 +311,7 @@ const PAAPI = (function () {
   }
 
   async function isCloudReady() {
-    if (!supabaseConfigured()) return false;
+    if (!supabaseConfigured() || typeof supabase === 'undefined') return false;
     if (cloudOk !== null) return cloudOk;
     try {
       const { error } = await withTimeout(
