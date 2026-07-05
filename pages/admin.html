@@ -1444,6 +1444,7 @@ function applyRoleRestrictions() {
   const acc = PAAPI.getAdminAccounts().find(a => a.email.toLowerCase() === u.toLowerCase());
   if (!sessionStorage.getItem('pa_user_name') && acc) sessionStorage.setItem('pa_user_name', acc.name);
   applyRoleRestrictions();
+  if (isOwnerUser && typeof PADivulgacaoIA !== 'undefined') PADivulgacaoIA.init();
   loadProfile();
   renderProfile();
 })();

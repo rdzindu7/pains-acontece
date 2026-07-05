@@ -573,6 +573,11 @@
     }
 
     startAutoScanLoop();
+
+    if (isOwnerView()) {
+      document.body.classList.add('pa-owner');
+      if (typeof PADivulgacaoIA !== 'undefined') PADivulgacaoIA.init();
+    }
   }
 
   window.enviarPauta = async function (e) {
