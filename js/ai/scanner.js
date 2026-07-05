@@ -258,6 +258,127 @@ const PAScanner = (function () {
     return html;
   }
 
+  function titleOverlap(a, b) {
+    const wa = new Set(norm(a).split(/\s+/).filter(w => w.length > 3));
+    const wb = new Set(norm(b).split(/\s+/).filter(w => w.length > 3));
+    if (!wa.size || !wb.size) return 0;
+    let hit = 0;
+    wa.forEach(w => { if (wb.has(w)) hit++; });
+    return hit / Math.max(wa.size, wb.size);
+  }
+
+  function extractPageMeta(html) {
+    if (!html) return { title: '', excerpt: '', valid: false };
+    const getMeta = (prop) => {
+      const m = html.match(new RegExp(`property=["']${prop}["'][^>]*content=["']([^"']+)["']`, 'i'))
+        || html.match(new RegExp(`content=["']([^"']+)["'][^>]*property=["']${prop}["']`, 'i'));
+      return m ? stripHtml(m[1]) : '';
+    };
+    const title = getMeta('og:title') || getMeta('twitter:title');
+    let excerpt = getMeta('og:description') || getMeta('description');
+    if (!excerpt) {
+      const p = html.match(/<p[^>]*>([^<]{60,500})<\/p>/i);
+      if (p) excerpt = stripHtml(p[1]);
+    }
+    return { title, excerpt };
+  }
+
+  function buildDeepContent(item, excerpt, sources, confidence, audit) {
+    const articleUrl = extractArticleUrl(item.summary, item.link);
+    const body = excerpt || stripHtml(item.summary) || item.title;
+    let html = `<p>${body.length > 500 ? body.slice(0, 497) + '…' : body}</p>`;
+    html += `<p><strong>${item.title}</strong> — matéria verificada pela IA editorial do Pains Acontece após busca minuciosa em múltiplas fontes.</p>`;
+    if (sources.length) {
+      html += `<p><strong>Fontes consultadas (${sources.length}):</strong></p><ul>`;
+      sources.slice(0, 6).forEach(s => {
+        html += `<li><a href="${s.url}" target="_blank" rel="noopener">${s.title}</a> — <em>${s.source}</em></li>`;
+      });
+      html += '</ul>';
+    }
+    html += `<p><em>✓ Verificação minuciosa — confiança ${confidence}% · ${audit.corroborations} corroboração(ões) · página ${audit.pageValidated ? 'validada' : 'não validada'} · ${new Date().toLocaleString('pt-BR')}</em></p>`;
+    if (articleUrl) html += `<p><a href="${articleUrl}" target="_blank" rel="noopener">Leia na fonte original</a></p>`;
+    return html;
+  }
+
+  async function deepVerifyPublication(item, allFeeds, cat) {
+    const keys = keywords(item.title + ' ' + stripHtml(item.summary));
+    const articleUrl = extractArticleUrl(item.summary, item.link);
+    const trusted = isTrusted(articleUrl) || isTrusted(item.link);
+
+    const corroborations = allFeeds
+      .filter(f => f.link !== item.link)
+      .map(f => ({
+        title: f.title, link: f.link, source: f.source || extractSource(f.link),
+        score: matchScore(f.title + ' ' + stripHtml(f.summary), keys),
+        overlap: titleOverlap(item.title, f.title)
+      }))
+      .filter(f => f.score >= 0.28 || f.overlap >= 0.35)
+      .sort((a, b) => b.score + b.overlap - (a.score + a.overlap))
+      .slice(0, 8);
+
+    let pageValidated = false;
+    let excerpt = '';
+    if (articleUrl && !/news\.google\.com\/rss/i.test(articleUrl) && ogFetchCount < OG_FETCH_MAX) {
+      ogFetchCount++;
+      const html = await fetchHtml(articleUrl);
+      if (html) {
+        const meta = extractPageMeta(html);
+        excerpt = meta.excerpt;
+        const blob = norm(meta.title + ' ' + meta.excerpt + ' ' + html.slice(0, 8000));
+        const titleChunk = norm(item.title).slice(0, 50);
+        pageValidated = matchScore(blob, keys) >= 0.22
+          || (titleChunk.length > 10 && blob.includes(titleChunk))
+          || keys.filter(k => blob.includes(k)).length >= Math.min(3, keys.length);
+        const pageImg = extractImagesFromHtml(html);
+        if (pageImg) item.image = pageImg;
+      }
+    }
+
+    let confidence = 40;
+    if (corroborations.length >= 1) confidence += 14;
+    if (corroborations.length >= 2) confidence += 12;
+    if (corroborations.length >= 4) confidence += 8;
+    if (trusted) confidence += 16;
+    if (pageValidated) confidence += 18;
+    if (item.image || extractImagesFromHtml(item.summary)) confidence += 6;
+    confidence = Math.min(97, confidence);
+
+    const approved = confidence >= 58 && (
+      corroborations.length >= 1 || pageValidated || trusted
+    );
+
+    const sources = [
+      { title: item.title, url: articleUrl || item.link, source: item.source || extractSource(item.link) },
+      ...corroborations.map(c => ({ title: c.title, url: c.link, source: c.source }))
+    ];
+
+    const audit = {
+      corroborations: corroborations.length,
+      pageValidated,
+      trusted,
+      feedsScanned: allFeeds.length,
+      checkedAt: new Date().toISOString()
+    };
+
+    const img = await resolveItemImage(item, cat);
+    const lead = excerpt
+      ? (excerpt.length > 220 ? excerpt.slice(0, 217) + '…' : excerpt)
+      : makeLead(item.title, item.summary);
+
+    return {
+      approved,
+      verified: approved && confidence >= 65,
+      confidence,
+      lead,
+      content: buildDeepContent(item, excerpt, sources, confidence, audit),
+      img,
+      sources,
+      source_url: articleUrl || item.link,
+      deepVerified: true,
+      audit
+    };
+  }
+
   async function fetchXml(url) {
     const attempts = [
       url,
@@ -316,6 +437,16 @@ const PAScanner = (function () {
     } catch { return []; }
   }
 
+  const DEEP_VERIFY_MAX = 40;
+  let deepVerifyProgress = null;
+
+  function setDeepProgress(current, total, title) {
+    deepVerifyProgress = { current, total, title };
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('pa-deep-verify', { detail: deepVerifyProgress }));
+    }
+  }
+
   async function processItems(all, seen, limit) {
     const sorted = [...all].sort((a, b) => {
       const imgScore = i => (i.image ? 3 : 0);
@@ -324,27 +455,37 @@ const PAScanner = (function () {
     const batch = [];
     for (const item of sorted) {
       if (seen.has(item.link)) continue;
-      const confidence = calcConfidence(item, all);
       const cat = detectCategory(item.title, item.summary, item.region, item.world);
-      batch.push({ item, confidence, cat });
+      batch.push({ item, cat });
       seen.add(item.link);
       if (limit && batch.length >= limit) break;
+      if (batch.length >= DEEP_VERIFY_MAX) break;
     }
 
     ogFetchCount = 0;
-    const items = await Promise.all(batch.map(async ({ item, confidence, cat }) => {
-      const img = await resolveItemImage(item, cat);
-      return {
+    const items = [];
+    const total = batch.length;
+
+    for (let i = 0; i < batch.length; i++) {
+      const { item, cat } = batch[i];
+      setDeepProgress(i + 1, total, item.title);
+      const deep = await deepVerifyPublication(item, all, cat);
+      if (!deep.approved) continue;
+      items.push({
         title: item.title,
-        lead: makeLead(item.title, item.summary),
-        content: buildContent(item.title, item.summary, item.source, item.link),
-        cat, img, author: 'IA Pains Acontece',
+        lead: deep.lead,
+        content: deep.content,
+        cat, img: deep.img, author: 'IA Pains Acontece',
         date: item.pubDate.toLocaleDateString('pt-BR'),
         timeAgo: formatDate(item.pubDate),
-        source: item.source, source_url: item.link, region: item.region,
-        verified: confidence >= 65, confidence, status: 'pending'
-      };
-    }));
+        source: item.source, source_url: deep.source_url, region: item.region,
+        verified: deep.verified, confidence: deep.confidence,
+        deepVerified: true, audit: deep.audit, sources: deep.sources,
+        status: 'pending'
+      });
+    }
+
+    setDeepProgress(total, total, 'Concluído');
     items.sort((a, b) => b.confidence - a.confidence);
     return items;
   }
@@ -494,8 +635,9 @@ const PAScanner = (function () {
   }
 
   return {
-    scanNews, scanNewsFull, verifyText, searchHeadlines, searchPublished,
+    scanNews, scanNewsFull, verifyText, deepVerifyPublication, getFeedItems, searchHeadlines, searchPublished,
     detectCategory, pickImage, resolveItemImage, formatDate, keywords, RSS_FEEDS,
-    invalidateCache: () => { feedCache = null; feedCacheAt = 0; imageCache.clear(); ogFetchCount = 0; }
+    getDeepProgress: () => deepVerifyProgress,
+    invalidateCache: () => { feedCache = null; feedCacheAt = 0; imageCache.clear(); ogFetchCount = 0; deepVerifyProgress = null; }
   };
 })();

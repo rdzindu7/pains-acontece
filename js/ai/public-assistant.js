@@ -63,7 +63,16 @@ const PAPublicIA = (function () {
   async function runSearch() {
     if (scanning) return;
     scanning = true;
-    addMsg('bot', '<i class="fas fa-satellite-dish"></i> Varredura inteligente em andamento: Pains MG, região, Brasil e mundo…');
+    addMsg('bot', '<i class="fas fa-satellite-dish"></i> <strong>Busca minuciosa</strong> em andamento — cada matéria será verificada em múltiplas fontes antes de publicar…');
+    const onProgress = (e) => {
+      const d = e.detail;
+      if (!d || !scanning) return;
+      const el = document.querySelector('#papiaMsgs .papia-msg.bot:last-child');
+      if (el && el.querySelector('.fa-satellite-dish')) {
+        el.innerHTML = `<i class="fas fa-satellite-dish"></i> Verificando <strong>${d.current}/${d.total}</strong>: ${(d.title || '').slice(0, 55)}…`;
+      }
+    };
+    window.addEventListener('pa-deep-verify', onProgress);
     try {
       PAScanner.invalidateCache?.();
       const result = await PAAutoPublisher.run(true);
@@ -72,11 +81,12 @@ const PAPublicIA = (function () {
       const pub = result.published || 0;
       const scanned = result.scanned || 0;
       addMsg('bot', pub
-        ? `✓ <strong>${pub}</strong> fato(s) verificado(s) publicado(s) de <strong>${scanned}</strong> fontes analisadas. Confira as abas Pains, Região e Brasil/Mundo.`
-        : `Análise concluída (${scanned} itens). Nenhuma novidade verificada para publicar agora — as matérias já estão atualizadas.`);
+        ? `✓ <strong>${pub}</strong> matéria(s) passaram na <strong>verificação minuciosa</strong> e foram publicadas (${scanned} analisadas). Cada uma foi cruzada com múltiplas fontes.`
+        : `Busca minuciosa concluída (${scanned} itens analisados). Nenhuma nova matéria aprovada — as publicações já estão verificadas.`);
     } catch {
       addMsg('bot', 'Não foi possível concluir a varredura. Verifique sua conexão e tente novamente.');
     }
+    window.removeEventListener('pa-deep-verify', onProgress);
     scanning = false;
   }
 

@@ -56,7 +56,9 @@ const PAAPI = (function () {
       timeAgo: row.time_ago,
       views: row.views ?? 0,
       verified: row.verified,
-      confidence: row.confidence
+      confidence: row.confidence,
+      deepVerified: row.deep_verified ?? row.deepVerified,
+      source_url: row.source_url
     };
   }
 
@@ -74,6 +76,8 @@ const PAAPI = (function () {
     if (data.views !== undefined) row.views = data.views;
     if (data.verified !== undefined) row.verified = data.verified;
     if (data.confidence !== undefined) row.confidence = data.confidence;
+    if (data.deepVerified !== undefined) row.deep_verified = data.deepVerified;
+    if (data.source_url !== undefined) row.source_url = data.source_url;
     return row;
   }
 

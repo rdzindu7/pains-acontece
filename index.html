@@ -552,6 +552,14 @@ body.cat-filter-mode .category-view { display: block; }
   opacity: 0; transition: opacity .3s; pointer-events: none;
 }
 .pa-loading-bar.active { opacity: 1; }
+.pa-loading-status {
+  position: fixed; top: 8px; left: 50%; transform: translateX(-50%);
+  z-index: 10003; background: rgba(8,8,8,.92); border: 1px solid rgba(29,122,29,.4);
+  padding: 8px 16px; border-radius: 20px; font-size: .72rem; color: var(--y);
+  opacity: 0; pointer-events: none; transition: opacity .3s; max-width: min(90vw, 520px);
+  text-align: center; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+.pa-loading-status.active { opacity: 1; }
 @keyframes loadingBar { from { background-position: 200% 0; } to { background-position: -200% 0; } }
 
 /* ═══════════════════════════════════════════
@@ -1099,6 +1107,7 @@ body.cat-filter-mode .category-view { display: block; }
 </head>
 <body>
 <div class="pa-loading-bar" id="paLoadingBar"></div>
+<div class="pa-loading-status" id="paLoadingStatus"></div>
 <div class="pa-toast-wrap" id="paToastWrap"></div>
 <div class="cursor-glow" id="cursorGlow"></div>
 <!-- TICKER -->
@@ -1552,6 +1561,7 @@ document.querySelectorAll('.ncard, .ncard-xl, .srv-card').forEach(card => {
 <script src="js/ai/engine.js"></script>
 <script src="js/core/api.js"></script>
 <script src="js/core/store.js"></script>
+<script src="js/ai/content-gate.js"></script>
 <script src="js/ai/autopublisher.js"></script>
 <script src="js/pages/weather.js"></script>
 <script src="js/ai/public-assistant.js"></script>

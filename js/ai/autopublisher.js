@@ -36,6 +36,7 @@ const PAAutoPublisher = (function () {
       if (published >= maxPub) break;
       const t = (item.title || '').toLowerCase().trim();
       if (!t || titles.has(t)) continue;
+      if (!item.deepVerified) continue;
       if (item.confidence < minConf) continue;
       if (!item.verified && item.confidence < (isEmpty ? 62 : 75)) continue;
 
@@ -52,6 +53,8 @@ const PAAutoPublisher = (function () {
           timeAgo: item.timeAgo || 'Agora',
           verified: item.verified,
           confidence: item.confidence,
+          deepVerified: true,
+          source_url: item.source_url,
           views: 0
         });
         titles.add(t);

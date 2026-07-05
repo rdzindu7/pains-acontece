@@ -39,8 +39,13 @@
     }, 4500);
   }
 
-  function setLoading(on) {
+  function setLoading(on, msg) {
     document.getElementById('paLoadingBar')?.classList.toggle('active', !!on);
+    const st = document.getElementById('paLoadingStatus');
+    if (st) {
+      st.classList.toggle('active', !!on && !!msg);
+      if (msg) st.textContent = msg;
+    }
   }
 
   function card(a, size) {
@@ -350,7 +355,24 @@
     } catch {}
 
     await PAStore.init();
-    allPub = PAStore.getArticles('pub');
+    const raw = PAStore.getArticles('pub');
+
+    if (typeof PAContentGate !== 'undefined' && raw.length) {
+      setLoading(true, 'IA: busca minuciosa das matérias…');
+      window.addEventListener('pa-deep-verify', e => {
+        const d = e.detail;
+        if (d) setLoading(true, `Verificando ${d.current}/${d.total}: ${(d.title || '').slice(0, 50)}…`);
+      });
+      allPub = await PAContentGate.gate(raw, (c, t, title) => {
+        setLoading(true, `Auditoria ${c}/${t}: ${(title || '').slice(0, 45)}…`);
+      });
+      if (allPub.length < raw.length) {
+        showToast(`${allPub.length} de ${raw.length} matérias passaram na verificação minuciosa`, 'success');
+      }
+    } else {
+      allPub = raw.filter(a => a.verified !== false && (a.confidence || 0) >= 55);
+    }
+
     renderHome();
     setupNav();
     setupPhoneSearch();
@@ -389,7 +411,7 @@
       });
     }
 
-    setLoading(false);
+    setLoading(false, '');
   }
 
   window.enviarPauta = async function (e) {
