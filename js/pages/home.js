@@ -580,17 +580,21 @@
 
   function runAutoScan() {
     if (autoScanRunning) return;
-    const fullAuto = typeof PAAutomation !== 'undefined' && PAAutomation.autoScan();
-    if (fullAuto || isOwnerView() || shouldAutoPublish()) {
-      executeBackgroundSearch(true);
+    if (isOwnerView()) {
+      if (typeof PAAutomation === 'undefined' || PAAutomation.autoScan()) {
+        executeBackgroundSearch(true);
+      }
+      return;
     }
+    if (shouldAutoPublish()) executeBackgroundSearch(true);
   }
 
   function startAutoScanLoop() {
+    if (!isOwnerView() && allPub.length) return;
     const ms = typeof PAAutomation !== 'undefined' ? PAAutomation.scanMs() : AUTO_SCAN_MS;
     clearInterval(autoScanTimer);
     autoScanTimer = setInterval(runAutoScan, ms);
-    setTimeout(runAutoScan, 8000);
+    setTimeout(runAutoScan, isOwnerView() ? 12000 : 3000);
   }
 
   function startPublicRefreshLoop() {
