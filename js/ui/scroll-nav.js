@@ -46,6 +46,7 @@ const PAScrollNav = (function () {
   }
 
   function init() {
+    if (/noticia\.html/i.test(location.pathname)) return;
     if (window.matchMedia('(max-width: 768px)').matches) return;
     inject();
   }
