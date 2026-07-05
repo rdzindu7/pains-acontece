@@ -7,7 +7,7 @@
 <link rel="apple-touch-icon" href="../assets/images/favicon.jpg"/>
 <title>Painel – Pains Acontece</title>
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
-<meta name="pa-build" content="2026.07.05-v4"/>
+<meta name="pa-build" content="2026.07.05-v5"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
@@ -1022,6 +1022,7 @@ body.pa-owner .owner-only.btn-pub{display:flex!important}
               <textarea id="pfBio" style="min-height:80px" placeholder="Uma breve descrição sobre você…">Portal de notícias hiperlocal de Pains e região — Sudoeste Mineiro.</textarea>
             </div>
             <button class="btn-pub green" onclick="saveProfile()"><i class="fas fa-save"></i> Salvar Dados</button>
+            <button class="btn-pub red-btn" onclick="zeroProfilePanel()" style="margin-top:4px"><i class="fas fa-undo"></i> Zerar Perfil e Estatísticas</button>
           </div>
         </div>
 
@@ -2006,11 +2007,39 @@ function profileKey() {
   return sessionStorage.getItem('pa_user') || 'default';
 }
 
+function getDefaultProfile() {
+  const u = sessionStorage.getItem('pa_user') || 'admin@painsacontece.com.br';
+  const acc = PAAPI.getAdminAccounts().find(a => a.email.toLowerCase() === u.toLowerCase());
+  const owner = PAAPI.isOwner();
+  const baseName = acc?.name || 'Usuário';
+  return {
+    name: owner ? 'Proprietário Pains Acontece' : baseName + ' — Pains Acontece',
+    byline: 'Redação Pains Acontece',
+    email: u,
+    phone: '',
+    role: owner ? 'Proprietário' : 'Editor',
+    bio: 'Portal de notícias hiperlocal de Pains e região — Sudoeste Mineiro.'
+  };
+}
+
+function applyDefaultProfile() {
+  const d = getDefaultProfile();
+  const set = (id, val) => { const el = document.getElementById(id); if (el) el.value = val ?? ''; };
+  set('pfName', d.name);
+  set('pfByline', d.byline);
+  set('pfEmail', d.email);
+  set('pfPhone', d.phone);
+  set('pfRole', d.role);
+  set('pfBio', d.bio);
+}
+
 function loadProfile() {
   try {
     const all = JSON.parse(localStorage.getItem(LS_PROFILE)) || {};
-    const data = all[profileKey()];
-    if (!data) return;
+    let data = all[profileKey()];
+    if (!data) { applyDefaultProfile(); return; }
+    const bad = /^(admin|administrador)$/i.test((data.name || '').trim());
+    if (bad) { applyDefaultProfile(); return; }
     const set = (id, val) => { const el = document.getElementById(id); if (el && val != null) el.value = val; };
     set('pfName', data.name);
     set('pfByline', data.byline);
@@ -2018,7 +2047,7 @@ function loadProfile() {
     set('pfPhone', data.phone);
     set('pfRole', data.role);
     set('pfBio', data.bio);
-  } catch {}
+  } catch { applyDefaultProfile(); }
 }
 
 function saveProfileData() {
@@ -2042,14 +2071,21 @@ function fmtProfileNum(n) {
   return n.toLocaleString('pt-BR');
 }
 
+function getProfileArticles() {
+  try {
+    const state = JSON.parse(localStorage.getItem('pa_admin_state_v2') || '{}');
+    return Array.isArray(state.articles) ? state.articles : [];
+  } catch { return []; }
+}
+
 function renderProfileStats() {
-  const arts = getArticles();
+  const arts = getProfileArticles();
   const pub = arts.filter(a => a.status === 'pub').length;
   const draft = arts.filter(a => a.status === 'draft').length;
-  const views = arts.reduce((s, a) => s + (a.views || 0), 0);
+  const views = arts.reduce((s, a) => s + (Number(a.views) || 0), 0);
   const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
   set('phStatPub', pub);
-  set('phStatViews', fmtProfileNum(views));
+  set('phStatViews', views === 0 ? '0' : fmtProfileNum(views));
   set('phStatDraft', draft);
 }
 
@@ -2057,7 +2093,8 @@ function renderProfile() {
   const u = sessionStorage.getItem('pa_user') || '';
   const acc = PAAPI.getAdminAccounts().find(a => a.email.toLowerCase() === u.toLowerCase());
   const savedName = document.getElementById('pfName')?.value?.trim();
-  const displayName = savedName || sessionStorage.getItem('pa_user_name') || acc?.name || 'Usuário';
+  let displayName = savedName || sessionStorage.getItem('pa_user_name') || acc?.name || 'Usuário';
+  if (/^admin$/i.test(displayName)) displayName = isOwnerUser ? 'Proprietário Pains Acontece' : 'Editor';
   const roleLabel = isOwnerUser ? 'Proprietário' : (document.getElementById('pfRole')?.value || acc?.role === 'editor' ? 'Editor' : 'Colaborador');
   const initial = displayName.charAt(0).toUpperCase();
 
@@ -2090,6 +2127,28 @@ function saveProfile() {
   saveProfileData();
   renderProfile();
   showToast('Perfil atualizado com sucesso!', 'success');
+}
+
+async function zeroProfilePanel() {
+  if (!confirm('Zerar perfil e estatísticas?\n\nIsso apaga dados salvos localmente (perfil, rascunhos, publicações do navegador, mídia e cache). O painel volta a 0.')) return;
+  const key = profileKey();
+  try {
+    const prof = JSON.parse(localStorage.getItem(LS_PROFILE) || '{}');
+    delete prof[key];
+    localStorage.setItem(LS_PROFILE, JSON.stringify(prof));
+  } catch {}
+  localStorage.removeItem('pa_admin_state_v2');
+  localStorage.removeItem('pa_articles_cache_v2');
+  localStorage.removeItem('pa_media_library_v1');
+  knownPendingIds.clear();
+  applyDefaultProfile();
+  saveProfileData();
+  await PAStore.init();
+  renderProfile();
+  renderDashboard();
+  renderPubs();
+  if (document.getElementById('panel-ia')?.classList.contains('active')) await renderPending();
+  showToast('Perfil e estatísticas zerados — tudo em 0!', 'success');
 }
 function changePassword() {
   const np = document.getElementById('newPass').value;
