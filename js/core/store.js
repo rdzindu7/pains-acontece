@@ -111,12 +111,7 @@ const PAStore = (function () {
   }
 
   function notifySiteUpdate() {
-    if (typeof PAAutoReload !== 'undefined') {
-      PAAutoReload.signalUpdate();
-      if (typeof PAAutoReload.softRefresh === 'function') {
-        PAAutoReload.softRefresh().catch(() => {});
-      }
-    }
+    if (typeof PAAutoReload !== 'undefined') PAAutoReload.signalUpdate();
   }
 
   async function addArticle(payload) {
