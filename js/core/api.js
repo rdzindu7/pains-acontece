@@ -103,9 +103,25 @@ const PAAPI = (function () {
     return !!(sessionStorage.getItem('pa_auth_mode') || sessionStorage.getItem('pa_token'));
   }
 
+  function getDeletedSet() {
+    const state = getState();
+    return new Set((state.deleted || []).map(String));
+  }
+
+  function isArticleDeleted(id) {
+    return getDeletedSet().has(String(id));
+  }
+
+  function applyDeletedFilter(list) {
+    const hidden = getDeletedSet();
+    if (!hidden.size) return list;
+    return list.filter(a => !hidden.has(String(a.id)));
+  }
+
   async function fetchArticleFromJson(id) {
     try {
       const sid = String(id);
+      if (isArticleDeleted(sid)) return null;
       const base = await fetchJson('articles.json');
       const fromBase = base.find(a => String(a.id) === sid);
       if (fromBase) return fromBase;
@@ -116,12 +132,11 @@ const PAAPI = (function () {
     }
   }
 
-  /** Lista pública — nunca aplica deleted (só o painel admin filtra removidas). */
   async function fetchArticlesFromJson(status) {
     try {
       const base = await fetchJson('articles.json');
       const state = getState();
-      let list = mergeArticles(base, state.articles);
+      let list = applyDeletedFilter(mergeArticles(base, state.articles));
       if (status) list = list.filter(a => a.status === status);
       return list;
     } catch {
@@ -308,7 +323,25 @@ const PAAPI = (function () {
     return jsonList;
   }
 
+  async function getArticlesAdmin(status) {
+    let remoteList = [];
+    if (supabaseConfigured() && sessionStorage.getItem('pa_auth_mode')) {
+      try {
+        if (await isCloudReady()) {
+          let q = sb().from('articles').select('*').order('id', { ascending: false });
+          if (status) q = q.eq('status', status);
+          const { data, error } = await q;
+          if (!error) remoteList = (data || []).map(rowToArticle);
+        }
+      } catch {}
+    }
+    const jsonList = await fetchArticlesForAdmin(status);
+    if (remoteList.length) return mergeArticles(jsonList, remoteList);
+    return jsonList;
+  }
+
   async function getArticlePublic(id) {
+    if (isArticleDeleted(id)) return null;
     const fromJson = await fetchArticleFromJson(id);
     if (fromJson) return fromJson;
     try {
@@ -364,10 +397,11 @@ const PAAPI = (function () {
     },
 
     async getArticles(status) {
-      return fetchArticlesFromJson(status);
+      return fetchArticlesForAdmin(status);
     },
 
     async getArticle(id) {
+      if (isArticleDeleted(id)) return null;
       const arts = await this.getArticles();
       const found = arts.find(a => String(a.id) === String(id));
       if (found) return found;
@@ -522,15 +556,21 @@ const PAAPI = (function () {
       return Promise.resolve({ ok: true, message: 'Busca resetada. Todas as fontes serão verificadas novamente.' });
     },
 
-    purgeAllPublications() {
+    async purgeAllPublications() {
+      const base = await fetchJson('articles.json').catch(() => []);
       const state = getState();
+      const allIds = [...new Set([
+        ...base.map(a => String(a.id)),
+        ...(state.articles || []).map(a => String(a.id))
+      ])];
       state.articles = [];
-      state.deleted = [];
+      state.deleted = allIds;
       state.pending = [];
       state.scanner = normalizeScanner({ last_scan: null, seen_urls: [] });
+      state.purged_at = new Date().toISOString();
       saveAdminState(state);
       try { localStorage.removeItem('pa_articles_cache_v2'); } catch {}
-      return Promise.resolve({ ok: true, removed: 'all' });
+      return { ok: true, removed: allIds.length };
     },
 
     sendPauta(data) {
@@ -926,9 +966,9 @@ const PAAPI = (function () {
         const { data, error } = await q;
         if (!error) remoteList = (data || []).map(rowToArticle);
       } catch {}
-      const localList = await fetchArticlesFromJson(status);
+      const localList = await fetchArticlesForAdmin(status);
       if (remoteList.length) return mergeArticles(localList, remoteList);
-      return localList.length ? localList : local.getArticles(status);
+      return localList;
     },
 
     async getArticle(id) {
@@ -967,9 +1007,21 @@ const PAAPI = (function () {
     },
 
     async deleteArticle(id) {
-      const { error } = await sb().from('articles').delete().eq('id', id);
-      if (error) throw error;
-      return { ok: true };
+      try {
+        const { error } = await sb().from('articles').delete().eq('id', id);
+        if (error) console.warn('[api] supabase delete:', error.message);
+      } catch {}
+      return local.deleteArticle(id);
+    },
+
+    async resetScanner() {
+      try {
+        await sb().from('pending_articles').delete().neq('id', '');
+        await sb().from('scanner_state').upsert({
+          id: 1, seen_urls: [], last_scan: null, interval_minutes: SCAN_INTERVAL_MINUTES
+        });
+      } catch {}
+      return local.resetScanner();
     },
 
     async incrementViews(id) {
@@ -1102,11 +1154,16 @@ const PAAPI = (function () {
     },
 
     async purgeAllPublications() {
-      await sb().from('pending_articles').delete().neq('id', '');
-      await sb().from('articles').delete().gte('id', 0);
-      await sb().from('scanner_state').upsert({
-        id: 1, seen_urls: [], last_scan: null, interval_minutes: SCAN_INTERVAL_MINUTES
-      });
+      try {
+        await sb().from('pending_articles').delete().neq('id', '');
+        const { error } = await sb().from('articles').delete().gte('id', 0);
+        if (error) console.warn('[api] supabase purge:', error.message);
+        await sb().from('scanner_state').upsert({
+          id: 1, seen_urls: [], last_scan: null, interval_minutes: SCAN_INTERVAL_MINUTES
+        });
+      } catch (e) {
+        console.warn('[api] supabase purge falhou:', e);
+      }
       return local.purgeAllPublications();
     }
   };
@@ -1130,7 +1187,7 @@ const PAAPI = (function () {
     isSupabaseMode: async () => (await getBackend()).isSupabaseMode(),
     getArticles: async (s) => getArticlesPublic(s),
     getArticle: async (id) => getArticlePublic(id),
-    getArticlesAdmin: async (s) => (await getBackend()).getArticles(s),
+    getArticlesAdmin: async (s) => getArticlesAdmin(s),
     fetchArticleFromJson,
     getArticlePublic,
     getArticlesPublic,

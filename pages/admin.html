@@ -7,7 +7,7 @@
 <link rel="apple-touch-icon" href="../assets/images/favicon.jpg"/>
 <title>Painel – Pains Acontece</title>
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
-<meta name="pa-build" content="2026.07.05-v18"/>
+<meta name="pa-build" content="2026.07.05-v19"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
@@ -2179,17 +2179,17 @@ body.pa-owner .owner-only.btn-pub{display:flex!important}
 <script src="../js/core/config.js"></script>
 <script src="../js/core/supabase-client.js"></script>
 <script src="../js/ui/article-format.js"></script>
-<script src="../js/ai/scanner.js"></script>
+<script src="../js/ai/scanner.js?v=20260705v39"></script>
 <script src="../js/ai/agents/sofia.js"></script>
 <script src="../js/ai/agents/lucas.js"></script>
 <script src="../js/ai/agents/camila.js"></script>
 <script src="../js/ai/orchestrator.js"></script>
 <script src="../js/ai/engine.js"></script>
-<script src="../js/core/purge.js?v=20260705v18"></script>
-<script src="../js/core/auto-reload.js?v=20260705v18"></script>
+<script src="../js/core/purge.js?v=20260705v19"></script>
+<script src="../js/core/auto-reload.js?v=20260705v19"></script>
 <script src="../js/ai/agents/tiago.js?v=20260705v26"></script>
 <script src="../js/ai/bus-assistant.js?v=20260705v26"></script>
-<script src="../js/core/api.js?v=20260705v26"></script>
+<script src="../js/core/api.js?v=20260705v39"></script>
 <script src="../js/ui/directory.js?v=20260705v23"></script>
 <script src="../js/ui/ads.js?v=20260705v21"></script>
 <script src="../js/ui/corner-notify.js"></script>
@@ -2199,7 +2199,7 @@ body.pa-owner .owner-only.btn-pub{display:flex!important}
 <script src="../js/ai/divulgacao-assistant.js"></script>
 <script src="../js/ui/dialog.js?v=20260705v25"></script>
 <script src="../js/core/social.js?v=20260705v33"></script>
-<script src="../js/core/store.js?v=20260705v33"></script>
+<script src="../js/core/store.js?v=20260705v39"></script>
 <script>
 /* ════ AUTH GUARD ════ */
 let isOwnerUser = false;
@@ -2510,7 +2510,7 @@ async function approvePending(id) {
     pendingPreviewId = null;
     closeModal('previewModal');
     showToast('Notícia publicada no portal!', 'success');
-    await PAStore.init();
+    await PAStore.initAdmin();
     if (typeof PAAutoReload !== 'undefined') PAAutoReload.signalUpdate();
     await renderPending();
     await updateScannerStatus();
@@ -2677,7 +2677,7 @@ function startAdminAutoScan() {
 }
 
 /* ════ PUBLICAÇÕES DATA ════ */
-async function refreshStore() { await PAStore.init(); }
+async function refreshStore() { await PAStore.initAdmin(); }
 function getArticles() { return PAStore.articlesForAdmin(); }
 
 const STATUS_LABELS = { pub:'Publicado', draft:'Rascunho', review:'Revisão' };
@@ -2788,7 +2788,7 @@ function openDelete(id) { currentDeleteId = id; document.getElementById('deleteM
 async function confirmDelete() {
   await PAStore.deleteArticle(currentDeleteId);
   closeModal('deleteModal');
-  showToast('Publicação excluída com sucesso.', 'error');
+  showToast('Publicação excluída com sucesso.', 'success');
   renderPubs();
   renderDashboard();
 }
@@ -2821,10 +2821,10 @@ async function confirmDeleteAll() {
   }
   try {
     await PAAPI.purgeAllPublications();
-    await PAStore.refreshFromCloud?.().catch(() => PAStore.init());
+    PAStore.clearArticles();
     if (typeof PAAutoReload !== 'undefined') PAAutoReload.signalUpdate();
     closeModal('deleteAllModal');
-    showToast(`${total} publicação${total > 1 ? 'ões removidas' : ' removida'} com sucesso.`, 'error');
+    showToast(`${total} publicação${total > 1 ? 'ões removidas' : ' removida'}. Exporte o JSON vazio no GitHub para atualizar o site online.`, 'success', 7000);
     renderPubs();
     renderDashboard();
     if (typeof window.PAHomeRefresh === 'function') window.PAHomeRefresh();
@@ -2926,7 +2926,7 @@ async function publishArticle(skipPreview) {
     editingId = null;
     closeModal('previewModal');
     clearEditor();
-    await PAStore.init();
+    await PAStore.initAdmin();
     PAStore.syncLocalCache?.();
     if (payload.status === 'pub') autoSyncSiteNotice();
     renderDashboard();
@@ -3244,7 +3244,7 @@ async function zeroProfilePanel() {
   knownPendingIds.clear();
   applyDefaultProfile();
   saveProfileData();
-  await PAStore.init();
+  await PAStore.initAdmin();
   renderProfile();
   renderDashboard();
   renderPubs();
@@ -4002,7 +4002,7 @@ async function importGitHub(input) {
   if (!file) return;
   try {
     await PAAPI.importFromFile(file);
-    await PAStore.init();
+    await PAStore.initAdmin();
     if (typeof PAAutoReload !== 'undefined') PAAutoReload.signalUpdate();
     renderPubs();
     showToast('JSON importado com sucesso!', 'success');
@@ -4249,7 +4249,7 @@ async function revokeVerifiedManual() {
   if (typeof PAContentPurge !== 'undefined') PAContentPurge.run();
   if (PASupabase.isConfigured()) await testSupabase();
   else updateSupabaseStatus(false);
-  await PAStore.init();
+  await PAStore.initAdmin();
   renderDashboard();
   renderPubs();
   await updateScannerStatus();

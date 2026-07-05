@@ -33,9 +33,13 @@ const PAStore = (function () {
     return loadFromLocalSources().find(a => String(a.id) === sid) || null;
   }
 
-  async function init() {
+  async function init(opts) {
+    const useAdmin = !!(opts && opts.admin);
+    const loader = useAdmin && typeof PAAPI.getArticlesAdmin === 'function'
+      ? () => PAAPI.getArticlesAdmin()
+      : () => PAAPI.getArticles();
     try {
-      articles = await withTimeout(PAAPI.getArticles(), 8000);
+      articles = await withTimeout(loader(), 8000);
     } catch (err) {
       const local = loadFromLocalSources();
       if (local.length) {
@@ -134,7 +138,10 @@ const PAStore = (function () {
 
   async function refreshFromCloud() {
     try {
-      articles = await withTimeout(PAAPI.getArticles(), 8000);
+      const loader = typeof PAAPI.getArticlesAdmin === 'function'
+        ? () => PAAPI.getArticlesAdmin()
+        : () => PAAPI.getArticles();
+      articles = await withTimeout(loader(), 8000);
       syncLocalCache();
       return articles;
     } catch {
@@ -142,8 +149,17 @@ const PAStore = (function () {
     }
   }
 
+  function clearArticles() {
+    articles = [];
+    try { localStorage.removeItem(LS_KEY); } catch {}
+  }
+
+  function initAdmin() {
+    return init({ admin: true });
+  }
+
   return {
-    init, getArticles, getArticle, fetchArticlePublic, findArticleLocal, syncLocalCache, refreshFromCloud,
-    articlesForAdmin, addArticle, updateArticle, deleteArticle, incrementViews
+    init, initAdmin, clearArticles, getArticles, getArticle, fetchArticlePublic, findArticleLocal,
+    syncLocalCache, refreshFromCloud, articlesForAdmin, addArticle, updateArticle, deleteArticle, incrementViews
   };
 })();

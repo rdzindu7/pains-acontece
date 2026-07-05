@@ -6,7 +6,7 @@
 <link rel="icon" type="image/jpeg" href="../assets/images/favicon.jpg"/>
 <link rel="apple-touch-icon" href="../assets/images/favicon.jpg"/>
 <title>Notícia – Pains Acontece</title>
-<meta name="pa-build" content="2026.07.05-v18"/>
+<meta name="pa-build" content="2026.07.05-v19"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,700;0,900;1,700&display=swap" rel="stylesheet"/>
@@ -339,11 +339,11 @@ body.cat-pains{--accent:#1d7a1d;--accent-glow:rgba(29,122,29,.35)}
 <script src="../js/core/supabase-client.js"></script>
 <script src="../js/ui/article-format.js"></script>
 <script src="../js/ai/scanner.js"></script>
-<script src="../js/core/purge.js?v=20260705v18"></script>
-<script src="../js/core/auto-reload.js?v=20260705v18"></script>
-<script src="../js/core/api.js?v=20260705v36"></script>
+<script src="../js/core/purge.js?v=20260705v19"></script>
+<script src="../js/core/auto-reload.js?v=20260705v19"></script>
+<script src="../js/core/api.js?v=20260705v39"></script>
 <script src="../js/ui/ads.js?v=20260705v36"></script>
-<script src="../js/core/store.js?v=20260705v18"></script>
+<script src="../js/core/store.js?v=20260705v39"></script>
 
 <script src="../js/ai/agents/sofia.js"></script>
 <script src="../js/ai/agents/lucas.js"></script>
@@ -487,7 +487,15 @@ body.cat-pains{--accent:#1d7a1d;--accent-glow:rgba(29,122,29,.35)}
   window.PACurrentArticle=art;
   PAStore.incrementViews(id).catch(()=>{});
 
-  const related=PAStore.getArticles('pub').filter(a=>a.id!==art.id&&a.cat===art.cat).slice(0,3);
+  let relatedPool=[];
+  try{
+    await withTimeout(PAStore.init(),5000);
+    relatedPool=PAStore.getArticles('pub');
+  }catch(e){console.warn('[noticia] related init',e)}
+  if(!relatedPool.length&&typeof PAAPI.getArticlesPublic==='function'){
+    try{relatedPool=await PAAPI.getArticlesPublic('pub')}catch(e){}
+  }
+  const related=relatedPool.filter(a=>String(a.id)!==String(art.id)&&a.cat===art.cat).slice(0,3);
   let quickText=art.quickLead||art.lead||art.title;
   if(quickText.length>400&&typeof PAArticleFormat!=='undefined'){
     quickText=PAArticleFormat.firstParagraph(quickText,380)||quickText.slice(0,377)+'…';
