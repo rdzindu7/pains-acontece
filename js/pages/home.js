@@ -630,19 +630,20 @@
   }
 
   async function init() {
-    let raw = [];
-    try {
-      await PAStore.init();
-      raw = PAStore.getArticles('pub');
-    } catch {
-      showToast('Carregando notícias do cache local…', 'error');
+    let raw = await fetchPubFromJson();
+    if (!raw.length) {
+      try { localStorage.removeItem('pa_articles_cache_v2'); } catch {}
+      applyArticles([], []);
+    } else {
       try {
-        raw = JSON.parse(localStorage.getItem('pa_articles_cache_v2') || '[]').filter(a => a.status === 'pub');
-      } catch {}
+        await PAStore.init();
+        raw = PAStore.getArticles('pub');
+        if (!raw.length) raw = await fetchPubFromJson();
+      } catch {
+        raw = await fetchPubFromJson();
+      }
+      applyArticles(raw, filterForDisplay(raw));
     }
-    if (!raw.length) raw = await fetchPubFromJson();
-
-    applyArticles(raw, filterForDisplay(raw));
 
     setupNav();
     setupPhoneSearch();

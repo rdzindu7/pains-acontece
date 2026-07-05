@@ -41,28 +41,39 @@ const PAStore = (function () {
     try {
       articles = await withTimeout(loader(), 8000);
     } catch (err) {
-      const local = loadFromLocalSources();
-      if (local.length) {
-        articles = local;
-        return articles;
+      if (useAdmin) {
+        const local = loadFromLocalSources();
+        if (local.length) {
+          articles = local;
+          return articles;
+        }
+      }
+      if (!useAdmin) {
+        try {
+          articles = await withTimeout(PAAPI.fetchArticlesFromJson('pub'), 6000);
+          return articles;
+        } catch {}
       }
       try {
         const cached = JSON.parse(localStorage.getItem(LS_KEY) || '[]');
-        if (cached.length) {
+        if (cached.length && useAdmin) {
           articles = cached;
           return articles;
         }
       } catch {}
       throw err;
     }
-    if (!articles.length) {
+    if (!articles.length && useAdmin) {
       const local = loadFromLocalSources();
       if (local.length) articles = local;
     }
     if (!articles.length && typeof PAAPI !== 'undefined' && PAAPI.fetchArticlesFromJson) {
       try {
-        articles = await withTimeout(PAAPI.fetchArticlesFromJson(), 6000);
+        articles = await withTimeout(PAAPI.fetchArticlesFromJson(useAdmin ? undefined : 'pub'), 6000);
       } catch {}
+    }
+    if (!useAdmin && Array.isArray(articles) && !articles.length) {
+      try { localStorage.removeItem(LS_KEY); } catch {}
     }
     localStorage.setItem(LS_KEY, JSON.stringify(articles));
     if (typeof PAViewsTracker !== 'undefined') articles = PAViewsTracker.mergeArticles(articles);
