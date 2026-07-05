@@ -1027,6 +1027,10 @@ body.pa-owner .owner-only.btn-pub{display:flex!important}
           <span class="sb-nav-ic"><i class="fas fa-user-circle"></i></span>
           <span class="sb-nav-label">Meu Perfil</span>
         </div>
+        <div class="sb-item sb-nav sb-nav--verified owner-only" onclick="showPanel('verificado_adm',this)" id="sbVerified">
+          <span class="sb-nav-ic"><i class="fas fa-check-circle"></i></span>
+          <span class="sb-nav-label">Selo Verificado</span>
+        </div>
         <div class="sb-item sb-nav sb-nav--config" onclick="showPanel('config',this)">
           <span class="sb-nav-ic"><i class="fas fa-cog"></i></span>
           <span class="sb-nav-label">Configurações</span>
@@ -1518,6 +1522,18 @@ body.pa-owner .owner-only.btn-pub{display:flex!important}
       </div>
     </div>
 
+    <!-- ══ SELO VERIFICADO (só proprietário) ══ -->
+    <div class="panel" id="panel-verificado_adm">
+      <div class="cat-hero">
+        <div>
+          <h2><i class="fas fa-check-circle" style="color:#1d9bf0;font-size:1.2rem;margin-right:8px"></i>Selo Verificado</h2>
+          <p>Aprove ou recuse solicitações de leitores. Somente você concede o selo verificado no portal.</p>
+        </div>
+        <button class="tb-btn outline" onclick="renderVerifiedRequests()"><i class="fas fa-sync"></i> Atualizar</button>
+      </div>
+      <div id="verifiedRequestsList" style="margin-top:20px"></div>
+    </div>
+
     <!-- ══ CATEGORIAS ══ -->
     <div class="panel" id="panel-categorias">
       <div class="cat-hero">
@@ -1973,6 +1989,7 @@ body.pa-owner .owner-only.btn-pub{display:flex!important}
 <script src="../js/ai/assistant.js?v=20260705v21"></script>
 <script src="../js/ai/agents/rafaela.js"></script>
 <script src="../js/ai/divulgacao-assistant.js"></script>
+<script src="../js/core/social.js?v=20260705v24"></script>
 <script>
 /* ════ AUTH GUARD ════ */
 let isOwnerUser = false;
@@ -2032,11 +2049,11 @@ const PANEL_LABELS = {
   ia: 'IA de Notícias', divulgacao: 'IA de Divulgação', categorias: 'Categorias',
   midia: 'Biblioteca de Mídia', agenda: 'Agenda de Eventos',
   empregos_adm: 'Vagas de Emprego', publicidades: 'Publicidades',
-  perfil: 'Meu Perfil', config: 'Configurações'
+  perfil: 'Meu Perfil', verificado_adm: 'Selo Verificado', config: 'Configurações'
 };
 
 function showPanel(id, el) {
-  if ((id === 'ia' || id === 'divulgacao') && !isOwnerUser) {
+  if ((id === 'ia' || id === 'divulgacao' || id === 'verificado_adm') && !isOwnerUser) {
     showToast('Recurso disponível apenas para o proprietário.', 'info');
     id = 'dashboard';
     el = document.querySelector('.sb-item');
@@ -2060,6 +2077,7 @@ function showPanel(id, el) {
     if (mount && typeof PADivulgacaoIA !== 'undefined') PADivulgacaoIA.mountInline(mount);
   }
   if (id === 'perfil') renderProfile();
+  if (id === 'verificado_adm' && isOwnerUser) renderVerifiedRequests();
   if (id === 'categorias') renderCategories();
   if (id === 'agenda') renderEvents();
   if (id === 'empregos_adm') renderJobs();
@@ -3698,6 +3716,65 @@ if (artStatusEl) {
   });
 }
 
+async function renderVerifiedRequests() {
+  const el = document.getElementById('verifiedRequestsList');
+  if (!el || typeof PASocial === 'undefined') return;
+  el.innerHTML = '<p style="color:rgba(255,255,255,.4);font-size:.82rem">Carregando solicitações…</p>';
+  try {
+    await PASocial.init();
+    const list = await PASocial.getVerifiedRequests();
+    if (!list.length) {
+      el.innerHTML = '<p style="color:rgba(255,255,255,.4);font-size:.85rem;padding:24px;text-align:center">Nenhuma solicitação pendente.</p>';
+      return;
+    }
+    el.innerHTML = list.map(r => {
+      const p = r.profiles || {};
+      const name = PASocial.esc(p.display_name || 'Leitor');
+      const email = PASocial.esc(p.email || '');
+      const msg = PASocial.esc(r.message || '(sem mensagem)');
+      const date = PASocial.formatDate(r.created_at);
+      const amount = Number(r.amount || 29.9).toFixed(2).replace('.', ',');
+      return `<div style="background:rgba(255,255,255,.03);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:18px;margin-bottom:12px;display:flex;gap:16px;flex-wrap:wrap;align-items:flex-start">
+        <div style="flex:1;min-width:200px">
+          <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+            ${PASocial.avatarHtml(p.avatar_url, p.display_name, 44)}
+            <div>
+              <strong style="font-size:.9rem">${name}</strong><br>
+              <span style="font-size:.72rem;color:rgba(255,255,255,.4)">${email}</span>
+            </div>
+          </div>
+          <p style="font-size:.8rem;color:rgba(255,255,255,.7);margin-bottom:6px">${msg}</p>
+          <span style="font-size:.68rem;color:rgba(255,255,255,.35)">${date} · Plano ${PASocial.esc(r.plan || 'anual')} · R$ ${amount}</span>
+        </div>
+        <div style="display:flex;gap:8px;flex-shrink:0">
+          <button class="btn-pub green" onclick="approveVerifiedReq(${r.id})"><i class="fas fa-check"></i> Aprovar</button>
+          <button class="btn-pub red-btn" onclick="rejectVerifiedReq(${r.id})"><i class="fas fa-times"></i> Recusar</button>
+        </div>
+      </div>`;
+    }).join('');
+  } catch (e) {
+    el.innerHTML = `<p style="color:#e74c3c;font-size:.82rem">${PASocial.esc(e.message)}</p>`;
+  }
+}
+
+async function approveVerifiedReq(id) {
+  if (!confirm('Conceder selo verificado a este usuário por 1 ano?')) return;
+  try {
+    await PASocial.approveVerified(id);
+    showToast('Selo verificado concedido!', 'success');
+    renderVerifiedRequests();
+  } catch (e) { showToast(e.message, 'error'); }
+}
+
+async function rejectVerifiedReq(id) {
+  if (!confirm('Recusar esta solicitação?')) return;
+  try {
+    await PASocial.rejectVerified(id);
+    showToast('Solicitação recusada.', 'info');
+    renderVerifiedRequests();
+  } catch (e) { showToast(e.message, 'error'); }
+}
+
 (async function initAdmin() {
   if (typeof PAContentPurge !== 'undefined') PAContentPurge.run();
   if (PASupabase.isConfigured()) await testSupabase();
@@ -3716,6 +3793,12 @@ if (artStatusEl) {
     iaPollTimer = setInterval(pollPending, 30000);
     pollPending();
     startAdminAutoScan();
+    if (typeof PASocial !== 'undefined') {
+      PASocial.init().then(() => PASocial.getVerifiedRequests()).then(list => {
+        const sb = document.getElementById('sbVerified');
+        if (sb && list.length) sb.querySelector('.sb-nav-label').textContent = `Selo Verificado (${list.length})`;
+      }).catch(() => {});
+    }
   }
   syncCategorySelect();
   renderCategories();

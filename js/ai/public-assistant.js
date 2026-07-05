@@ -210,6 +210,25 @@ const PAPublicIA = (function () {
       return typeof PASofia !== 'undefined' ? PASofia.weather() : { agent: PASofia?.PROFILE, reply: 'Veja a previsão na aba Clima do menu.' };
     }
 
+    if (/selo|verificad|badge|conta verificada|credibilidade/.test(low)) {
+      setActiveAgent('sofia');
+      const plan = PAConfig?.verifiedPlan || {};
+      const price = (plan.price || 29.9).toFixed(2).replace('.', ',');
+      const benefits = (plan.benefits || []).map(b => `• <strong>${esc(b.title)}</strong> — ${esc(b.desc)}`).join('<br>');
+      const verPath = location.pathname.includes('/pages/') ? 'verificado.html' : 'pages/verificado.html';
+      const logged = typeof PASocial !== 'undefined' && PASocial.isLoggedIn?.();
+      const hasBadge = logged && PASocial.isVerified?.(PASocial.getProfile?.());
+      let cta = hasBadge
+        ? 'Você já possui o selo ativo no seu perfil!'
+        : logged
+          ? `Solicite agora em <a class="papia-link" href="${verPath}">Selo Verificado</a> — investimento de <strong>R$ ${price}/ano</strong>.`
+          : `Entre com Google em <a class="papia-link" href="${location.pathname.includes('/pages/') ? 'entrar.html' : 'pages/entrar.html'}">Entrar</a> e depois solicite em <a class="papia-link" href="${verPath}">Selo Verificado</a>.`;
+      return {
+        agent: PASofia?.PROFILE,
+        reply: `<strong>Selo Verificado Pains Acontece</strong><br><br>Identidade reconhecida exclusivamente pelo proprietário do portal. Benefícios:<br><br>${benefits || '• Selo no perfil<br>• Comentários em destaque'}<br><br>${cta}<br><br><span style="font-size:.65rem;color:rgba(255,255,255,.4)">Aprovação feita somente por admin@painsacontece.com.br</span>`
+      };
+    }
+
     if (/últim|ultim|recente|hoje|novidade/.test(low)) {
       setActiveAgent('lucas');
       const arts = await ensureArticles();
@@ -355,6 +374,7 @@ const PAPublicIA = (function () {
     if (cmd === 'mundo') { sendDirect('Quais notícias internacionais do mundo?'); return; }
     if (cmd === 'clima') { sendDirect('como está o clima em Pains?'); return; }
     if (cmd === 'duvida') { sendDirect('Tenho uma dúvida sobre uma publicação'); return; }
+    if (cmd === 'verificado') { sendDirect('Quero saber sobre o selo verificado e seus benefícios'); return; }
     const input = document.getElementById('papiaInput');
     if (input?.value.trim()) send();
   }
@@ -385,6 +405,7 @@ const PAPublicIA = (function () {
     return `
       <button type="button" class="papia-act" onclick="PAPublicIA.quick('ultimas')"><i class="fas fa-newspaper"></i> Últimas</button>
       ${onArticle ? '<button type="button" class="papia-act" onclick="PAPublicIA.quick(\'explicar\')">Explicar matéria</button>' : ''}
+      <button type="button" class="papia-act" onclick="PAPublicIA.quick('verificado')"><i class="fas fa-check-circle"></i> Selo</button>
       <button type="button" class="papia-act" onclick="PAPublicIA.quick('pains')">Pains</button>
       <button type="button" class="papia-act" onclick="PAPublicIA.quick('clima')">Clima</button>
       <button type="button" class="papia-act" onclick="PAPublicIA.quick('duvida')">Tirar dúvida</button>`;

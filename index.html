@@ -1265,6 +1265,7 @@ body.cat-filter-mode .category-view { display: block; }
       <a href="#" class="h-social tk" aria-label="TikTok"><i class="fab fa-tiktok"></i></a>
       <a href="#" class="h-social fb" aria-label="Facebook"><i class="fab fa-facebook-f"></i></a>
       <a href="#" class="h-social yt" aria-label="YouTube"><i class="fab fa-youtube"></i></a>
+      <div id="paUserNav" class="pa-user-nav"></div>
       <a href="pages/login.html" class="h-admin-btn" aria-label="Área administrativa" title="Painel do Administrador">
         <i class="fas fa-lock"></i> <span data-i18n="admin">Admin</span>
       </a>
@@ -1736,6 +1737,9 @@ document.querySelectorAll('.ncard, .ncard-xl, .srv-card').forEach(card => {
 <script src="js/ai/bom-dia.js"></script>
 <script src="js/ui/scroll-nav.js"></script>
 <script src="js/ai/public-assistant.js"></script>
+<script src="js/core/social.js?v=20260705v24"></script>
+<script src="js/ui/user-nav.js?v=20260705v24"></script>
 <script src="js/pages/home.js"></script>
+<script>document.addEventListener('DOMContentLoaded',()=>PAUserNav.init('#paUserNav'));</script>
 </body>
 </html>

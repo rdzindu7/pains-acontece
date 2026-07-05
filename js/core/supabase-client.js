@@ -33,5 +33,31 @@ const PASupabase = (function () {
     return data.session;
   }
 
-  return { isConfigured, init, getClient, signOut, getSession };
+  async function signInWithGoogle(redirectTo) {
+    const c = getClient();
+    if (!c) return { ok: false, error: 'Supabase não configurado' };
+    const { data, error } = await c.auth.signInWithOAuth({
+      provider: 'google',
+      options: { redirectTo, queryParams: { access_type: 'offline', prompt: 'consent' } }
+    });
+    if (error) return { ok: false, error: error.message };
+    return { ok: true, data };
+  }
+
+  async function handleAuthCallback() {
+    const c = getClient();
+    if (!c) return null;
+    const { data, error } = await c.auth.getSession();
+    if (error) return null;
+    return data.session;
+  }
+
+  function onAuthStateChange(cb) {
+    const c = getClient();
+    if (!c) return () => {};
+    const { data } = c.auth.onAuthStateChange((_event, session) => cb(session));
+    return () => data?.subscription?.unsubscribe?.();
+  }
+
+  return { isConfigured, init, getClient, signOut, getSession, signInWithGoogle, handleAuthCallback, onAuthStateChange };
 })();

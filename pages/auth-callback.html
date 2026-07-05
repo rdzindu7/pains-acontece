@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<link rel="icon" type="image/jpeg" href="../assets/images/favicon.jpg"/>
+<title>Autenticando… – Pains Acontece</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet"/>
+<style>
+body{min-height:100dvh;background:#080808;color:#f2f2f2;font-family:'Inter',sans-serif;display:flex;align-items:center;justify-content:center;text-align:center;padding:24px}
+.spinner{width:40px;height:40px;border:3px solid rgba(255,255,255,.1);border-top-color:#2ecc2e;border-radius:50%;animation:spin .8s linear infinite;margin:0 auto 16px}
+@keyframes spin{to{transform:rotate(360deg)}}
+p{color:rgba(255,255,255,.5);font-size:.85rem}
+.err{color:#e74c3c;margin-top:12px}
+a{color:#2ecc2e}
+</style>
+</head>
+<body>
+<div>
+  <div class="spinner" id="spin"></div>
+  <p id="msg">Conectando sua conta Google…</p>
+  <p class="err" id="err"></p>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/core/config.js"></script>
+<script src="../js/core/supabase-client.js"></script>
+<script src="../js/core/social.js?v=20260705v24"></script>
+<script>
+(async function(){
+  const msg = document.getElementById('msg');
+  const err = document.getElementById('err');
+  const spin = document.getElementById('spin');
+  const params = new URLSearchParams(location.search);
+  const redirect = params.get('redirect') || '../index.html';
+
+  try {
+    PASupabase.init();
+    await new Promise(r => setTimeout(r, 400));
+    const session = await PASupabase.handleAuthCallback();
+    if (!session) {
+      await PASocial.init();
+      if (PASocial.isLoggedIn()) {
+        location.replace(redirect);
+        return;
+      }
+      throw new Error('Sessão não encontrada. Tente entrar novamente.');
+    }
+    await PASocial.init();
+    msg.textContent = 'Pronto! Redirecionando…';
+    setTimeout(() => location.replace(redirect), 600);
+  } catch (e) {
+    spin.style.display = 'none';
+    msg.textContent = 'Não foi possível completar o login.';
+    err.innerHTML = (e.message || '') + '<br><br><a href="entrar.html">Tentar novamente</a>';
+  }
+})();
+</script>
+</body>
+</html>

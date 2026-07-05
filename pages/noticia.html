@@ -101,7 +101,10 @@ footer{text-align:center;padding:28px clamp(12px,3vw,28px);font-size:.72rem;colo
 <div class="top-bar">
   <div class="top-inner">
     <a href="../index.html"><img src="../assets/images/pains-acontece-logo.png" alt="Pains Acontece"/></a>
-    <a href="../index.html" class="back"><i class="fas fa-arrow-left"></i> Voltar ao portal</a>
+    <div style="margin-left:auto;display:flex;align-items:center;gap:12px">
+      <div id="paUserNav" class="pa-user-nav"></div>
+      <a href="../index.html" class="back" style="margin-left:0"><i class="fas fa-arrow-left"></i> Voltar</a>
+    </div>
   </div>
 </div>
 <main id="main"></main>
@@ -121,6 +124,9 @@ footer{text-align:center;padding:28px clamp(12px,3vw,28px);font-size:.72rem;colo
 <script src="../js/ai/agents/camila.js"></script>
 <script src="../js/ai/orchestrator.js"></script>
 <script src="../js/ai/public-assistant.js"></script>
+<script src="../js/core/social.js?v=20260705v24"></script>
+<script src="../js/ui/social-widget.js?v=20260705v24"></script>
+<script src="../js/ui/user-nav.js?v=20260705v24"></script>
 <script>
 (async function(){
   const params = new URLSearchParams(location.search);
@@ -213,6 +219,7 @@ footer{text-align:center;padding:28px clamp(12px,3vw,28px);font-size:.72rem;colo
           <a href="#" onclick="navigator.clipboard.writeText(location.href);return false"><i class="fas fa-link"></i></a>
         </div>
       </div>
+      <div id="paSocialMount"></div>
       ${related.length ? `<div class="related"><h3>Notícias Relacionadas</h3><div class="rel-grid">${related.map(r=>`
         <a href="noticia.html?id=${r.id}" class="rel-card"><img src="${esc(r.img)}" alt=""/><div class="body"><h4>${esc(r.title)}</h4></div></a>`).join('')}</div></div>` : ''}
     </article>
@@ -226,7 +233,12 @@ footer{text-align:center;padding:28px clamp(12px,3vw,28px);font-size:.72rem;colo
         render();
       });
     });
+    const socialMount = document.getElementById('paSocialMount');
+    if (socialMount && typeof PASocialWidget !== 'undefined') {
+      PASocialWidget.mount(socialMount, id);
+    }
   }
+  PAUserNav.init('#paUserNav');
   render();
 })();
 </script>

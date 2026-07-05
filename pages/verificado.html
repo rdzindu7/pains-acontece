@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<link rel="icon" type="image/jpeg" href="../assets/images/favicon.jpg"/>
+<title>Selo Verificado – Pains Acontece</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&family=Playfair+Display:wght@700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--g:#1d7a1d;--g3:#2ecc2e;--y:#c9a227;--k:#080808;--k3:#1a1a1a}
+body{background:var(--k);color:#f2f2f2;font-family:'Inter',sans-serif;min-height:100dvh}
+a{text-decoration:none;color:inherit}
+.hero{background:linear-gradient(135deg,rgba(13,77,13,.4),rgba(8,8,8,.95)),url('https://images.unsplash.com/photo-1477959858617-67f85cf4f1df?w=1200&q=60') center/cover;padding:60px 24px 48px;text-align:center;border-bottom:2px solid rgba(201,162,39,.3)}
+.hero .badge{width:72px;height:72px;border-radius:50%;background:linear-gradient(135deg,#1d9bf0,#0d8bd9);display:flex;align-items:center;justify-content:center;margin:0 auto 20px;font-size:2rem;color:#fff;box-shadow:0 8px 32px rgba(29,155,240,.4)}
+.hero h1{font-family:'Playfair Display',serif;font-size:clamp(1.8rem,5vw,2.6rem);margin-bottom:12px}
+.hero p{max-width:520px;margin:0 auto;color:rgba(255,255,255,.6);font-size:.95rem;line-height:1.7}
+.price{margin-top:24px;font-family:'Bebas Neue',sans-serif;letter-spacing:2px;font-size:2rem;color:var(--y)}
+.price small{font-size:.9rem;color:rgba(255,255,255,.4);letter-spacing:1px}
+.wrap{max-width:900px;margin:0 auto;padding:40px 24px 80px}
+.back-link{display:inline-flex;align-items:center;gap:6px;color:var(--g3);font-size:.78rem;margin-bottom:32px}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:18px;margin-bottom:40px}
+.benefit{background:var(--k3);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:22px;transition:border-color .3s,transform .3s}
+.benefit:hover{border-color:rgba(29,155,240,.35);transform:translateY(-3px)}
+.benefit i{font-size:1.4rem;color:#1d9bf0;margin-bottom:12px}
+.benefit h3{font-size:.95rem;font-weight:700;margin-bottom:8px}
+.benefit p{font-size:.8rem;color:rgba(255,255,255,.55);line-height:1.55}
+.cta{background:linear-gradient(135deg,rgba(201,162,39,.12),rgba(29,122,29,.1));border:1px solid rgba(201,162,39,.3);border-radius:12px;padding:32px;text-align:center}
+.cta h2{font-family:'Bebas Neue',sans-serif;letter-spacing:2px;color:var(--y);font-size:1.4rem;margin-bottom:12px}
+.cta p{color:rgba(255,255,255,.55);font-size:.85rem;margin-bottom:20px;max-width:480px;margin-left:auto;margin-right:auto}
+.cta textarea{width:100%;max-width:480px;min-height:80px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:8px;padding:12px;color:#fff;font-family:inherit;font-size:.82rem;margin-bottom:16px;resize:vertical}
+.btn{padding:14px 32px;border-radius:8px;border:none;background:linear-gradient(135deg,#1d9bf0,#0d8bd9);color:#fff;font-weight:800;font-size:.88rem;cursor:pointer;display:inline-flex;align-items:center;gap:10px}
+.btn:disabled{opacity:.5;cursor:wait}
+.btn-login{background:var(--g);margin-left:10px}
+.msg{font-size:.78rem;margin-top:14px;padding:10px;border-radius:6px;display:none}
+.msg.show{display:block}
+.msg.ok{background:rgba(46,204,46,.12);color:var(--g3)}
+.msg.err{background:rgba(231,76,60,.12);color:#e74c3c}
+.note{font-size:.72rem;color:rgba(255,255,255,.35);margin-top:20px}
+.ia-box{margin-top:32px;padding:20px;background:rgba(29,122,29,.08);border-radius:10px;border:1px solid rgba(29,122,29,.2);font-size:.82rem;color:rgba(255,255,255,.65);line-height:1.6}
+.ia-box strong{color:var(--g3)}
+</style>
+</head>
+<body>
+<section class="hero">
+  <div class="badge"><i class="fas fa-check"></i></div>
+  <h1>Selo Verificado Pains Acontece</h1>
+  <p>Identidade reconhecida pela redação. Comentários em destaque, credibilidade local e benefícios exclusivos no portal.</p>
+  <p class="price">R$ <span id="priceVal">29,90</span> <small>/ ano</small></p>
+</section>
+<main class="wrap">
+  <a href="../index.html" class="back-link"><i class="fas fa-arrow-left"></i> Voltar ao portal</a>
+  <div class="grid" id="benefitsGrid"></div>
+  <div class="cta" id="ctaBox">
+    <h2>Solicitar meu selo</h2>
+    <p>A equipe IA apresenta os benefícios e encaminha sua solicitação. A aprovação é feita exclusivamente pelo proprietário do portal.</p>
+    <div id="ctaContent"></div>
+    <p class="note">Pagamento e ativação confirmados após análise da redação. Dúvidas? Fale com a IA no canto da tela.</p>
+  </div>
+  <div class="ia-box">
+    <strong><i class="fas fa-robot"></i> Equipe IA</strong> — Pergunte <em>"quero o selo verificado"</em> no assistente do portal. A Sofia explica os benefícios e ajuda com sua solicitação.
+  </div>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/core/config.js"></script>
+<script src="../js/core/supabase-client.js"></script>
+<script src="../js/core/social.js?v=20260705v24"></script>
+<script>
+(async function(){
+  const plan = PAConfig.verifiedPlan || {};
+  document.getElementById('priceVal').textContent = (plan.price || 29.9).toFixed(2).replace('.', ',');
+
+  const grid = document.getElementById('benefitsGrid');
+  (plan.benefits || []).forEach(b => {
+    grid.innerHTML += `<div class="benefit"><i class="fas ${b.icon}"></i><h3>${b.title}</h3><p>${b.desc}</p></div>`;
+  });
+
+  await PASocial.init();
+  const cta = document.getElementById('ctaContent');
+  const verified = PASocial.isVerified(PASocial.getProfile());
+
+  if (verified) {
+    cta.innerHTML = `<p style="color:#1d9bf0;font-weight:700"><i class="fas fa-check-circle"></i> Você já possui o selo verificado!</p>
+      <a href="conta.html" class="btn" style="margin-top:16px;text-decoration:none"><i class="fas fa-user"></i> Ver meu perfil</a>`;
+    return;
+  }
+
+  if (!PASocial.isLoggedIn()) {
+    cta.innerHTML = `<a href="entrar.html?redirect=${encodeURIComponent(location.href)}" class="btn btn-login"><i class="fab fa-google"></i> Entrar para solicitar</a>`;
+    return;
+  }
+
+  cta.innerHTML = `
+    <textarea id="reqMsg" placeholder="Mensagem opcional (por que deseja o selo?)…" maxlength="500"></textarea><br>
+    <button type="button" class="btn" id="btnRequest"><i class="fas fa-check-circle"></i> Solicitar Selo Verificado</button>
+    <p class="msg" id="reqMsgBox"></p>`;
+
+  document.getElementById('btnRequest').addEventListener('click', async () => {
+    const btn = document.getElementById('btnRequest');
+    const box = document.getElementById('reqMsgBox');
+    btn.disabled = true;
+    box.className = 'msg';
+    try {
+      await PASocial.requestVerified(document.getElementById('reqMsg').value);
+      box.textContent = 'Solicitação enviada! O proprietário analisará em breve. A equipe IA pode ajudar com dúvidas.';
+      box.classList.add('show', 'ok');
+      btn.style.display = 'none';
+    } catch (e) {
+      box.textContent = e.message;
+      box.classList.add('show', 'err');
+      btn.disabled = false;
+    }
+  });
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+<link rel="icon" type="image/jpeg" href="../assets/images/favicon.jpg"/>
+<title>Meu Perfil – Pains Acontece</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet"/>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--g:#1d7a1d;--g3:#2ecc2e;--y:#c9a227;--k:#080808;--k3:#1a1a1a}
+body{background:var(--k);color:#f2f2f2;font-family:'Inter',sans-serif;min-height:100dvh;line-height:1.6}
+a{text-decoration:none;color:inherit}
+.top{background:var(--k3);border-bottom:1px solid rgba(29,122,29,.25);padding:14px 0;position:sticky;top:0;z-index:50}
+.top-inner{max-width:720px;margin:0 auto;padding:0 20px;display:flex;align-items:center;gap:12px}
+.top-inner img{height:36px}
+.back{margin-left:auto;font-size:.78rem;color:var(--g3)}
+.wrap{max-width:720px;margin:0 auto;padding:32px 20px 60px}
+.profile-hero{display:flex;gap:20px;align-items:center;margin-bottom:32px;flex-wrap:wrap}
+.avatar-wrap{position:relative;width:96px;height:96px;flex-shrink:0}
+.avatar-wrap img,.avatar-wrap .av-letter{width:96px;height:96px;border-radius:50%;object-fit:cover;border:3px solid rgba(29,122,29,.4)}
+.av-letter{display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--g),#0d4d0d);font-size:2rem;font-weight:800}
+.profile-hero h1{font-family:'Bebas Neue',sans-serif;letter-spacing:1.5px;font-size:1.8rem;color:var(--y)}
+.profile-hero .email{font-size:.78rem;color:rgba(255,255,255,.4)}
+.verified-pill{display:inline-flex;align-items:center;gap:6px;padding:4px 12px;border-radius:20px;background:rgba(29,155,240,.15);color:#1d9bf0;font-size:.72rem;font-weight:700;margin-top:6px}
+.card{background:var(--k3);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:24px;margin-bottom:20px}
+.card h2{font-family:'Bebas Neue',sans-serif;letter-spacing:1.5px;color:var(--y);font-size:1.1rem;margin-bottom:18px;display:flex;align-items:center;gap:8px}
+.field{margin-bottom:16px}
+.field label{display:block;font-size:.72rem;font-weight:700;color:rgba(255,255,255,.45);margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
+.field input,.field textarea{width:100%;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.1);border-radius:6px;padding:11px 14px;color:#fff;font-family:inherit;font-size:.88rem;outline:none}
+.field input:focus,.field textarea:focus{border-color:var(--g)}
+.field textarea{min-height:100px;resize:vertical}
+.row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:560px){.row{grid-template-columns:1fr}}
+.btn{padding:12px 24px;border-radius:6px;border:none;font-weight:700;font-size:.82rem;cursor:pointer;display:inline-flex;align-items:center;gap:8px}
+.btn-green{background:var(--g);color:#fff}
+.btn-outline{background:transparent;border:1px solid rgba(255,255,255,.15);color:rgba(255,255,255,.7)}
+.msg{font-size:.78rem;margin-top:12px;padding:10px 14px;border-radius:6px;display:none}
+.msg.ok{display:block;background:rgba(46,204,46,.12);color:var(--g3);border:1px solid rgba(46,204,46,.25)}
+.msg.err{display:block;background:rgba(231,76,60,.12);color:#e74c3c;border:1px solid rgba(231,76,60,.25)}
+.promo{padding:20px;background:linear-gradient(135deg,rgba(201,162,39,.1),rgba(29,122,29,.08));border:1px solid rgba(201,162,39,.25);border-radius:10px;margin-bottom:24px}
+.promo h3{font-family:'Bebas Neue',sans-serif;color:var(--y);letter-spacing:1px;margin-bottom:8px}
+.promo p{font-size:.82rem;color:rgba(255,255,255,.6);margin-bottom:12px}
+.promo a{display:inline-flex;align-items:center;gap:6px;color:var(--g3);font-weight:700;font-size:.82rem}
+</style>
+</head>
+<body>
+<div class="top">
+  <div class="top-inner">
+    <a href="../index.html"><img src="../assets/images/pains-acontece-logo.png" alt=""/></a>
+    <a href="../index.html" class="back"><i class="fas fa-arrow-left"></i> Portal</a>
+  </div>
+</div>
+<main class="wrap" id="main">
+  <p style="text-align:center;color:rgba(255,255,255,.4)">Carregando…</p>
+</main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="../js/core/config.js"></script>
+<script src="../js/core/supabase-client.js"></script>
+<script src="../js/core/social.js?v=20260705v24"></script>
+<script src="../js/ui/social-widget.js?v=20260705v24"></script>
+<script>
+(async function(){
+  const main = document.getElementById('main');
+  await PASocial.init();
+
+  if (!PASocial.isLoggedIn()) {
+    location.href = 'entrar.html?redirect=' + encodeURIComponent(location.href);
+    return;
+  }
+
+  const user = PASocial.getUser();
+  const prof = PASocial.getProfile();
+  const verified = PASocial.isVerified(prof);
+
+  function renderForm() {
+    const p = PASocial.getProfile();
+    main.innerHTML = `
+      <div class="profile-hero">
+        <div class="avatar-wrap" id="avWrap">
+          ${p.avatar_url ? `<img src="${PASocial.esc(p.avatar_url)}" alt=""/>` : `<span class="av-letter">${PASocial.esc((p.display_name||'?')[0])}</span>`}
+        </div>
+        <div>
+          <h1>${PASocial.esc(p.display_name)} ${verified ? PASocial.verifiedBadgeHtml() : ''}</h1>
+          <p class="email">${PASocial.esc(user.email)}</p>
+          ${verified ? '<span class="verified-pill"><i class="fas fa-check-circle"></i> Conta Verificada</span>' : ''}
+        </div>
+      </div>
+      ${!verified ? `<div class="promo">
+        <h3><i class="fas fa-check-circle"></i> Selo Verificado</h3>
+        <p>Destaque seus comentários, ganhe credibilidade e benefícios exclusivos no portal.</p>
+        <a href="verificado.html">Conhecer benefícios <i class="fas fa-arrow-right"></i></a>
+      </div>` : ''}
+      <form class="card" id="profileForm">
+        <h2><i class="fas fa-user-edit"></i> Editar Perfil</h2>
+        <div class="field">
+          <label>Nome de exibição</label>
+          <input type="text" id="display_name" value="${PASocial.esc(p.display_name)}" maxlength="80" required/>
+        </div>
+        <div class="field">
+          <label>URL da foto (avatar)</label>
+          <input type="url" id="avatar_url" value="${PASocial.esc(p.avatar_url || '')}" placeholder="https://…"/>
+        </div>
+        <div class="field">
+          <label>Bio</label>
+          <textarea id="bio" maxlength="500" placeholder="Conte um pouco sobre você…">${PASocial.esc(p.bio || '')}</textarea>
+        </div>
+        <div class="row">
+          <div class="field">
+            <label>Local</label>
+            <input type="text" id="location" value="${PASocial.esc(p.location || '')}" maxlength="80" placeholder="Pains, MG"/>
+          </div>
+          <div class="field">
+            <label>Site / rede social</label>
+            <input type="url" id="website" value="${PASocial.esc(p.website || '')}" placeholder="https://…"/>
+          </div>
+        </div>
+        <button type="submit" class="btn btn-green"><i class="fas fa-save"></i> Salvar perfil</button>
+        <p class="msg" id="formMsg"></p>
+      </form>
+      <div class="card">
+        <h2><i class="fas fa-sign-out-alt"></i> Sessão</h2>
+        <button type="button" class="btn btn-outline" id="btnLogout"><i class="fas fa-power-off"></i> Sair da conta</button>
+      </div>`;
+
+    document.getElementById('profileForm').addEventListener('submit', async e => {
+      e.preventDefault();
+      const msg = document.getElementById('formMsg');
+      msg.className = 'msg';
+      try {
+        await PASocial.updateProfile({
+          display_name: document.getElementById('display_name').value,
+          avatar_url: document.getElementById('avatar_url').value,
+          bio: document.getElementById('bio').value,
+          location: document.getElementById('location').value,
+          website: document.getElementById('website').value
+        });
+        msg.textContent = 'Perfil salvo com sucesso!';
+        msg.classList.add('ok');
+        renderForm();
+      } catch (err) {
+        msg.textContent = err.message;
+        msg.classList.add('err');
+      }
+    });
+
+    document.getElementById('btnLogout').addEventListener('click', async () => {
+      await PASocial.signOut();
+      location.href = 'entrar.html';
+    });
+  }
+
+  PASocialWidget.injectStyles();
+  renderForm();
+})();
+</script>
+</body>
+</html>
