@@ -540,6 +540,18 @@ const PAAPI = (function () {
       return { views: 0 };
     },
 
+    incrementSiteVisits() {
+      const state = getState();
+      state.site_visits = (state.site_visits || 0) + 1;
+      saveAdminState(state);
+      return Promise.resolve({ total: state.site_visits });
+    },
+
+    getSiteVisits() {
+      const state = getState();
+      return Promise.resolve({ total: state.site_visits || 0 });
+    },
+
     getPending() {
       const state = getState();
       const deduped = dedupePending(state.pending);
@@ -1100,6 +1112,24 @@ const PAAPI = (function () {
       }
     },
 
+    async incrementSiteVisits() {
+      try {
+        const { data, error } = await sb().rpc('increment_site_visits');
+        if (!error && data != null) return { total: Number(data) || 0 };
+      } catch (e) {
+        console.warn('[api] incrementSiteVisits', e);
+      }
+      return local.incrementSiteVisits();
+    },
+
+    async getSiteVisits() {
+      try {
+        const { data, error } = await sb().from('site_stats').select('total_visits').eq('id', 1).maybeSingle();
+        if (!error && data) return { total: Number(data.total_visits) || 0 };
+      } catch {}
+      return local.getSiteVisits();
+    },
+
     async getPending() {
       const { data, error } = await sb().from('pending_articles').select('*').order('found_at', { ascending: false });
       if (error) throw error;
@@ -1278,6 +1308,8 @@ const PAAPI = (function () {
       return r;
     },
     incrementViews: async (id) => (await getBackend()).incrementViews(id),
+    incrementSiteVisits: async () => (await getBackend()).incrementSiteVisits(),
+    getSiteVisits: async () => (await getBackend()).getSiteVisits(),
     getPending: async () => (await getBackend()).getPending(),
     scannerStatus: async () => (await getBackend()).scannerStatus(),
     runScanner: async () => (await getBackend()).runScanner(),

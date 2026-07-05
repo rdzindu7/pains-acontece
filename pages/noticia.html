@@ -210,6 +210,8 @@ body::before{content:'';position:fixed;inset:0;
 .share-btns a.fb:hover{background:#1877f2;border-color:#1877f2}
 .share-btns a.cp:hover{background:var(--g);border-color:var(--g)}
 .share-btns a.x:hover{background:#111;border-color:#333}
+.art-site-visits{font-size:.75rem;color:var(--dim);margin:20px 0 8px;display:flex;align-items:center;gap:8px}
+.art-site-visits i{color:var(--g);font-size:.7rem}
 
 /* Relacionadas */
 .related{margin-top:64px}
@@ -343,8 +345,8 @@ body.cat-pains{--accent:#1d7a1d;--accent-glow:rgba(29,122,29,.35)}
 <script src="../js/core/auto-reload.js?v=20260705v31"></script>
 <script src="../js/core/pains-media.js?v=20260705v44"></script>
 <script src="../js/core/article-images.js?v=20260705v45"></script>
-<script src="../js/core/views-tracker.js?v=20260705v41"></script>
-<script src="../js/core/api.js?v=20260705v49"></script>
+<script src="../js/core/views-tracker.js?v=20260705v52"></script>
+<script src="../js/core/api.js?v=20260705v52"></script>
 <script src="../js/ui/ads.js?v=20260705v36"></script>
 <script src="../js/core/store.js?v=20260705v51"></script>
 
@@ -714,6 +716,7 @@ body.cat-pains{--accent:#1d7a1d;--accent-glow:rgba(29,122,29,.35)}
           <a class="cp" href="#" id="btnCopyLink"><i class="fas fa-link"></i><span>Copiar link</span></a>
         </div>
       </div>
+      <p class="art-site-visits reveal"><i class="fas fa-chart-line"></i> <span data-pa-site-visits>—</span> visitas ao portal</p>
       <div id="paSocialMount" class="reveal"></div>
       ${related.length?`<div class="related reveal"><h3>Notícias Relacionadas</h3><div class="rel-grid">${related.map((r,i)=>`
         <a href="noticia.html?id=${r.id}" class="rel-card reveal reveal-delay-${(i%4)+1}">${thumbHtml(r)}<div class="body"><h4>${esc(r.title)}</h4><div class="rel-cat">${esc(r.cat)}</div></div></a>`).join('')}</div></div>`:''}

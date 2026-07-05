@@ -1177,7 +1177,7 @@ body.pa-owner .owner-only.btn-pub{display:flex!important}
           <div class="ic"><i class="fas fa-eye"></i></div>
           <div class="val" id="statViews">0</div>
           <div class="lbl">Total de Visualizações</div>
-          <div class="delta up" id="statViewsDelta"><i class="fas fa-chart-line"></i> —</div>
+          <div class="delta up" id="statViewsDelta"><i class="fas fa-globe-americas"></i> <span id="statSiteVisits">0</span> visitas ao site</div>
         </div>
         <div class="stat-card" style="--accent:var(--y)">
           <div class="ic"><i class="fas fa-file-alt"></i></div>
@@ -2190,10 +2190,10 @@ body.pa-owner .owner-only.btn-pub{display:flex!important}
 <script src="../js/core/auto-reload.js?v=20260705v31"></script>
 <script src="../js/core/pains-media.js?v=20260705v44"></script>
 <script src="../js/core/article-images.js?v=20260705v46"></script>
-<script src="../js/core/views-tracker.js?v=20260705v40"></script>
+<script src="../js/core/views-tracker.js?v=20260705v52"></script>
 <script src="../js/ai/agents/tiago.js?v=20260705v26"></script>
 <script src="../js/ai/bus-assistant.js?v=20260705v26"></script>
-<script src="../js/core/api.js?v=20260705v49"></script>
+<script src="../js/core/api.js?v=20260705v52"></script>
 <script src="../js/ui/directory.js?v=20260705v23"></script>
 <script src="../js/ui/ads.js?v=20260705v21"></script>
 <script src="../js/ui/corner-notify.js"></script>
@@ -2696,11 +2696,18 @@ function renderDashboard() {
   const pub = arts.filter(a => a.status === 'pub');
   const draft = arts.filter(a => a.status === 'draft');
   const review = arts.filter(a => a.status === 'review');
-  const views = arts.reduce((s, a) => s + (a.views || 0), 0);
+  const views = arts.reduce((s, a) => s + (Number(a.views) || 0), 0);
+  const siteVisits = typeof PAViewsTracker !== 'undefined' ? PAViewsTracker.getSiteVisits() : 0;
 
   const set = (id, val) => { const el = document.getElementById(id); if (el) el.textContent = val; };
   set('statPub', pub.length);
   set('statViews', views.toLocaleString('pt-BR'));
+  set('statSiteVisits', siteVisits.toLocaleString('pt-BR'));
+  if (typeof PAViewsTracker !== 'undefined' && PAViewsTracker.syncSiteVisitsFromCloud) {
+    PAViewsTracker.syncSiteVisitsFromCloud().then(total => {
+      set('statSiteVisits', Number(total || 0).toLocaleString('pt-BR'));
+    }).catch(() => {});
+  }
   set('statDraft', draft.length);
   set('statReview', review.length);
 
