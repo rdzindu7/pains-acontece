@@ -4,7 +4,8 @@
     ultimas:     { type: 'scroll', target: '#ultimas' },
     pains:       { type: 'news', title: 'Pains', cats: ['Pains'] },
     regiao:      { type: 'news', title: 'Região', cats: ['Região'] },
-    brasil:      { type: 'news', title: 'Brasil / Mundo', cats: ['Brasil / Mundo'] },
+    brasil:      { type: 'news', title: 'Brasil', filter: 'brasil' },
+    mundo:       { type: 'news', title: 'Mundo', filter: 'mundo' },
     policia:     { type: 'news', title: 'Polícia', cats: ['Polícia'] },
     politica:    { type: 'news', title: 'Política', cats: ['Política'] },
     saude:       { type: 'news', title: 'Saúde', cats: ['Saúde'] },
@@ -121,6 +122,17 @@
   function filterByCats(arts, cats) {
     if (!cats) return arts;
     return arts.filter(a => cats.includes(a.cat));
+  }
+
+  function filterByScope(arts, scope) {
+    if (!scope || typeof PAArticleScope === 'undefined') return arts;
+    if (scope === 'mundo') return PAArticleScope.forMundo(arts);
+    if (scope === 'brasil') return PAArticleScope.forBrasil(arts);
+    return arts;
+  }
+
+  function forHomePage(arts) {
+    return typeof PAArticleScope !== 'undefined' ? PAArticleScope.forHome(arts) : arts;
   }
 
   function renderHero(arts) {
@@ -262,8 +274,13 @@
   }
 
   function renderHome() {
-    const pub = allPub;
-    const byCat = (cat, n) => pub.filter(a => a.cat === cat).slice(0, n);
+    const pub = forHomePage(allPub);
+    const byCat = (cat, n) => {
+      if (cat === 'Brasil' && typeof PAArticleScope !== 'undefined') {
+        return PAArticleScope.forBrasil(pub).slice(0, n);
+      }
+      return pub.filter(a => a.cat === cat).slice(0, n);
+    };
 
     renderHero(pub);
     renderTicker(pub);
@@ -279,7 +296,7 @@
     }
     renderSection('politicaList', byCat('Política', 5), 'list');
     renderSection('saudeGrid', byCat('Saúde', 3), 'grid');
-    renderSection('brasilList', byCat('Brasil / Mundo', 10), 'list');
+    renderSection('brasilList', byCat('Brasil', 10), 'list');
     renderSection('regiaoGrid', byCat('Região', 6), 'grid');
     observeReveals();
   }
@@ -353,7 +370,9 @@
 
     if (cfg.type === 'news') {
       document.body.classList.add('cat-filter-mode');
-      const filtered = filterByCats(allPub, cfg.cats);
+      const filtered = cfg.filter
+        ? filterByScope(allPub, cfg.filter)
+        : filterByCats(allPub, cfg.cats);
       renderCategoryView(filtered, cfg.title);
       window.scrollTo({ top: 0, behavior: 'smooth' });
     }

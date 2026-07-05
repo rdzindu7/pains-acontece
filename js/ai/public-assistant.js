@@ -312,7 +312,7 @@ const PAPublicIA = (function () {
       return;
     }
     if (cmd === 'pains') { sendDirect('Quais notícias recentes sobre Pains MG?'); return; }
-    if (cmd === 'mundo') { sendDirect('Quais notícias do Brasil e da região?'); return; }
+    if (cmd === 'mundo') { sendDirect('Quais notícias internacionais do mundo?'); return; }
     if (cmd === 'clima') { sendDirect('como está o clima em Pains?'); return; }
     if (cmd === 'duvida') { sendDirect('Tenho uma dúvida sobre uma publicação'); return; }
     const input = document.getElementById('papiaInput');

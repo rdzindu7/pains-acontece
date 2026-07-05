@@ -31,7 +31,7 @@ const PAAutoPublisher = (function () {
     let published = 0;
 
     const sorted = [...items].sort((a, b) => {
-      const pri = { 'Pains': 4, 'Região': 3, 'Brasil / Mundo': 2 };
+      const pri = { 'Pains': 4, 'Região': 3, 'Brasil': 2, 'Brasil / Mundo': 2, 'Mundo': 1 };
       return (pri[b.cat] || 1) - (pri[a.cat] || 1) || b.confidence - a.confidence;
     });
 
@@ -60,6 +60,7 @@ const PAAutoPublisher = (function () {
           confidence: item.confidence,
           deepVerified: true,
           source_url: item.source_url,
+          world: item.world || item.cat === 'Mundo',
           views: 0
         });
         titles.add(t);

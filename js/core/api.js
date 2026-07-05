@@ -81,7 +81,8 @@ const PAAPI = (function () {
       deepVerified: row.deep_verified ?? row.deepVerified,
       source_url: row.source_url,
       quickLead: row.quick_lead ?? row.quickLead,
-      pubISO: row.pub_iso ?? row.pubISO
+      pubISO: row.pub_iso ?? row.pubISO,
+      world: row.world ?? false
     };
   }
 
@@ -104,6 +105,7 @@ const PAAPI = (function () {
     if (data.source_url !== undefined) row.source_url = data.source_url;
     if (data.quickLead !== undefined) row.quick_lead = data.quickLead;
     if (data.pubISO !== undefined) row.pub_iso = data.pubISO;
+    if (data.world !== undefined) row.world = data.world;
     return row;
   }
 
@@ -329,7 +331,8 @@ const PAAPI = (function () {
       const p = state.pending.splice(idx, 1)[0];
       const art = await this.addArticle({
         title: p.title, lead: p.lead, content: p.content, cat: p.cat, status: 'pub',
-        img: p.img, author: p.author || 'IA Pains Acontece', verified: p.verified, confidence: p.confidence
+        img: p.img, author: p.author || 'IA Pains Acontece', verified: p.verified, confidence: p.confidence,
+        world: p.world || p.cat === 'Mundo', source_url: p.source_url
       });
       saveAdminState(state);
       return art;
@@ -576,7 +579,8 @@ const PAAPI = (function () {
 
       const art = await this.addArticle({
         title: p.title, lead: p.lead, content: p.content, cat: p.cat, status: 'pub',
-        img: p.img, author: p.author || 'IA Pains Acontece', verified: p.verified, confidence: p.confidence
+        img: p.img, author: p.author || 'IA Pains Acontece', verified: p.verified, confidence: p.confidence,
+        world: p.world || p.cat === 'Mundo', source_url: p.source_url
       });
 
       const { error: e2 } = await sb().from('pending_articles').delete().eq('id', id);

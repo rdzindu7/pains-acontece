@@ -7,16 +7,16 @@ const PAScanner = (function () {
     { url: 'https://news.google.com/rss/search?q=Piumhi+MG&hl=pt-BR&gl=BR&ceid=BR:pt-419', region: 'Região', priority: 2 },
     { url: 'https://news.google.com/rss/search?q=Alto+S%C3%A3o+Francisco+Mineiro&hl=pt-BR&gl=BR&ceid=BR:pt-419', region: 'Região', priority: 2 },
     { url: 'https://news.google.com/rss/search?q=Dores+do+Indai%C3%A1+MG&hl=pt-BR&gl=BR&ceid=BR:pt-419', region: 'Região', priority: 2 },
-    { url: 'https://news.google.com/rss/search?q=Minas+Gerais&hl=pt-BR&gl=BR&ceid=BR:pt-419', region: 'Brasil / Mundo', priority: 1 },
-    { url: 'https://news.google.com/rss/search?q=Brasil+not%C3%ADcias&hl=pt-BR&gl=BR&ceid=BR:pt-419', region: 'Brasil / Mundo', priority: 1 },
-    { url: 'https://news.google.com/rss/search?q=site:g1.globo.com+Brasil&hl=pt-BR&gl=BR&ceid=BR:pt-419', region: 'Brasil / Mundo', priority: 1 },
-    { url: 'https://news.google.com/rss/search?q=mundo+internacional&hl=pt-BR&gl=BR&ceid=BR:pt-419', region: 'Brasil / Mundo', priority: 1, world: true },
-    { url: 'https://news.google.com/rss/search?q=world+news&hl=en-US&gl=US&ceid=US:en', region: 'Brasil / Mundo', priority: 1, world: true },
-    { url: 'https://feeds.bbci.co.uk/portuguese/rss.xml', region: 'Brasil / Mundo', priority: 2, world: true },
+    { url: 'https://news.google.com/rss/search?q=Minas+Gerais&hl=pt-BR&gl=BR&ceid=BR:pt-419', region: 'Brasil', priority: 1 },
+    { url: 'https://news.google.com/rss/search?q=Brasil+not%C3%ADcias&hl=pt-BR&gl=BR&ceid=BR:pt-419', region: 'Brasil', priority: 1 },
+    { url: 'https://news.google.com/rss/search?q=site:g1.globo.com+Brasil&hl=pt-BR&gl=BR&ceid=BR:pt-419', region: 'Brasil', priority: 1 },
+    { url: 'https://news.google.com/rss/search?q=mundo+internacional&hl=pt-BR&gl=BR&ceid=BR:pt-419', region: 'Mundo', priority: 1, world: true },
+    { url: 'https://news.google.com/rss/search?q=world+news&hl=en-US&gl=US&ceid=US:en', region: 'Mundo', priority: 1, world: true },
+    { url: 'https://feeds.bbci.co.uk/portuguese/rss.xml', region: 'Mundo', priority: 2, world: true },
     { url: 'https://g1.globo.com/rss/g1/minas-gerais/', region: 'Região', priority: 2 },
-    { url: 'https://g1.globo.com/rss/g1/', region: 'Brasil / Mundo', priority: 2 },
-    { url: 'https://news.google.com/rss/search?q=economia+Brasil&hl=pt-BR&gl=BR&ceid=BR:pt-419', region: 'Brasil / Mundo', priority: 1 },
-    { url: 'https://news.google.com/rss/search?q=pol%C3%ADtica+Brasil&hl=pt-BR&gl=BR&ceid=BR:pt-419', region: 'Brasil / Mundo', priority: 1 }
+    { url: 'https://g1.globo.com/rss/g1/', region: 'Brasil', priority: 2 },
+    { url: 'https://news.google.com/rss/search?q=economia+Brasil&hl=pt-BR&gl=BR&ceid=BR:pt-419', region: 'Brasil', priority: 1 },
+    { url: 'https://news.google.com/rss/search?q=pol%C3%ADtica+Brasil&hl=pt-BR&gl=BR&ceid=BR:pt-419', region: 'Brasil', priority: 1 }
   ];
 
   const TRUSTED = ['gov.br', 'g1.globo.com', 'uol.com.br', 'r7.com', 'otempo.com.br', 'em.com.br', 'prefeitura', 'camara', 'pains.mg.gov.br', 'bbc.com', 'bbc.co.uk', 'cnn.com', 'reuters.com', 'agenciabrasil', 'folha.uol', 'estadao'];
@@ -31,15 +31,30 @@ const PAScanner = (function () {
     'Esportes': ['futebol', 'campeonato', 'atleta', 'esporte'],
     'Pains': ['pains'],
     'Região': ['formiga', 'piumhi', 'dores', 'bambui', 'regiao'],
-    'Brasil / Mundo': ['brasil', 'mundo', 'nacional', 'internacional']
+    'Brasil': ['brasil', 'nacional', 'governo federal', 'congresso'],
+    'Mundo': ['mundo', 'internacional', 'global', 'eua', 'europa']
   };
 
   function norm(s) {
     return (s || '').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
   }
 
+  function classifyBrasilOrMundo(title, summary) {
+    if (typeof PAArticleScope !== 'undefined') {
+      return PAArticleScope.classifyBrasilOrMundo(title, summary);
+    }
+    const text = norm(`${title} ${summary}`);
+    const intl = ['ucrania', 'eua', 'china', 'israel', 'trump', 'onu', 'internacional'];
+    const br = ['brasil', 'lula', 'bolsonaro', 'congresso'];
+    const i = intl.filter(k => text.includes(k)).length;
+    const b = br.filter(k => text.includes(k)).length;
+    return i > b && i >= 1 ? 'Mundo' : 'Brasil';
+  }
+
   function detectCategory(title, summary, feedRegion, isWorld) {
-    if (isWorld || feedRegion === 'Brasil / Mundo') return 'Brasil / Mundo';
+    if (isWorld || feedRegion === 'Mundo') return 'Mundo';
+    if (feedRegion === 'Brasil') return 'Brasil';
+    if (feedRegion === 'Brasil / Mundo') return classifyBrasilOrMundo(title, summary);
     if (feedRegion && feedRegion !== 'Últimas Notícias') return feedRegion;
     const text = norm(title + ' ' + summary);
     let best = 'Últimas Notícias', score = 0;
@@ -119,7 +134,9 @@ const PAScanner = (function () {
       'Empregos': 'https://images.unsplash.com/photo-1519389950473-47ba0277781c?w=800&q=80',
       'Pains': 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?w=800&q=80',
       'Região': 'https://images.unsplash.com/photo-1470071459604-3b5ec3a7fe05?w=800&q=80',
-      'Brasil / Mundo': 'https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?w=800&q=80'
+      'Brasil': 'https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?w=800&q=80',
+      'Brasil / Mundo': 'https://images.unsplash.com/photo-1526304640581-d334cdbbf45e?w=800&q=80',
+      'Mundo': 'https://images.unsplash.com/photo-1451187580459-43490279c0fa?w=800&q=80'
     };
     return imgs[cat] || 'https://images.unsplash.com/photo-1504711434969-e33886168f5c?w=800&q=80';
   }
@@ -642,6 +659,7 @@ const PAScanner = (function () {
         source: item.source, source_url: deep.source_url, region: item.region,
         verified: deep.verified, confidence: deep.confidence,
         deepVerified: true, audit: deep.audit, sources: deep.sources,
+        world: cat === 'Mundo' || !!item.world,
         status: 'pending'
       };
     });
@@ -696,6 +714,7 @@ const PAScanner = (function () {
         source: item.source, source_url: deep.source_url, region: item.region,
         verified: deep.verified, confidence: deep.confidence,
         deepVerified: true, audit: deep.audit, sources: deep.sources,
+        world: cat === 'Mundo' || !!item.world,
         status: 'pending'
       };
     });

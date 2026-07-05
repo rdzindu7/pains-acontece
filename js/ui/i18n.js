@@ -9,7 +9,7 @@ const PATranslate = (function () {
   const T = {
     'pt-BR': {
       'nav.home': 'Home', 'nav.ultimas': 'Últimas', 'nav.pains': 'Pains', 'nav.regiao': 'Região',
-      'nav.brasil': 'Brasil/Mundo', 'nav.policia': 'Polícia', 'nav.politica': 'Política', 'nav.saude': 'Saúde',
+      'nav.brasil': 'Brasil', 'nav.mundo': 'Mundo', 'nav.policia': 'Polícia', 'nav.politica': 'Política', 'nav.saude': 'Saúde',
       'nav.agenda': 'Agenda', 'nav.empregos': 'Empregos', 'nav.restaurantes': 'Restaurantes', 'nav.telefones': 'Telefones',
       'nav.clima': 'Clima', 'nav.anuncie': 'Anuncie', 'nav.pauta': 'Pauta',
       'search.placeholder': 'Buscar notícias, serviços, restaurantes…',
@@ -24,7 +24,7 @@ const PATranslate = (function () {
     },
     'en-US': {
       'nav.home': 'Home', 'nav.ultimas': 'Latest', 'nav.pains': 'Pains', 'nav.regiao': 'Region',
-      'nav.brasil': 'Brazil/World', 'nav.policia': 'Police', 'nav.politica': 'Politics', 'nav.saude': 'Health',
+      'nav.brasil': 'Brazil', 'nav.mundo': 'World', 'nav.policia': 'Police', 'nav.politica': 'Politics', 'nav.saude': 'Health',
       'nav.agenda': 'Events', 'nav.empregos': 'Jobs', 'nav.restaurantes': 'Restaurants', 'nav.telefones': 'Phones',
       'nav.clima': 'Weather', 'nav.anuncie': 'Advertise', 'nav.pauta': 'Tip Line',
       'search.placeholder': 'Search news, services, restaurants…',
@@ -39,7 +39,7 @@ const PATranslate = (function () {
     },
     'es-ES': {
       'nav.home': 'Inicio', 'nav.ultimas': 'Últimas', 'nav.pains': 'Pains', 'nav.regiao': 'Región',
-      'nav.brasil': 'Brasil/Mundo', 'nav.policia': 'Policía', 'nav.politica': 'Política', 'nav.saude': 'Salud',
+      'nav.brasil': 'Brasil', 'nav.mundo': 'Mundo', 'nav.policia': 'Policía', 'nav.politica': 'Política', 'nav.saude': 'Salud',
       'nav.agenda': 'Agenda', 'nav.empregos': 'Empleos', 'nav.restaurantes': 'Restaurantes', 'nav.telefones': 'Teléfonos',
       'nav.clima': 'Clima', 'nav.anuncie': 'Anuncie', 'nav.pauta': 'Sugerencia',
       'search.placeholder': 'Buscar noticias, servicios, restaurantes…',

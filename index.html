@@ -8,7 +8,7 @@
 <title>Pains Acontece – Notícias, serviços e o que importa em Pains e região</title>
 <meta name="description" content="Portal de notícias hiperlocal de Pains e região."/>
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
-<meta name="pa-build" content="2026.07.05-v7"/>
+<meta name="pa-build" content="2026.07.05-v8"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,700;0,900;1,700&display=swap" rel="stylesheet"/>
@@ -1280,7 +1280,8 @@ body.cat-filter-mode .category-view { display: block; }
     <div class="nav-item"><a href="#ultimas" data-nav="ultimas" data-i18n="nav.ultimas">Últimas</a></div>
     <div class="nav-item"><a href="#pains" data-nav="pains" data-i18n="nav.pains">Pains</a></div>
     <div class="nav-item"><a href="#regiao" data-nav="regiao" data-i18n="nav.regiao">Região</a></div>
-    <div class="nav-item"><a href="#brasil" data-nav="brasil" data-i18n="nav.brasil">Brasil/Mundo</a></div>
+    <div class="nav-item"><a href="#brasil" data-nav="brasil" data-i18n="nav.brasil">Brasil</a></div>
+    <div class="nav-item"><a href="#mundo" data-nav="mundo" data-i18n="nav.mundo">Mundo</a></div>
     <div class="nav-item"><a href="#policia" data-nav="policia" data-i18n="nav.policia">Polícia</a></div>
     <div class="nav-item"><a href="#politica" data-nav="politica" data-i18n="nav.politica">Política</a></div>
     <div class="nav-item"><a href="#saude" data-nav="saude" data-i18n="nav.saude">Saúde</a></div>
@@ -1393,13 +1394,13 @@ body.cat-filter-mode .category-view { display: block; }
         <div class="grid-3 reveal" style="border-radius:4px;overflow:hidden;" id="saudeGrid"></div>
       </div>
 
-      <!-- BRASIL / MUNDO -->
+      <!-- BRASIL -->
       <div id="brasil">
         <div class="sec-head reveal">
           <div class="line-v" style="background:linear-gradient(180deg,#f39c12,#8b5e00)"></div>
-          <h2>Brasil / Mundo</h2>
+          <h2 data-i18n="nav.brasil">Brasil</h2>
           <div class="rule"></div>
-          <a href="#" class="view-all">Ver mais <i class="fas fa-arrow-right"></i></a>
+          <a href="#brasil" class="view-all" data-nav="brasil" onclick="event.preventDefault();applyNav('brasil')">Ver mais <i class="fas fa-arrow-right"></i></a>
         </div>
         <div style="display:flex;flex-direction:column;gap:0;border:1px solid rgba(255,255,255,.04);border-radius:4px;overflow:hidden;" class="reveal" id="brasilList"></div>
       </div>
@@ -1672,7 +1673,8 @@ body.cat-filter-mode .category-view { display: block; }
         <li><a href="#ultimas" data-nav="ultimas">Últimas Notícias</a></li>
         <li><a href="#pains" data-nav="pains">Pains</a></li>
         <li><a href="#regiao" data-nav="regiao">Região</a></li>
-        <li><a href="#brasil" data-nav="brasil">Brasil / Mundo</a></li>
+        <li><a href="#brasil" data-nav="brasil">Brasil</a></li>
+        <li><a href="#mundo" data-nav="mundo">Mundo</a></li>
         <li><a href="#policia" data-nav="policia">Polícia</a></li>
         <li><a href="#politica" data-nav="politica">Política</a></li>
         <li><a href="#saude" data-nav="saude">Saúde</a></li>
@@ -1760,6 +1762,7 @@ document.querySelectorAll('.ncard, .ncard-xl, .srv-card').forEach(card => {
 <script src="js/core/config.js"></script>
 <script src="js/core/supabase-client.js"></script>
 <script src="js/ui/article-format.js"></script>
+<script src="js/core/article-scope.js"></script>
 <script src="js/ai/scanner.js"></script>
 <script src="js/ai/agents/sofia.js"></script>
 <script src="js/ai/agents/lucas.js"></script>
