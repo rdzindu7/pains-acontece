@@ -1,63 +1,49 @@
 # Pains Acontece — Setup automático Supabase
-# Uso: .\scripts\setup-supabase.ps1 -ServiceRoleKey "sua_chave_service_role"
+# Uso: .\scripts\setup-supabase.ps1 -SecretKey "sb_secret_..."
 #
-# Pegue a chave em: Supabase Dashboard → Settings → API → service_role (secret)
+# Pegue em: Supabase Dashboard → Settings → API → Secret keys → default (olho + copiar)
 
 param(
   [Parameter(Mandatory = $true)]
-  [string]$ServiceRoleKey
+  [string]$SecretKey
 )
 
 $ProjectUrl = "https://blcomwofpyorypqjdhfb.supabase.co"
 $AdminEmail = "admin@painsacontece.com.br"
 $AdminPass  = "Pains@2026"
 
-$headers = @{
-  apikey        = $ServiceRoleKey
-  Authorization = "Bearer $ServiceRoleKey"
-  "Content-Type" = "application/json"
-}
+$jsonUser = Join-Path $env:TEMP "pa-supabase-user.json"
+[System.IO.File]::WriteAllText($jsonUser, (@{
+  email = $AdminEmail; password = $AdminPass; email_confirm = $true
+} | ConvertTo-Json -Compress))
 
 Write-Host "=== Pains Acontece — Setup Supabase ===" -ForegroundColor Green
 
-# 1. Criar usuário admin
+# 1. Criar usuário admin (curl evita bloqueio "browser")
 Write-Host "`n[1/2] Criando usuário admin..." -ForegroundColor Cyan
-$body = @{
-  email         = $AdminEmail
-  password      = $AdminPass
-  email_confirm = $true
-} | ConvertTo-Json
-
-try {
-  $user = Invoke-RestMethod -Uri "$ProjectUrl/auth/v1/admin/users" -Method POST -Headers $headers -Body $body
-  Write-Host "OK — Admin criado: $($user.email)" -ForegroundColor Green
-} catch {
-  $err = $_.ErrorDetails.Message
-  if ($err -match "already|exists|registered") {
-    Write-Host "OK — Admin já existe, atualizando senha..." -ForegroundColor Yellow
-    try {
-      $list = Invoke-RestMethod -Uri "$ProjectUrl/auth/v1/admin/users?email=$AdminEmail" -Method GET -Headers $headers
-      $uid = $list.users[0].id
-      $upd = @{ password = $AdminPass; email_confirm = $true } | ConvertTo-Json
-      Invoke-RestMethod -Uri "$ProjectUrl/auth/v1/admin/users/$uid" -Method PUT -Headers $headers -Body $upd | Out-Null
-      Write-Host "OK — Senha atualizada" -ForegroundColor Green
-    } catch {
-      Write-Host "AVISO: $($_.ErrorDetails.Message)" -ForegroundColor Yellow
-    }
-  } else {
-    Write-Host "ERRO: $err" -ForegroundColor Red
-    exit 1
-  }
+$create = curl.exe -s -w "`n%{http_code}" -X POST "$ProjectUrl/auth/v1/admin/users" `
+  -H "apikey: $SecretKey" -H "Authorization: Bearer $SecretKey" `
+  -H "Content-Type: application/json" -H "User-Agent: pains-acontece-setup/1.0" `
+  --data-binary "@$jsonUser"
+$code = ($create -split "`n")[-1]
+$resp = ($create -split "`n")[0..-2] -join "`n"
+if ($code -eq "200") {
+  Write-Host "OK — Admin criado" -ForegroundColor Green
+} elseif ($resp -match "already|exists|registered") {
+  Write-Host "OK — Admin já existe" -ForegroundColor Yellow
+} else {
+  Write-Host "Resposta ($code): $resp" -ForegroundColor Yellow
 }
 
 # 2. Verificar tabelas
 Write-Host "`n[2/2] Verificando tabelas..." -ForegroundColor Cyan
-try {
-  Invoke-RestMethod -Uri "$ProjectUrl/rest/v1/articles?select=id&limit=1" -Method GET -Headers $headers | Out-Null
+$check = curl.exe -s -w "`n%{http_code}" "$ProjectUrl/rest/v1/articles?select=id&limit=1" `
+  -H "apikey: $SecretKey" -H "Authorization: Bearer $SecretKey" -H "User-Agent: pains-acontece-setup/1.0"
+$tcode = ($check -split "`n")[-1]
+if ($tcode -eq "200") {
   Write-Host "OK — Tabelas existem" -ForegroundColor Green
-} catch {
-  Write-Host "AVISO — Tabelas não encontradas." -ForegroundColor Yellow
-  Write-Host "Execute supabase/schema.sql no SQL Editor do Supabase:" -ForegroundColor Yellow
+} else {
+  Write-Host "AVISO — Execute schema.sql no SQL Editor:" -ForegroundColor Yellow
   Write-Host "  https://supabase.com/dashboard/project/blcomwofpyorypqjdhfb/sql/new" -ForegroundColor White
 }
 
