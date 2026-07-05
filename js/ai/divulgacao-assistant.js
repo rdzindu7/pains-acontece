@@ -42,12 +42,12 @@ const PADivulgacaoIA = (function () {
       }
       .padiv-panel.open{transform:none;opacity:1;pointer-events:all;visibility:visible}
       .padiv-panel.inline{
-        position:relative;bottom:auto;right:auto;width:100%;height:auto;min-height:420px;max-height:none;
+        position:relative;bottom:auto;right:auto;width:100%;height:auto;min-height:440px;max-height:none;
         transform:none;opacity:1;pointer-events:all;visibility:visible;
-        box-shadow:none;border:1px solid var(--border, rgba(255,255,255,.1));
-        display:flex;flex-direction:column;
+        box-shadow:none;border:none;border-radius:0;
+        display:flex;flex-direction:column;background:transparent;
       }
-      .padiv-head{padding:12px 14px;background:linear-gradient(90deg,rgba(230,126,34,.25),rgba(8,8,8,.5));border-bottom:1px solid rgba(255,255,255,.06);display:flex;align-items:center;gap:10px;flex-shrink:0}
+      .padiv-head{padding:16px 20px;background:rgba(230,126,34,.08);border-bottom:1px solid rgba(255,255,255,.06);display:flex;align-items:center;gap:12px;flex-shrink:0}
       .padiv-head .av{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,#e67e22,#f39c12);display:flex;align-items:center;justify-content:center;flex-shrink:0}
       .padiv-head .meta{flex:1;min-width:0}
       .padiv-head h4{font-family:'Bebas Neue',sans-serif;letter-spacing:1.5px;font-size:1rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -58,8 +58,8 @@ const PADivulgacaoIA = (function () {
       .padiv-msg.bot{background:rgba(230,126,34,.12);border:1px solid rgba(230,126,34,.25);align-self:flex-start}
       .padiv-msg.user{background:rgba(255,255,255,.06);border:1px solid rgba(255,255,255,.08);align-self:flex-end}
       .padiv-actions{padding:8px 12px;display:grid;grid-template-columns:1fr 1fr;gap:6px;border-top:1px solid rgba(255,255,255,.04);flex-shrink:0}
-      .padiv-act{font-size:.58rem;font-weight:700;letter-spacing:.5px;text-transform:uppercase;padding:8px 6px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:rgba(255,255,255,.55);cursor:pointer;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;-webkit-tap-highlight-color:transparent}
-      .padiv-act:hover,.padiv-act:active{background:rgba(230,126,34,.2);color:#f39c12;border-color:rgba(230,126,34,.35)}
+      .padiv-act{font-size:.62rem;font-weight:700;letter-spacing:.6px;text-transform:uppercase;padding:9px 12px;border-radius:20px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.04);color:rgba(255,255,255,.6);cursor:pointer;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;-webkit-tap-highlight-color:transparent;transition:all .22s}
+      .padiv-act:hover,.padiv-act:active{background:rgba(230,126,34,.18);color:#f39c12;border-color:rgba(230,126,34,.35);transform:translateY(-1px)}
       .padiv-foot{padding:10px 12px calc(10px + env(safe-area-inset-bottom));display:flex;gap:8px;border-top:1px solid rgba(255,255,255,.06);flex-shrink:0;align-items:center}
       .padiv-foot input{flex:1;min-width:0;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:10px 12px;color:#fff;font-size:.78rem;outline:none}
       .padiv-foot input:focus{border-color:#e67e22}
