@@ -6,7 +6,7 @@
 <link rel="icon" type="image/jpeg" href="../assets/images/favicon.jpg"/>
 <link rel="apple-touch-icon" href="../assets/images/favicon.jpg"/>
 <title>Notícia – Pains Acontece</title>
-<meta name="pa-build" content="2026.07.05-v34"/>
+<meta name="pa-build" content="2026.07.05-v35"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,700;0,900;1,700&display=swap" rel="stylesheet"/>
@@ -339,10 +339,10 @@ body.cat-pains{--accent:#1d7a1d;--accent-glow:rgba(29,122,29,.35)}
 <script src="../js/core/supabase-client.js"></script>
 <script src="../js/ui/article-format.js"></script>
 <script src="../js/ai/scanner.js"></script>
-<script src="../js/core/purge.js?v=20260705v34"></script>
-<script src="../js/core/api.js?v=20260705v34"></script>
-<script src="../js/ui/ads.js?v=20260705v34"></script>
-<script src="../js/core/store.js?v=20260705v34"></script>
+<script src="../js/core/purge.js?v=20260705v35"></script>
+<script src="../js/core/api.js?v=20260705v35"></script>
+<script src="../js/ui/ads.js?v=20260705v35"></script>
+<script src="../js/core/store.js?v=20260705v35"></script>
 
 <script src="../js/ai/agents/sofia.js"></script>
 <script src="../js/ai/agents/lucas.js"></script>
@@ -450,23 +450,33 @@ body.cat-pains{--accent:#1d7a1d;--accent-glow:rgba(29,122,29,.35)}
 
   function withTimeout(promise,ms){return Promise.race([promise,new Promise((_,r)=>setTimeout(()=>r(new Error('timeout')),ms||8000))])}
 
-  let art=PAStore.findArticleLocal?PAStore.findArticleLocal(id):null;
-  if(art&&art.status==='pub'){
-    /* render imediato do cache */
-  }else{
-    showSkeleton();
-    try{
-      await withTimeout(PAStore.init(),8000);
-      art=PAStore.getArticle(id);
-    }catch(err){console.warn('[noticia] store',err)}
-    if(!art){
-      try{art=await withTimeout(PAAPI.getArticle(id),6000)}catch(e){console.warn('[noticia] api',e)}
+  let art=null;
+  try{
+    art=PAStore.findArticleLocal?PAStore.findArticleLocal(id):null;
+    if(art&&art.status==='pub'){
+      /* render imediato do cache */
+    }else{
+      showSkeleton();
+      try{
+        await withTimeout(PAStore.init(),8000);
+        art=PAStore.getArticle(id);
+      }catch(err){console.warn('[noticia] store',err)}
+      if(!art){
+        try{art=await withTimeout(PAAPI.getArticle(id),6000)}catch(e){console.warn('[noticia] api',e)}
+      }
+      if(!art&&typeof PAAPI.fetchArticleFromJson==='function'){
+        try{art=await withTimeout(PAAPI.fetchArticleFromJson(id),5000)}catch(e){console.warn('[noticia] json',e)}
+      }
+      if(!art&&PAStore.findArticleLocal)art=PAStore.findArticleLocal(id);
     }
-    if(!art&&PAStore.findArticleLocal)art=PAStore.findArticleLocal(id);
-  }
 
-  if(!art||art.status!=='pub'){
-    main.innerHTML='<div class="not-found"><h1>Notícia não encontrada</h1><p>Esta matéria não está disponível ou foi removida.</p><a href="../index.html">Ir para a home</a></div>';
+    if(!art||art.status!=='pub'){
+      main.innerHTML='<div class="not-found"><h1>Notícia não encontrada</h1><p>Esta matéria não está disponível ou foi removida.</p><a href="../index.html">Ir para a home</a></div>';
+      return;
+    }
+  }catch(err){
+    console.error('[noticia] load',err);
+    showLoadError('Não foi possível carregar esta matéria. Verifique sua conexão e tente novamente.');
     return;
   }
 

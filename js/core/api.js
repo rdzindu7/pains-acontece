@@ -99,6 +99,36 @@ const PAAPI = (function () {
     return s;
   }
 
+  function isAdminSession() {
+    return !!(sessionStorage.getItem('pa_auth_mode') || sessionStorage.getItem('pa_token'));
+  }
+
+  async function fetchArticleFromJson(id) {
+    try {
+      const base = await fetchJson('articles.json');
+      const state = getState();
+      const merged = mergeArticles(base, state.articles);
+      return merged.find(a => String(a.id) === String(id)) || null;
+    } catch {
+      return null;
+    }
+  }
+
+  async function fetchArticlesFromJson(status) {
+    try {
+      const base = await fetchJson('articles.json');
+      const state = getState();
+      let list = mergeArticles(base, state.articles);
+      if (state.deleted?.length && isAdminSession()) {
+        list = list.filter(a => !state.deleted.includes(String(a.id)));
+      }
+      if (status) list = list.filter(a => a.status === status);
+      return list;
+    } catch {
+      return [];
+    }
+  }
+
   async function fetchJson(file) {
     const res = await fetch(dataUrl(file), { cache: 'no-cache' });
     if (!res.ok) throw new Error('Arquivo não encontrado: ' + file);
@@ -288,17 +318,14 @@ const PAAPI = (function () {
     },
 
     async getArticles(status) {
-      const base = await fetchJson('articles.json');
-      const state = getState();
-      let list = mergeArticles(base, state.articles);
-      if (state.deleted?.length) list = list.filter(a => !state.deleted.includes(String(a.id)));
-      if (status) list = list.filter(a => a.status === status);
-      return list;
+      return fetchArticlesFromJson(status);
     },
 
     async getArticle(id) {
       const arts = await this.getArticles();
-      return arts.find(a => String(a.id) === String(id));
+      const found = arts.find(a => String(a.id) === String(id));
+      if (found) return found;
+      return fetchArticleFromJson(id);
     },
 
     async addArticle(data) {
@@ -853,14 +880,19 @@ const PAAPI = (function () {
         const { data, error } = await q;
         if (!error) remoteList = (data || []).map(rowToArticle);
       } catch {}
-      if (remoteList.length) return remoteList;
-      return local.getArticles(status);
+      const localList = await fetchArticlesFromJson(status);
+      if (remoteList.length) return mergeArticles(localList, remoteList);
+      return localList.length ? localList : local.getArticles(status);
     },
 
     async getArticle(id) {
-      const { data, error } = await sb().from('articles').select('*').eq('id', id).maybeSingle();
-      if (error) throw error;
-      return rowToArticle(data);
+      try {
+        const { data, error } = await sb().from('articles').select('*').eq('id', id).maybeSingle();
+        if (!error && data) return rowToArticle(data);
+      } catch {}
+      const localArt = await local.getArticle(id);
+      if (localArt) return localArt;
+      return fetchArticleFromJson(id);
     },
 
     async addArticle(data) {
@@ -1052,6 +1084,7 @@ const PAAPI = (function () {
     isSupabaseMode: async () => (await getBackend()).isSupabaseMode(),
     getArticles: async (s) => (await getBackend()).getArticles(s),
     getArticle: async (id) => (await getBackend()).getArticle(id),
+    fetchArticleFromJson,
     addArticle: async (d) => (await getBackend()).addArticle(d),
     updateArticle: async (id, d) => (await getBackend()).updateArticle(id, d),
     deleteArticle: async (id) => (await getBackend()).deleteArticle(id),

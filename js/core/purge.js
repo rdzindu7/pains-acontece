@@ -1,6 +1,6 @@
 /** Limpa publicações e cache local quando a versão de conteúdo muda. */
 const PAContentPurge = (function () {
-  const VER = '2026.07.05-v15';
+  const VER = '2026.07.05-v16';
 
   function run() {
     if (localStorage.getItem('pa_content_purge') === VER) return false;

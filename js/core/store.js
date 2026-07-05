@@ -64,6 +64,16 @@ const PAStore = (function () {
     return [...list];
   }
 
+  async function fetchArticlePublic(id) {
+    if (typeof PAAPI.fetchArticleFromJson === 'function') {
+      try {
+        const art = await PAAPI.fetchArticleFromJson(id);
+        if (art) return art;
+      } catch {}
+    }
+    return findArticleLocal(id);
+  }
+
   function getArticle(id) {
     return articles.find(a => String(a.id) === String(id)) || findArticleLocal(id);
   }
@@ -119,7 +129,7 @@ const PAStore = (function () {
   }
 
   return {
-    init, getArticles, getArticle, findArticleLocal, syncLocalCache, refreshFromCloud,
+    init, getArticles, getArticle, fetchArticlePublic, findArticleLocal, syncLocalCache, refreshFromCloud,
     articlesForAdmin, addArticle, updateArticle, deleteArticle, incrementViews
   };
 })();
