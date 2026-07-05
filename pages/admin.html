@@ -7,7 +7,7 @@
 <link rel="apple-touch-icon" href="../assets/images/favicon.jpg"/>
 <title>Painel – Pains Acontece</title>
 <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate"/>
-<meta name="pa-build" content="2026.07.05-v33"/>
+<meta name="pa-build" content="2026.07.05-v35"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet"/>
@@ -150,6 +150,12 @@ body{background:var(--k2);font-family:var(--fb);color:var(--w);display:flex}
 .sb-tab--empregos .sb-tab-ic{background:rgba(212,160,23,.12);color:#e8b84a}
 .sb-tab--ads{--nav-accent:var(--y2)}
 .sb-tab--ads .sb-tab-ic{background:rgba(201,162,39,.14);color:var(--y2)}
+.sb-tab--bus{--nav-accent:#3498db}
+.sb-tab--bus .sb-tab-ic{background:rgba(52,152,219,.12);color:#5dade2}
+.sb-tab--rest{--nav-accent:#e67e22}
+.sb-tab--rest .sb-tab-ic{background:rgba(230,126,34,.12);color:#f39c12}
+.sb-tab--srv{--nav-accent:#95a5a6}
+.sb-tab--srv .sb-tab-ic{background:rgba(149,165,166,.12);color:#bdc3c7}
 .sb-item.active.sb-tab .sb-tab-ic{
   background:color-mix(in srgb,var(--nav-accent) 22%,transparent);
 }
@@ -221,9 +227,10 @@ body{background:var(--k2);font-family:var(--fb);color:var(--w);display:flex}
 .topbar-actions{display:flex;align-items:center;gap:10px}
 .tb-btn{
   display:flex;align-items:center;gap:8px;
-  padding:9px 18px;border-radius:8px;
-  font-size:.7rem;font-weight:700;letter-spacing:.8px;text-transform:uppercase;
+  padding:10px 18px;border-radius:8px;
+  font-size:.76rem;font-weight:600;letter-spacing:.3px;
   cursor:pointer;border:none;transition:all .22s var(--ease);
+  font-family:var(--fb);white-space:nowrap;
 }
 .tb-btn.primary{background:linear-gradient(135deg,var(--g),#1a6b1a);color:#fff;box-shadow:0 2px 14px rgba(29,122,29,.45)}
 .tb-btn.primary:hover{background:linear-gradient(135deg,var(--g3),var(--g));box-shadow:0 4px 22px rgba(29,122,29,.55);transform:translateY(-1px)}
@@ -255,7 +262,7 @@ body{background:var(--k2);font-family:var(--fb);color:var(--w);display:flex}
 
 /* CONTENT AREA */
 .content{
-  flex:1;padding:24px 28px 36px;overflow-y:auto;
+  flex:1;padding:28px 32px 44px;overflow-y:auto;
   background:
     radial-gradient(ellipse 70% 45% at 50% -15%,rgba(29,122,29,.07),transparent),
     var(--k2);
@@ -283,14 +290,16 @@ body{background:var(--k2);font-family:var(--fb);color:var(--w);display:flex}
 .pa-badge--purple{background:rgba(168,85,247,.1);border:1px solid rgba(168,85,247,.22);color:#c084fc}
 .pa-badge--gold{background:rgba(201,162,39,.12);border:1px solid rgba(201,162,39,.28);color:var(--y2)}
 .pa-badge--cyan{background:rgba(34,211,238,.1);border:1px solid rgba(34,211,238,.22);color:#4dd0e1}
-.pa-page-hd h2{font-family:var(--ff);font-size:1.7rem;letter-spacing:2px;margin-bottom:6px;color:#fff;line-height:1.1}
-.pa-page-hd p{font-size:.8rem;color:rgba(255,255,255,.42);line-height:1.65;max-width:580px}
+.pa-page-hd h2{font-family:var(--ff);font-size:1.55rem;letter-spacing:1.5px;margin-bottom:8px;color:#fff;line-height:1.15}
+.pa-page-hd p{font-size:.84rem;color:rgba(255,255,255,.48);line-height:1.7;max-width:620px}
+.pa-page-hd .tb-btn,.pa-page-hd-actions .tb-btn{align-self:flex-start;flex-shrink:0}
 .pa-surface{
   background:rgba(255,255,255,.025);border:1px solid rgba(255,255,255,.07);
   border-radius:12px;overflow:hidden;
   box-shadow:0 8px 32px rgba(0,0,0,.22);
 }
-.pa-page-wrap{max-width:960px}
+.pa-page-wrap{max-width:1080px;width:100%}
+.pa-badge--transport{background:rgba(52,152,219,.12);border:1px solid rgba(52,152,219,.28);color:#5dade2}
 </style>
 <style>
 /* ════════════════ DASHBOARD ════════════════ */
@@ -313,7 +322,7 @@ body{background:var(--k2);font-family:var(--fb);color:var(--w);display:flex}
   color:var(--accent,var(--g3));
 }
 .stat-card .val{font-family:var(--ff);font-size:2.2rem;color:var(--w);letter-spacing:1px}
-.stat-card .lbl{font-size:.72rem;color:var(--dim);margin-top:2px}
+.stat-card .lbl{font-size:.78rem;color:rgba(255,255,255,.42);margin-top:4px;line-height:1.3}
 .stat-card .delta{
   font-size:.68rem;font-weight:700;margin-top:8px;
   display:flex;align-items:center;gap:4px;
@@ -333,7 +342,7 @@ body{background:var(--k2);font-family:var(--fb);color:var(--w);display:flex}
   display:flex;align-items:center;gap:10px;
   background:rgba(255,255,255,.02);
 }
-.box-head h3{font-family:var(--ff);font-size:1.02rem;letter-spacing:1.5px;flex:1;color:rgba(255,255,255,.9)}
+.box-head h3{font-family:var(--fb);font-size:.92rem;font-weight:700;letter-spacing:.2px;flex:1;color:rgba(255,255,255,.92)}
 .box-head .see-all{font-size:.68rem;color:var(--g3);font-weight:600;cursor:pointer;transition:color .2s}
 .box-head .see-all:hover{color:var(--y)}
 
@@ -409,7 +418,7 @@ body{background:var(--k2);font-family:var(--fb);color:var(--w);display:flex}
   border-bottom:1px solid rgba(255,255,255,.06);
   border-radius:12px 12px 0 0;
 }
-.pub-thead span{font-size:.6rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,.32)}
+.pub-thead span{font-size:.68rem;font-weight:600;letter-spacing:.5px;color:rgba(255,255,255,.38)}
 .pub-row{
   display:grid;grid-template-columns:50px 1fr 140px 100px 100px 120px;
   padding:14px 20px;gap:12px;align-items:center;
@@ -530,8 +539,8 @@ body{background:var(--k2);font-family:var(--fb);color:var(--w);display:flex}
 .side-box-head{
   padding:13px 16px;background:rgba(255,255,255,.03);
   border-bottom:1px solid rgba(255,255,255,.06);
-  font-family:var(--ff);font-size:.88rem;letter-spacing:1.5px;
-  display:flex;align-items:center;gap:8px;color:rgba(255,255,255,.85);
+  font-family:var(--fb);font-size:.84rem;font-weight:700;letter-spacing:.2px;
+  display:flex;align-items:center;gap:8px;color:rgba(255,255,255,.88);
 }
 .side-box-head i{color:var(--g3);font-size:.78rem}
 .side-box-body{padding:16px;display:flex;flex-direction:column;gap:12px}
@@ -562,10 +571,10 @@ body{background:var(--k2);font-family:var(--fb);color:var(--w);display:flex}
 
 .pub-actions{display:flex;flex-direction:column;gap:8px}
 .btn-pub{
-  padding:11px;border-radius:4px;
-  font-weight:700;font-size:.72rem;letter-spacing:1.5px;text-transform:uppercase;
+  padding:11px 14px;border-radius:8px;
+  font-weight:600;font-size:.76rem;letter-spacing:.2px;
   cursor:pointer;border:none;display:flex;align-items:center;justify-content:center;gap:8px;
-  transition:all .2s;
+  transition:all .2s;font-family:var(--fb);
 }
 .btn-pub.green{background:var(--g);color:#fff;box-shadow:0 2px 12px rgba(29,122,29,.4)}
 .btn-pub.green:hover{background:var(--g3);box-shadow:0 4px 20px rgba(29,122,29,.6)}
@@ -576,9 +585,10 @@ body{background:var(--k2);font-family:var(--fb);color:var(--w);display:flex}
 
 /* ════════════════ PERFIL ════════════════ */
 .profile-header{
-  background:var(--k3);border:1px solid var(--border);border-radius:6px;
-  padding:32px;display:flex;align-items:center;gap:28px;
+  background:var(--k3);border:1px solid var(--border);border-radius:12px;
+  padding:28px 32px;display:flex;align-items:center;gap:28px;
   margin-bottom:20px;position:relative;overflow:hidden;
+  box-shadow:0 8px 28px rgba(0,0,0,.2);
 }
 .profile-header::before{
   content:'';position:absolute;top:0;left:0;right:0;height:3px;
@@ -622,14 +632,14 @@ body{background:var(--k2);font-family:var(--fb);color:var(--w);display:flex}
 .ph-stat .l{font-size:.62rem;color:var(--dim);margin-top:6px;letter-spacing:.5px}
 
 .profile-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
-.profile-sec{background:var(--k3);border:1px solid var(--border);border-radius:6px;overflow:hidden}
+.profile-sec{background:var(--k3);border:1px solid var(--border);border-radius:12px;overflow:hidden;box-shadow:0 4px 16px rgba(0,0,0,.15)}
 .profile-sec-head{
   padding:14px 18px;background:rgba(255,255,255,.03);
   border-bottom:1px solid var(--border);
   display:flex;align-items:center;gap:8px;
 }
 .profile-sec-head i{color:var(--y);font-size:.82rem}
-.profile-sec-head h3{font-family:var(--ff);font-size:1rem;letter-spacing:1.5px}
+.profile-sec-head h3{font-family:var(--fb);font-size:.92rem;font-weight:700;letter-spacing:.2px}
 .profile-sec-body{padding:18px;display:flex;flex-direction:column;gap:14px}
 .pf-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
 
@@ -643,7 +653,7 @@ body{background:var(--k2);font-family:var(--fb);color:var(--w);display:flex}
   box-shadow:0 8px 32px rgba(29,155,240,.12);
 }
 .verified-grant h3{
-  font-family:var(--ff);letter-spacing:2px;font-size:1.25rem;color:#1d9bf0;
+  font-family:var(--fb);font-weight:700;letter-spacing:.2px;font-size:1.05rem;color:#1d9bf0;
   margin-bottom:8px;display:flex;align-items:center;gap:10px;
 }
 .verified-grant p{font-size:.82rem;color:rgba(255,255,255,.55);margin-bottom:18px;line-height:1.55}
@@ -659,7 +669,7 @@ body{background:var(--k2);font-family:var(--fb);color:var(--w);display:flex}
 .verified-hint{font-size:.72rem;color:rgba(255,255,255,.4);margin-top:12px}
 .verified-hint code{background:rgba(255,255,255,.08);padding:2px 6px;border-radius:4px;font-size:.68rem}
 .verified-section-title{
-  font-family:var(--ff);letter-spacing:1.5px;font-size:1rem;color:var(--y);
+  font-family:var(--fb);font-weight:700;letter-spacing:.2px;font-size:.92rem;color:var(--y);
   margin-bottom:12px;display:flex;align-items:center;gap:8px;
 }
 .verified-user-card{
@@ -722,19 +732,19 @@ body{background:var(--k2);font-family:var(--fb);color:var(--w);display:flex}
 .modal-form textarea{min-height:72px;resize:vertical}
 
 .empty-state{
-  padding:56px 32px;text-align:center;color:var(--dim);
-  display:flex;flex-direction:column;align-items:center;gap:14px;
+  padding:48px 28px;text-align:center;color:var(--dim);
+  display:flex;flex-direction:column;align-items:center;gap:12px;
 }
 .empty-state-icon{
-  width:72px;height:72px;border-radius:18px;
+  width:64px;height:64px;border-radius:16px;
   display:flex;align-items:center;justify-content:center;
-  font-size:1.8rem;margin-bottom:4px;
+  font-size:1.5rem;margin-bottom:2px;
   background:rgba(29,122,29,.1);border:1px solid rgba(29,122,29,.2);
-  color:var(--g3);box-shadow:0 8px 24px rgba(0,0,0,.2);
+  color:var(--g3);box-shadow:0 6px 20px rgba(0,0,0,.18);
 }
-.empty-state i.empty-state-icon{font-size:1.8rem;opacity:1}
-.empty-state h4{font-family:var(--ff);font-size:1.25rem;letter-spacing:1.5px;color:rgba(255,255,255,.75)}
-.empty-state p{font-size:.8rem;line-height:1.65;max-width:360px;color:rgba(255,255,255,.38)}
+.empty-state i.empty-state-icon{font-size:1.5rem;opacity:1}
+.empty-state h4{font-family:var(--fb);font-size:1rem;font-weight:700;letter-spacing:0;text-transform:none;color:rgba(255,255,255,.82)}
+.empty-state p{font-size:.84rem;line-height:1.65;max-width:400px;color:rgba(255,255,255,.42)}
 
 .media-shell{
   padding:20px;background:rgba(255,255,255,.025);
@@ -750,7 +760,7 @@ body{background:var(--k2);font-family:var(--fb);color:var(--w);display:flex}
   display:flex;flex-direction:column;align-items:center;gap:12px;
 }
 .media-empty .empty-state-icon{background:rgba(168,85,247,.1);border-color:rgba(168,85,247,.22);color:#c084fc}
-.media-empty h4{font-family:var(--ff);font-size:1.25rem;letter-spacing:1.5px;color:rgba(255,255,255,.7)}
+.media-empty h4{font-family:var(--fb);font-size:1rem;font-weight:700;letter-spacing:0;color:rgba(255,255,255,.78)}
 .media-empty p{font-size:.8rem;color:rgba(255,255,255,.38);max-width:360px;line-height:1.65}
 .media-card{
   aspect-ratio:1;border-radius:10px;overflow:hidden;
@@ -777,7 +787,7 @@ body{background:var(--k2);font-family:var(--fb);color:var(--w);display:flex}
   content:'';position:absolute;top:-50%;right:-10%;width:240px;height:240px;
   background:radial-gradient(circle,rgba(201,162,39,.1),transparent 70%);pointer-events:none;
 }
-.ads-hero h3{font-family:var(--ff);font-size:1.85rem;letter-spacing:2px;flex:1;min-width:200px;position:relative}
+.ads-hero h3{font-family:var(--ff);font-size:1.5rem;letter-spacing:1.5px;flex:1;min-width:200px;position:relative;line-height:1.15}
 .ads-hero p{font-size:.82rem;color:rgba(255,255,255,.45);line-height:1.65;max-width:500px;position:relative}
 .ads-table{width:100%;border-collapse:collapse}
 .ads-table th,.ads-table td{
@@ -818,50 +828,67 @@ body.pa-owner .owner-only.sb-item{display:flex!important}
 body.pa-owner .owner-only.btn-pub{display:flex!important}
 
 /* ════════════════ IA DE NOTÍCIAS ════════════════ */
-.ia-hero{
-  display:flex;align-items:flex-start;justify-content:space-between;gap:20px;flex-wrap:wrap;
-  padding:26px 30px;margin-bottom:20px;
-  background:linear-gradient(135deg,rgba(29,122,29,.12) 0%,rgba(8,8,8,.55) 55%,rgba(201,162,39,.05) 100%);
-  border:1px solid rgba(29,122,29,.2);border-radius:14px;position:relative;overflow:hidden;
-  box-shadow:0 8px 32px rgba(0,0,0,.22);
+.ia-page-hd{
+  padding:22px 24px;margin-bottom:20px;
+  background:linear-gradient(135deg,rgba(29,122,29,.1) 0%,rgba(8,8,8,.5) 55%,rgba(201,162,39,.04) 100%);
+  border:1px solid rgba(29,122,29,.18);border-radius:14px;
+  box-shadow:0 8px 32px rgba(0,0,0,.2);
 }
-.ia-hero::before{
-  content:'';position:absolute;top:-40%;right:-8%;width:220px;height:220px;
-  background:radial-gradient(circle,rgba(46,204,46,.12) 0%,transparent 70%);pointer-events:none;
+.ia-flow-steps{
+  display:flex;flex-wrap:wrap;gap:8px;margin-top:12px;
 }
-.ia-hero-text{flex:1;min-width:240px;position:relative}
-.ia-hero-badge{
-  display:inline-flex;align-items:center;gap:8px;
-  font-size:.62rem;font-weight:700;letter-spacing:1.5px;text-transform:uppercase;
-  color:var(--g3);background:rgba(29,122,29,.15);border:1px solid rgba(29,122,29,.3);
-  padding:5px 12px;border-radius:20px;margin-bottom:12px;
+.ia-flow-step{
+  font-size:.72rem;font-weight:600;color:rgba(255,255,255,.55);
+  padding:6px 12px;border-radius:20px;
+  background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.07);
 }
-.ia-hero h2{font-family:var(--ff);font-size:1.75rem;letter-spacing:2px;margin-bottom:6px}
-.ia-hero p{font-size:.8rem;color:var(--dim);line-height:1.6;max-width:520px}
-.ia-hero-actions{display:flex;gap:10px;flex-wrap:wrap;position:relative}
-.ia-team-bar{display:flex;align-items:center;gap:8px;padding:14px 18px;margin-bottom:16px;background:rgba(255,255,255,.02);border:1px solid rgba(255,255,255,.06);border-radius:8px;overflow-x:auto}
-.ia-team-member{display:flex;align-items:center;gap:10px;padding:8px 14px;border-radius:8px;border:1px solid rgba(255,255,255,.06);background:rgba(255,255,255,.03);transition:all .35s;flex-shrink:0;min-width:0}
-.ia-team-member.active{border-color:rgba(29,122,29,.45);background:rgba(29,122,29,.12);box-shadow:0 0 20px rgba(29,122,29,.1)}
-.ia-team-member.done{border-color:rgba(46,204,46,.3);background:rgba(46,204,46,.06)}
-.ia-team-av{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:.9rem;flex-shrink:0}
+.ia-flow-step strong{color:rgba(255,255,255,.85);font-weight:700}
+.ia-hero-actions{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.ia-team-bar{
+  display:grid;grid-template-columns:repeat(4,1fr);gap:12px;
+  margin-bottom:18px;
+}
+.ia-team-member{
+  display:flex;flex-direction:column;align-items:center;text-align:center;gap:8px;
+  padding:18px 14px;border-radius:12px;
+  border:1px solid rgba(255,255,255,.07);background:rgba(255,255,255,.03);
+  transition:border-color .3s,background .3s,box-shadow .3s,transform .3s;
+}
+.ia-team-member:hover{transform:translateY(-2px);border-color:rgba(255,255,255,.12)}
+.ia-team-member.active{border-color:rgba(29,122,29,.45);background:rgba(29,122,29,.1);box-shadow:0 0 24px rgba(29,122,29,.12)}
+.ia-team-member.done{border-color:rgba(46,204,46,.28);background:rgba(46,204,46,.05)}
+.ia-team-av{
+  width:46px;height:46px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;font-size:1rem;flex-shrink:0;
+  box-shadow:0 4px 16px rgba(0,0,0,.25);
+}
 .ia-team-av.sofia{background:linear-gradient(135deg,#5dade2,#2980b9)}
 .ia-team-av.lucas{background:linear-gradient(135deg,#1d7a1d,#2ecc2e)}
 .ia-team-av.camila{background:linear-gradient(135deg,#c9a227,#8b6914)}
 .ia-team-av.tiago{background:linear-gradient(135deg,#3498db,#2980b9)}
-.ia-team-info{min-width:0}
-.ia-team-name{font-size:.72rem;font-weight:800;letter-spacing:.5px}
-.ia-team-role{font-size:.58rem;color:var(--dim)}
-.ia-team-status{font-size:.58rem;color:var(--g3);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:140px}
-.ia-team-arrow{color:var(--dim);font-size:.7rem;flex-shrink:0;opacity:.5}
+.ia-team-info{min-width:0;width:100%}
+.ia-team-name{font-size:.84rem;font-weight:700;color:#fff;line-height:1.25}
+.ia-team-role{font-size:.72rem;color:rgba(255,255,255,.42);margin-top:2px;line-height:1.3}
+.ia-team-status{
+  font-size:.7rem;font-weight:600;color:var(--g3);margin-top:6px;
+  padding:4px 10px;border-radius:20px;background:rgba(29,122,29,.1);
+  display:inline-block;max-width:100%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.ia-team-arrow{display:none}
 .ia-team-pulse{width:8px;height:8px;border-radius:50%;background:var(--g3);animation:iaPulse 1.2s ease infinite;flex-shrink:0}
 @keyframes iaPulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.8)}}
 .ad-mgmt-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:14px;margin-top:16px}
-.ad-mgmt-card{padding:16px;border-radius:8px;border:1px solid rgba(255,255,255,.08);background:rgba(255,255,255,.02);transition:border-color .25s}
-.ad-mgmt-card.active{border-color:rgba(29,122,29,.35)}
+.ad-mgmt-card{
+  padding:18px;border-radius:12px;border:1px solid rgba(255,255,255,.08);
+  background:rgba(255,255,255,.025);transition:border-color .25s,transform .25s,box-shadow .25s;
+  box-shadow:0 4px 16px rgba(0,0,0,.12);
+}
+.ad-mgmt-card:hover{transform:translateY(-2px);border-color:rgba(255,255,255,.12)}
+.ad-mgmt-card.active{border-color:rgba(29,122,29,.35);background:rgba(29,122,29,.04)}
 .ad-mgmt-card.inactive{opacity:.55}
-.ad-mgmt-slot{font-size:.58rem;font-weight:800;letter-spacing:1.5px;text-transform:uppercase;color:var(--y);margin-bottom:8px}
-.ad-mgmt-title{font-size:.85rem;font-weight:700;margin-bottom:6px}
-.ad-mgmt-meta{font-size:.68rem;color:var(--dim);margin-bottom:12px}
+.ad-mgmt-slot{font-size:.68rem;font-weight:700;letter-spacing:.8px;text-transform:uppercase;color:var(--y);margin-bottom:8px}
+.ad-mgmt-title{font-size:.9rem;font-weight:700;margin-bottom:6px;line-height:1.35}
+.ad-mgmt-meta{font-size:.76rem;color:rgba(255,255,255,.42);margin-bottom:12px;line-height:1.5}
 .ad-mgmt-actions{display:flex;gap:8px;flex-wrap:wrap}
 .ia-scan-bar{
   display:none;font-size:.75rem;color:var(--g3);margin-bottom:20px;padding:12px 16px;
@@ -884,9 +911,9 @@ body.pa-owner .owner-only.btn-pub{display:flex!important}
 .ia-stat--pending .ia-stat-ic{background:rgba(46,204,46,.12);color:var(--g3)}
 .ia-stat--interval .ia-stat-ic{background:rgba(52,152,219,.12);color:#5dade2}
 .ia-stat--last .ia-stat-ic{background:rgba(201,162,39,.12);color:var(--y2)}
-.ia-stat-val{font-family:var(--ff);font-size:1.9rem;letter-spacing:1px;line-height:1;color:var(--w)}
-.ia-stat-val.sm{font-size:1.15rem;letter-spacing:.5px}
-.ia-stat-lbl{font-size:.7rem;color:var(--dim);margin-top:3px}
+.ia-stat-val{font-family:var(--ff);font-size:1.75rem;letter-spacing:1px;line-height:1;color:var(--w)}
+.ia-stat-val.sm{font-family:var(--fb);font-size:1.05rem;font-weight:700;letter-spacing:0}
+.ia-stat-lbl{font-size:.78rem;color:rgba(255,255,255,.45);margin-top:4px;line-height:1.3}
 .ia-feed{border-radius:10px;overflow:hidden}
 .ia-feed .box-head{padding:16px 22px}
 .ia-pending-list{display:flex;flex-direction:column}
@@ -916,12 +943,6 @@ body.pa-owner .owner-only.btn-pub{display:flex!important}
 .ia-pending-actions{display:flex;flex-direction:column;gap:8px;flex-shrink:0}
 
 /* ════════════════ CATEGORIAS ════════════════ */
-.cat-hero{
-  display:flex;align-items:flex-start;justify-content:space-between;gap:20px;flex-wrap:wrap;
-  margin-bottom:20px;
-}
-.cat-hero h2{font-family:var(--ff);font-size:1.75rem;letter-spacing:2px;margin-bottom:6px}
-.cat-hero p{font-size:.8rem;color:var(--dim);line-height:1.6;max-width:480px}
 .cat-toolbar{
   display:flex;align-items:center;gap:12px;margin-bottom:18px;flex-wrap:wrap;
 }
@@ -939,7 +960,7 @@ body.pa-owner .owner-only.btn-pub{display:flex!important}
   padding:14px 18px;text-align:center;
 }
 .cat-summary-item .v{font-family:var(--ff);font-size:1.6rem;color:var(--y);letter-spacing:1px}
-.cat-summary-item .l{font-size:.65rem;color:var(--dim);margin-top:4px}
+.cat-summary-item .l{font-size:.74rem;color:rgba(255,255,255,.42);margin-top:4px}
 .cat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(260px,1fr));gap:12px}
 .cat-card{
   background:var(--k3);border:1px solid var(--border);border-radius:10px;
@@ -959,6 +980,9 @@ body.pa-owner .owner-only.btn-pub{display:flex!important}
 .cat-card-actions{display:flex;gap:6px;flex-shrink:0}
 
 /* RESPONSIVO */
+@media(max-width:1100px){
+  .ia-team-bar{grid-template-columns:repeat(2,1fr)}
+}
 @media(max-width:900px){
   .sidebar{position:fixed;transform:translateX(-100%)}
   .sidebar.open{transform:none;box-shadow:4px 0 40px rgba(0,0,0,.8)}
@@ -968,10 +992,14 @@ body.pa-owner .owner-only.btn-pub{display:flex!important}
   .pub-thead,.pub-row{grid-template-columns:40px 1fr 100px 80px}
   .pub-thead span:nth-child(5),.pub-row .date-cell{display:none}
   .profile-grid{grid-template-columns:1fr}
+  .pa-page-hd{flex-direction:column;align-items:stretch}
+  .ia-hero-actions{width:100%}
+  .ia-hero-actions .tb-btn{flex:1;justify-content:center}
 }
 @media(max-width:600px){
   .dash-grid{grid-template-columns:1fr}
   .ia-stats,.cat-summary{grid-template-columns:1fr}
+  .ia-team-bar{grid-template-columns:1fr}
   .ia-pending-card{grid-template-columns:1fr;gap:12px}
   .ia-pending-thumb{width:100%;height:120px}
   .ia-pending-actions{flex-direction:row}
@@ -981,7 +1009,7 @@ body.pa-owner .owner-only.btn-pub{display:flex!important}
   .pub-thead,.pub-row{grid-template-columns:36px 1fr 70px}
   .pub-thead span:nth-child(4),.pub-row .views-cell{display:none}
   .topbar{padding:0 12px}
-  .content{padding:16px 12px}
+  .content{padding:18px 14px 32px}
 }
 @media(max-width:380px){
   .tb-btn span{display:none}
@@ -1128,6 +1156,13 @@ body.pa-owner .owner-only.btn-pub{display:flex!important}
   <div class="content">
     <!-- ══ DASHBOARD ══ -->
     <div class="panel active" id="panel-dashboard">
+      <div class="pa-page-hd" style="margin-bottom:22px">
+        <div class="pa-page-hd-text">
+          <div class="pa-page-badge pa-badge--green"><i class="fas fa-chart-line"></i> Visão Geral</div>
+          <h2>Dashboard</h2>
+          <p>Resumo das publicações, visualizações e atalhos para as principais tarefas do portal.</p>
+        </div>
+      </div>
       <div class="dash-grid">
         <div class="stat-card" style="--accent:#2ecc71">
           <div class="ic"><i class="fas fa-newspaper"></i></div>
@@ -1214,11 +1249,17 @@ body.pa-owner .owner-only.btn-pub{display:flex!important}
 
     <!-- ══ IA SCANNER ══ -->
     <div class="panel" id="panel-ia">
-      <div class="ia-hero">
-        <div class="ia-hero-text">
-          <div class="ia-hero-badge"><i class="fas fa-users"></i> Equipe IA Editorial</div>
+      <div class="pa-page-hd ia-page-hd">
+        <div class="pa-page-hd-text">
+          <div class="pa-page-badge pa-badge--purple"><i class="fas fa-users"></i> Equipe IA Editorial</div>
           <h2>IA de Notícias</h2>
-          <p>Sofia roteia → Lucas busca nas fontes (últimos <strong>2 dias</strong>) → Camila organiza com data de divulgação. <strong>Tiago</strong> atende transporte e ônibus no assistente público. Cada notícia passa pela sua aprovação.</p>
+          <p>A equipe busca, organiza e prepara matérias para sua aprovação. Você decide o que publica no portal.</p>
+          <div class="ia-flow-steps">
+            <span class="ia-flow-step"><strong>Sofia</strong> roteia</span>
+            <span class="ia-flow-step"><strong>Lucas</strong> busca fontes (2 dias)</span>
+            <span class="ia-flow-step"><strong>Camila</strong> organiza matérias</span>
+            <span class="ia-flow-step"><strong>Tiago</strong> atende ônibus</span>
+          </div>
         </div>
         <div class="ia-hero-actions">
           <button class="tb-btn ghost" onclick="resetSearch()" id="btnResetScan" title="Limpar cache e buscar tudo de novo">
@@ -1238,7 +1279,6 @@ body.pa-owner .owner-only.btn-pub{display:flex!important}
             <div class="ia-team-status" id="iaStatusSofia">Aguardando</div>
           </div>
         </div>
-        <i class="fas fa-chevron-right ia-team-arrow"></i>
         <div class="ia-team-member" data-agent="lucas" id="iaTeamLucas">
           <div class="ia-team-av lucas"><i class="fas fa-satellite-dish"></i></div>
           <div class="ia-team-info">
@@ -1247,7 +1287,6 @@ body.pa-owner .owner-only.btn-pub{display:flex!important}
             <div class="ia-team-status" id="iaStatusLucas">Pronto</div>
           </div>
         </div>
-        <i class="fas fa-chevron-right ia-team-arrow"></i>
         <div class="ia-team-member" data-agent="camila" id="iaTeamCamila">
           <div class="ia-team-av camila"><i class="fas fa-pen-nib"></i></div>
           <div class="ia-team-info">
@@ -1256,12 +1295,11 @@ body.pa-owner .owner-only.btn-pub{display:flex!important}
             <div class="ia-team-status" id="iaStatusCamila">Aguardando</div>
           </div>
         </div>
-        <i class="fas fa-chevron-right ia-team-arrow"></i>
         <div class="ia-team-member" data-agent="tiago" id="iaTeamTiago">
           <div class="ia-team-av tiago"><i class="fas fa-bus"></i></div>
           <div class="ia-team-info">
             <div class="ia-team-name">Tiago Ribeiro</div>
-            <div class="ia-team-role">Especialista em Transporte</div>
+            <div class="ia-team-role">Transporte & Ônibus</div>
             <div class="ia-team-status" id="iaStatusTiago">Pronto</div>
           </div>
         </div>
@@ -1295,8 +1333,8 @@ body.pa-owner .owner-only.btn-pub{display:flex!important}
       </div>
       <div class="box ia-feed">
         <div class="box-head">
-          <h3>Notícias Encontradas pela IA</h3>
-          <span style="font-size:.68rem;color:var(--dim)">Aprove ou rejeite cada matéria</span>
+          <h3>Notícias encontradas pela IA</h3>
+          <span style="font-size:.75rem;color:rgba(255,255,255,.4)">Aprove ou rejeite cada matéria</span>
         </div>
         <div id="pendingList" class="ia-pending-list">
           <div class="empty-state">
@@ -1483,6 +1521,13 @@ body.pa-owner .owner-only.btn-pub{display:flex!important}
     </div>
     <!-- ══ PERFIL ══ -->
     <div class="panel" id="panel-perfil">
+      <div class="pa-page-hd" style="margin-bottom:20px">
+        <div class="pa-page-hd-text">
+          <div class="pa-page-badge pa-badge--green"><i class="fas fa-user-circle"></i> Conta</div>
+          <h2>Meu Perfil</h2>
+          <p>Dados pessoais, senha e configurações do portal exibidas no site público.</p>
+        </div>
+      </div>
       <div class="profile-header">
         <div class="profile-avatar-big" id="bigAvatar">
           A
@@ -1583,12 +1628,13 @@ body.pa-owner .owner-only.btn-pub{display:flex!important}
 
     <!-- ══ SELO VERIFICADO (só proprietário) ══ -->
     <div class="panel" id="panel-verificado_adm">
-      <div class="cat-hero">
-        <div>
-          <h2><i class="fas fa-check-circle" style="color:#1d9bf0;font-size:1.2rem;margin-right:8px"></i>Selo Verificado</h2>
+      <div class="pa-page-hd">
+        <div class="pa-page-hd-text">
+          <div class="pa-page-badge pa-badge--blue"><i class="fas fa-check-circle"></i> Verificação</div>
+          <h2>Selo Verificado</h2>
           <p>Conceda o selo por ID ou e-mail, aprove solicitações e gerencie contas verificadas.</p>
         </div>
-        <button class="tb-btn outline" onclick="renderVerifiedPanel()"><i class="fas fa-sync"></i> Atualizar</button>
+        <button class="tb-btn ghost" onclick="renderVerifiedPanel()"><i class="fas fa-sync"></i> Atualizar</button>
       </div>
       <div class="verified-panel">
         <div class="verified-grant">
@@ -1617,9 +1663,10 @@ body.pa-owner .owner-only.btn-pub{display:flex!important}
 
     <!-- ══ CATEGORIAS ══ -->
     <div class="panel" id="panel-categorias">
-      <div class="cat-hero">
-        <div>
-          <h2><i class="fas fa-tags" style="color:var(--g3);font-size:1.2rem;margin-right:8px"></i>Gerenciar Categorias</h2>
+      <div class="pa-page-hd">
+        <div class="pa-page-hd-text">
+          <div class="pa-page-badge pa-badge--green"><i class="fas fa-tags"></i> Seções</div>
+          <h2>Categorias</h2>
           <p>Organize as seções do portal. Cada categoria aparece no menu e na página inicial.</p>
         </div>
         <button class="tb-btn primary" onclick="addCategory()"><i class="fas fa-plus"></i> Nova Categoria</button>
@@ -1689,7 +1736,7 @@ body.pa-owner .owner-only.btn-pub{display:flex!important}
       <div class="pa-page-wrap">
         <div class="pa-page-hd">
           <div class="pa-page-hd-text">
-            <div class="pa-page-badge" style="background:rgba(52,152,219,.15);color:#5dade2"><i class="fas fa-bus"></i> IA de Transporte</div>
+            <div class="pa-page-badge pa-badge--transport"><i class="fas fa-bus"></i> IA de Transporte</div>
             <h2>Linhas de Ônibus</h2>
             <p>Rotas exibidas na busca rigorosa do Tiago — Pains e região.</p>
           </div>
@@ -1818,7 +1865,14 @@ body.pa-owner .owner-only.btn-pub{display:flex!important}
 
     <!-- ══ CONFIGURAÇÕES ══ -->
     <div class="panel" id="panel-config">
-      <div style="max-width:700px;display:flex;flex-direction:column;gap:16px">
+      <div class="pa-page-hd" style="margin-bottom:20px">
+        <div class="pa-page-hd-text">
+          <div class="pa-page-badge pa-badge--green"><i class="fas fa-cog"></i> Sistema</div>
+          <h2>Configurações</h2>
+          <p>Conexão Supabase, sincronização automática e modo offline do portal.</p>
+        </div>
+      </div>
+      <div class="pa-page-wrap" style="display:flex;flex-direction:column;gap:16px">
         <div class="profile-sec">
           <div class="profile-sec-head"><i class="fas fa-database"></i><h3>Banco de Dados Supabase</h3></div>
           <div class="profile-sec-body">
@@ -2184,8 +2238,10 @@ const PANEL_LABELS = {
   dashboard: 'Dashboard', publicacoes: 'Publicações', nova: 'Nova Notícia',
   ia: 'IA de Notícias', divulgacao: 'IA de Divulgação', categorias: 'Categorias',
   midia: 'Biblioteca de Mídia', agenda: 'Agenda de Eventos',
-  empregos_adm: 'Vagas de Emprego', publicidades: 'Publicidades',
-  perfil: 'Meu Perfil', verificado_adm: 'Selo Verificado', onibus_adm: 'Ônibus', config: 'Configurações'
+  empregos_adm: 'Vagas de Emprego', onibus_adm: 'Linhas de Ônibus',
+  restaurantes_adm: 'Restaurantes', servicos_adm: 'Serviços',
+  publicidades: 'Publicidades', perfil: 'Meu Perfil',
+  verificado_adm: 'Selo Verificado', config: 'Configurações'
 };
 
 function showPanel(id, el) {
