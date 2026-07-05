@@ -114,7 +114,7 @@ const PAAPI = (function () {
     };
   }
 
-  function useSupabase() {
+  function supabaseConfigured() {
     return typeof PASupabase !== 'undefined' && PASupabase.isConfigured();
   }
 
@@ -122,12 +122,48 @@ const PAAPI = (function () {
     return PASupabase.getClient();
   }
 
+  let cloudOk = null;
+
+  async function isCloudReady() {
+    if (!supabaseConfigured()) return false;
+    if (cloudOk !== null) return cloudOk;
+    try {
+      const { error } = await sb().from('articles').select('id', { count: 'exact', head: true });
+      cloudOk = !error;
+    } catch {
+      cloudOk = false;
+    }
+    return cloudOk;
+  }
+
+  function isLocalAuth() {
+    return sessionStorage.getItem('pa_auth_mode') === 'local';
+  }
+
+  async function getBackend() {
+    if (!supabaseConfigured() || isLocalAuth()) return local;
+    if (sessionStorage.getItem('pa_auth_mode') === 'cloud') {
+      if (await isCloudReady()) return remote;
+      sessionStorage.setItem('pa_auth_mode', 'local');
+      return local;
+    }
+    if (await isCloudReady()) return remote;
+    return local;
+  }
+
+  function staticAdminLogin(user, pass) {
+    if (user === ADMIN_USER && pass === ADMIN_PASS) {
+      sessionStorage.setItem('pa_auth_mode', 'local');
+      return { ok: true, token: 'local-admin-' + Date.now(), user, mode: 'local' };
+    }
+    return null;
+  }
+
   /* ── Backend local (JSON + localStorage) ── */
   const local = {
     login(user, pass) {
-      if (user === ADMIN_USER && pass === ADMIN_PASS) {
-        return Promise.resolve({ ok: true, token: 'static-' + Date.now(), user });
-      }
+      const res = staticAdminLogin(user, pass);
+      if (res) return Promise.resolve(res);
       return Promise.reject(new Error('Credenciais inválidas'));
     },
 
@@ -299,9 +335,17 @@ const PAAPI = (function () {
   /* ── Backend Supabase ── */
   const remote = {
     async login(user, pass) {
-      const { data, error } = await sb().auth.signInWithPassword({ email: user, password: pass });
-      if (error) throw new Error('Credenciais inválidas');
-      return { ok: true, token: data.session.access_token, user: data.user.email };
+      try {
+        const { data, error } = await sb().auth.signInWithPassword({ email: user, password: pass });
+        if (!error && data?.session) {
+          sessionStorage.setItem('pa_auth_mode', 'cloud');
+          cloudOk = null;
+          return { ok: true, token: data.session.access_token, user: data.user.email, mode: 'cloud' };
+        }
+      } catch {}
+      const fallback = staticAdminLogin(user, pass);
+      if (fallback) return fallback;
+      throw new Error('Credenciais inválidas');
     },
 
     async logout() {
@@ -467,31 +511,41 @@ const PAAPI = (function () {
     }
   };
 
-  function backend() {
-    return useSupabase() ? remote : local;
+  async function login(u, p) {
+    if (!supabaseConfigured()) return local.login(u, p);
+    return remote.login(u, p);
+  }
+
+  async function logout() {
+    sessionStorage.removeItem('pa_auth_mode');
+    cloudOk = null;
+    if (supabaseConfigured()) {
+      try { await PASupabase.signOut(); } catch {}
+    }
   }
 
   return {
-    login: (u, p) => backend().login(u, p),
-    logout: () => backend().logout(),
-    isSupabaseMode: () => backend().isSupabaseMode(),
-    getArticles: (s) => backend().getArticles(s),
-    getArticle: (id) => backend().getArticle(id),
-    addArticle: (d) => backend().addArticle(d),
-    updateArticle: (id, d) => backend().updateArticle(id, d),
-    deleteArticle: (id) => backend().deleteArticle(id),
-    incrementViews: (id) => backend().incrementViews(id),
-    getPending: () => backend().getPending(),
-    scannerStatus: () => backend().scannerStatus(),
-    runScanner: () => backend().runScanner(),
-    approvePending: (id) => backend().approvePending(id),
-    rejectPending: (id) => backend().rejectPending(id),
+    login,
+    logout,
+    isSupabaseMode: async () => (await getBackend()).isSupabaseMode(),
+    getArticles: async (s) => (await getBackend()).getArticles(s),
+    getArticle: async (id) => (await getBackend()).getArticle(id),
+    addArticle: async (d) => (await getBackend()).addArticle(d),
+    updateArticle: async (id, d) => (await getBackend()).updateArticle(id, d),
+    deleteArticle: async (id) => (await getBackend()).deleteArticle(id),
+    incrementViews: async (id) => (await getBackend()).incrementViews(id),
+    getPending: async () => (await getBackend()).getPending(),
+    scannerStatus: async () => (await getBackend()).scannerStatus(),
+    runScanner: async () => (await getBackend()).runScanner(),
+    approvePending: async (id) => (await getBackend()).approvePending(id),
+    rejectPending: async (id) => (await getBackend()).rejectPending(id),
     aiChat: (msg, ctx) => PAEngine.chat(msg, ctx),
     aiOrganize: (text, hints) => PAEngine.organizeNews(text, hints),
-    sendPauta: (d) => backend().sendPauta(d),
-    getEvents: () => backend().getEvents(),
-    getJobs: () => backend().getJobs(),
-    exportForGitHub: () => backend().exportForGitHub(),
-    importFromFile: (f) => backend().importFromFile(f)
+    sendPauta: async (d) => (await getBackend()).sendPauta(d),
+    getEvents: async () => (await getBackend()).getEvents(),
+    getJobs: async () => (await getBackend()).getJobs(),
+    exportForGitHub: async () => (await getBackend()).exportForGitHub(),
+    importFromFile: async (f) => (await getBackend()).importFromFile(f),
+    getAuthMode: () => sessionStorage.getItem('pa_auth_mode') || (supabaseConfigured() ? 'cloud' : 'local')
   };
 })();

@@ -1085,19 +1085,21 @@ body{background:var(--k2);font-family:var(--fb);color:var(--w);display:flex}
 <script>
 /* ════ AUTH GUARD ════ */
 (async function(){
-  if (PASupabase.isConfigured()) {
-    const session = await PASupabase.getSession();
-    if (!session && !sessionStorage.getItem('pa_logged')) {
+  if (!sessionStorage.getItem('pa_logged')) {
+    if (PASupabase.isConfigured()) {
+      const session = await PASupabase.getSession();
+      if (session) {
+        sessionStorage.setItem('pa_logged', '1');
+        sessionStorage.setItem('pa_user', session.user.email);
+        sessionStorage.setItem('pa_auth_mode', 'cloud');
+      } else {
+        window.location.href = 'login.html';
+        return;
+      }
+    } else {
       window.location.href = 'login.html';
       return;
     }
-    if (session) {
-      sessionStorage.setItem('pa_logged', '1');
-      sessionStorage.setItem('pa_user', session.user.email);
-    }
-  } else if (!sessionStorage.getItem('pa_logged')) {
-    window.location.href = 'login.html';
-    return;
   }
   const u = sessionStorage.getItem('pa_user') || 'admin@painsacontece.com.br';
   const name = u.split('@')[0].charAt(0).toUpperCase() + u.split('@')[0].slice(1);
@@ -1575,15 +1577,18 @@ async function testSupabase() {
     showToast('Cole a URL e a chave anon do Supabase em config.js', 'error', 5000);
     return;
   }
+  const mode = PAAPI.getAuthMode?.() || sessionStorage.getItem('pa_auth_mode') || 'local';
   try {
     const { count, error } = await PASupabase.getClient()
       .from('articles').select('*', { count: 'exact', head: true });
     if (error) throw error;
-    updateSupabaseStatus(true, `Conectado — ${count ?? 0} artigos no banco`);
+    const modeLabel = mode === 'cloud' ? 'nuvem' : 'modo local (execute schema.sql + setup)';
+    updateSupabaseStatus(true, `Conectado — ${count ?? 0} artigos · ${modeLabel}`);
     showToast('Supabase conectado com sucesso!', 'success');
   } catch (e) {
-    updateSupabaseStatus(false, 'Falha: ' + (e.message || 'verifique URL, chave e schema.sql'));
-    showToast('Erro ao conectar. Execute schema.sql no Supabase.', 'error', 5000);
+    const localNote = mode === 'local' ? ' · Painel em modo local até configurar tabelas' : '';
+    updateSupabaseStatus(false, 'Tabelas pendentes — execute schema.sql no Supabase' + localNote);
+    showToast('Execute schema.sql no SQL Editor do Supabase.', 'error', 5000);
   }
 }
 
@@ -1595,7 +1600,8 @@ async function exportGitHub() {
     a.href = URL.createObjectURL(blob);
     a.download = 'articles.json';
     a.click();
-    const msg = PAAPI.isSupabaseMode()
+    const cloud = await PAAPI.isSupabaseMode();
+    const msg = cloud
       ? 'Backup JSON exportado!'
       : 'JSON exportado! Substitua data/articles.json no GitHub.';
     showToast(msg, 'success', 5000);
