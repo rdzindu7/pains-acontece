@@ -59,6 +59,7 @@ const PAIA = (function () {
       .paia-actions{padding:8px 12px;display:grid;grid-template-columns:1fr 1fr;gap:6px;flex-shrink:0;border-top:1px solid rgba(255,255,255,.04)}
       .paia-act{font-size:.58rem;font-weight:700;letter-spacing:.4px;text-transform:uppercase;padding:8px 6px;border-radius:8px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:rgba(255,255,255,.6);cursor:pointer;transition:all .2s;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;-webkit-tap-highlight-color:transparent}
       .paia-act:hover,.paia-act:active{background:rgba(29,122,29,.15);color:#2ecc2e;border-color:rgba(29,122,29,.3)}
+      .paia-act.hidden{display:none!important}
       .paia-foot{padding:10px 12px calc(10px + env(safe-area-inset-bottom));border-top:1px solid rgba(255,255,255,.06);display:flex;gap:8px;flex-shrink:0;align-items:flex-end}
       .paia-foot textarea{flex:1;min-width:0;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-radius:8px;padding:10px 12px;color:#fff;font-family:'Inter',sans-serif;font-size:.8rem;resize:none;height:44px;max-height:80px;outline:none;line-height:1.4}
       .paia-foot textarea:focus{border-color:#1d7a1d}
@@ -129,7 +130,7 @@ const PAIA = (function () {
       <div class="paia-actions">
         <button type="button" class="paia-act" onclick="PAIA.quick('verificar')">Verificar Fatos</button>
         <button type="button" class="paia-act" onclick="PAIA.quick('organizar')">Organizar</button>
-        <button type="button" class="paia-act" onclick="PAIA.showPreview()">Preview</button>
+        <button type="button" class="paia-act hidden" id="paiaBtnPreview" onclick="PAIA.showPreview()">Preview</button>
         <button type="button" class="paia-act" onclick="PAIA.applyToEditor()">Aplicar no Editor</button>
       </div>
       <div class="paia-foot">
@@ -149,7 +150,30 @@ const PAIA = (function () {
     window.addEventListener('resize', () => syncOpenState());
 
     addMsg('bot', '**Sofia Mendes** recebe sua demanda → **Lucas Ferreira** busca e verifica fontes → **Camila Rocha** organiza e prepara para publicar. Cole a notícia ou descreva a pauta.');
+    syncPreviewButton();
     mounted = true;
+  }
+
+  function stripHtml(html) {
+    return (html || '').replace(/<[^>]*>/g, '').trim();
+  }
+
+  function hasPreviewableArticle() {
+    if (lastArticle?.title?.trim()) {
+      const body = (lastArticle.lead || '') + stripHtml(lastArticle.content);
+      if (body.trim()) return true;
+    }
+    const title = document.getElementById('artTitle')?.value?.trim();
+    if (!title) return false;
+    const lead = document.getElementById('artLead')?.value?.trim() || '';
+    const content = stripHtml(document.getElementById('artContent')?.innerHTML);
+    return !!(lead || content);
+  }
+
+  function syncPreviewButton() {
+    const btn = document.getElementById('paiaBtnPreview');
+    if (!btn) return;
+    btn.classList.toggle('hidden', !hasPreviewableArticle());
   }
 
   function addMsg(role, text, extra) {
@@ -201,6 +225,7 @@ const PAIA = (function () {
         extra = `<div class="verif ${cls}">${lbl} — ${res.verification.confidence}%</div>`;
       }
       if (res.article) lastArticle = res.article;
+      syncPreviewButton();
       const prefix = res.agent ? `**${res.agent.name}:** ` : '';
       addMsg('bot', prefix + res.reply, extra);
       if (res.article && res.action === 'organize') applyToEditor(true);
@@ -233,9 +258,14 @@ const PAIA = (function () {
     if (c) c.innerHTML = lastArticle.content || '';
     if (cat && lastArticle.cat) cat.value = lastArticle.cat;
     if (!silent) showToast?.('Matéria aplicada no editor!', 'success');
+    syncPreviewButton();
   }
 
   function showPreview() {
+    if (!hasPreviewableArticle()) {
+      showToast?.('Preview disponível apenas quando a IA encontrar ou organizar uma notícia.', 'info');
+      return;
+    }
     const title = document.getElementById('artTitle')?.value || lastArticle?.title || 'Sem título';
     const lead = document.getElementById('artLead')?.value || lastArticle?.lead || '';
     const content = document.getElementById('artContent')?.innerHTML || lastArticle?.content || '';
@@ -296,5 +326,5 @@ const PAIA = (function () {
 
   whenReady(init);
 
-  return { init, toggle, send, quick, showPreview, applyToEditor, getLastArticle: () => lastArticle };
+  return { init, toggle, send, quick, showPreview, applyToEditor, syncPreviewButton, getLastArticle: () => lastArticle };
 })();
