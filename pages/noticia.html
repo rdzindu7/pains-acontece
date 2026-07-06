@@ -6,7 +6,7 @@
 <link rel="icon" type="image/jpeg" href="../assets/images/favicon.jpg"/>
 <link rel="apple-touch-icon" href="../assets/images/favicon.jpg"/>
 <title>Notícia – Pains Acontece</title>
-<meta name="pa-build" content="2026.07.05-v30"/>
+<meta name="pa-build" content="2026.07.05-v60"/>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,700;0,900;1,700&display=swap" rel="stylesheet"/>
@@ -336,17 +336,18 @@ body.cat-pains{--accent:#1d7a1d;--accent-glow:rgba(29,122,29,.35)}
   <button type="button" id="fabTop" title="Voltar ao topo"><i class="fas fa-arrow-up"></i></button>
 </div>
 <footer>© 2026 Pains Acontece — Todos os direitos reservados.</footer>
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script async src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script src="../js/core/config.js"></script>
+<script src="../js/core/automation.js?v=20260705v60"></script>
 <script src="../js/core/supabase-client.js"></script>
 <script src="../js/ui/article-format.js"></script>
 <script src="../js/ai/scanner.js"></script>
-<script src="../js/core/purge.js?v=20260705v55"></script>
-<script src="../js/core/auto-reload.js?v=20260705v31"></script>
+<script src="../js/core/purge.js?v=20260705v60"></script>
+<script src="../js/core/auto-reload.js?v=20260705v60"></script>
 <script src="../js/core/pains-media.js?v=20260705v44"></script>
-<script src="../js/core/article-images.js?v=20260705v45"></script>
+<script src="../js/core/article-images.js?v=20260705v46"></script>
 <script src="../js/core/views-tracker.js?v=20260705v52"></script>
-<script src="../js/core/api.js?v=20260705v55"></script>
+<script src="../js/core/api.js?v=20260705v60"></script>
 <script src="../js/ui/ads.js?v=20260705v36"></script>
 <script src="../js/core/store.js?v=20260705v51"></script>
 
@@ -463,60 +464,76 @@ body.cat-pains{--accent:#1d7a1d;--accent-glow:rgba(29,122,29,.35)}
   async function fetchArticlesJson(ms){
     const url=new URL('data/articles.json',new URL(jsonBase(),location.href)).href;
     const ctrl=new AbortController();
-    const t=setTimeout(()=>ctrl.abort(),ms||6000);
+    const t=setTimeout(()=>ctrl.abort(),ms||3500);
     try{
       const res=await fetch(url+'?_='+Date.now(),{cache:'no-store',signal:ctrl.signal});
-      if(!res.ok)return[];
+      if(!res.ok)return{list:[],ok:false};
       const data=await res.json();
-      return Array.isArray(data)?data:[];
+      return{list:Array.isArray(data)?data:[],ok:true};
     }catch(e){
       console.warn('[noticia] json fetch',e);
-      return[];
+      return{list:[],ok:false};
     }finally{clearTimeout(t)}
   }
 
+  let portalEmpty=false;
+
   async function loadArticleDirect(articleId){
     const sid=String(articleId);
-    const list=await fetchArticlesJson(6000);
+    const {list,ok}=await fetchArticlesJson(3500);
     const hit=list.find(a=>String(a.id)===sid&&a.status==='pub');
     if(hit)return hit;
-    const api=typeof PAAPI!=='undefined'?PAAPI:null;
-    if(api?.getArticlePublic){
-      try{
-        const a=await withTimeout(api.getArticlePublic(articleId),4000);
-        if(a&&a.status==='pub')return a;
-      }catch(e){console.warn('[noticia] api',e)}
+
+    if(ok&&!list.length){
+      portalEmpty=true;
+      return null;
     }
+
     if(typeof PAStore!=='undefined'&&PAStore.findArticleLocal){
       const local=PAStore.findArticleLocal(articleId);
       if(local&&local.status==='pub')return local;
+    }
+
+    if(ok&&list.length){
+      const pubIds=new Set(list.filter(a=>a.status==='pub').map(a=>String(a.id)));
+      if(!pubIds.has(sid))return null;
+    }
+
+    const api=typeof PAAPI!=='undefined'?PAAPI:null;
+    if(!ok&&api?.getArticlePublic){
+      try{
+        const a=await withTimeout(api.getArticlePublic(articleId),2500);
+        if(a&&a.status==='pub')return a;
+      }catch(e){console.warn('[noticia] api',e)}
     }
     return null;
   }
 
   async function loadRelatedArticles(articleId,cat){
-    let pool=await fetchArticlesJson(5000);
-    pool=pool.filter(a=>a.status==='pub');
-    if(!pool.length){
+    const {list:pool,ok}=await fetchArticlesJson(3000);
+    let filtered=pool.filter(a=>a.status==='pub');
+    if(!filtered.length&&ok)return[];
+    if(!filtered.length){
       const api=typeof PAAPI!=='undefined'?PAAPI:null;
       if(api?.getArticlesPublic){
-        try{pool=await withTimeout(api.getArticlesPublic('pub'),4000)}catch(e){}
+        try{filtered=await withTimeout(api.getArticlesPublic('pub'),2500)}catch(e){}
       }
     }
-    if(!pool.length&&typeof PAStore!=='undefined'){
+    if(!filtered.length&&typeof PAStore!=='undefined'){
       try{
-        await withTimeout(PAStore.init(),4000);
-        pool=PAStore.getArticles('pub');
+        await withTimeout(PAStore.init(),2500);
+        filtered=PAStore.getArticles('pub');
       }catch(e){}
     }
-    return pool.filter(a=>String(a.id)!==String(articleId)&&a.cat===cat).slice(0,3);
+    return filtered.filter(a=>String(a.id)!==String(articleId)&&a.cat===cat).slice(0,3);
   }
 
+  let loadFinished=false;
   const loadGuard=setTimeout(()=>{
-    if(!main.querySelector('.art-loaded,.not-found,.art-load-err')){
+    if(!loadFinished&&!main.querySelector('.art-loaded,.not-found,.art-load-err')){
       showLoadError('O carregamento demorou demais. Recarregue a página ou volte ao portal.');
     }
-  },10000);
+  },12000);
 
   let art=null;
   try{
@@ -524,11 +541,16 @@ body.cat-pains{--accent:#1d7a1d;--accent-glow:rgba(29,122,29,.35)}
     art=await loadArticleDirect(id);
     if(!art){
       clearTimeout(loadGuard);
-      main.innerHTML='<div class="not-found"><h1>Notícia não encontrada</h1><p>Esta matéria não está disponível ou foi removida.</p><a href="../index.html">Ir para a home</a></div>';
+      loadFinished=true;
+      const msg=portalEmpty
+        ?'O portal não tem matérias publicadas no momento. As postagens foram removidas ou ainda não há conteúdo no ar.'
+        :'Esta matéria não está disponível ou foi removida.';
+      main.innerHTML=`<div class="not-found"><h1>Matéria não disponível</h1><p>${esc(msg)}</p><a href="../index.html">Ir para a home</a></div>`;
       return;
     }
   }catch(err){
     clearTimeout(loadGuard);
+    loadFinished=true;
     console.error('[noticia] load',err);
     showLoadError('Não foi possível carregar esta matéria. Verifique sua conexão e tente novamente.');
     return;
@@ -768,6 +790,7 @@ body.cat-pains{--accent:#1d7a1d;--accent-glow:rgba(29,122,29,.35)}
   });
   render();
   clearTimeout(loadGuard);
+  loadFinished=true;
   loadRelatedArticles(id,art.cat).then(rel=>{
     if(!rel.length)return;
     related=rel;
